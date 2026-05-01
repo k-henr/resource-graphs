@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="index.css" />
+        <title>Resource calculator</title>
+    </head>
+    <body>
+        <div id="main-view">
+            <div class="flex-2">
+                <h2>Converters</h2>
+                <div id="converter-wrapper">
+                    <div id="converters">
+                        <!-- Contains converters that are used and the "number" of conversions required -->
+                    </div>
+                    <button
+                        id="open-converter-menu-button"
+                        class="primary-button"
+                    >
+                        <img src="icons/add.svg" />
+                        Add new converter
+                    </button>
+                </div>
+            </div>
+            <div class="flex-1">
+                <h2>Resources</h2>
+                <div id="resources">
+                    <!-- Contains resources and their rate of consumption/production -->
+                </div>
+                <button id="open-item-delta-menu-button" class="primary-button">
+                    <img src="icons/add.svg" />
+                    Add new resource source/drain
+                </button>
+            </div>
+        </div>
+
+        <!-- Menu for adding resources or converters to the graph -->
+        <div id="add-rc-menu-wrapper" class="hidden">
+            <div id="add-rc-menu">
+                <h2 id="add-rc-menu-header"></h2>
+                <!-- Filter form for when adding resources. -->
+                <form id="resource-filter-form" class="hidden">
+                    <label for="search-string">Search</label>
+                    <input
+                        type="text"
+                        name="search-string"
+                        autocomplete="off"
+                    />
+                    <button type="submit">Apply</button>
+                </form>
+                <!-- Filter form for when adding converters. Currently the same as
+                 the resource form, but different elements due to listeners being
+                 different. Can also be expanded later -->
+                <form id="converter-filter-form" class="hidden">
+                    <label for="search-string">Search</label>
+                    <input
+                        type="text"
+                        name="search-string"
+                        autocomplete="off"
+                    />
+                    <button type="submit">Apply</button>
+                </form>
+                <div id="add-rc-thumb-list">
+                    <!-- All resource/converter thumbs are loaded in here -->
+                </div>
+                <div id="add-rc-footer">
+                    <div id="rc-info-panel" class="flex-2"></div>
+                    <div class="flex-1">
+                        <form
+                            id="resource-submission-form"
+                            class="popup-form hidden"
+                        >
+                            <fieldset>
+                                <legend>Rate of change</legend>
+                                <input
+                                    type="number"
+                                    name="delta"
+                                    value="1"
+                                    step="0.01"
+                                    autocomplete="off"
+                                />
+                            </fieldset>
+                            <div>
+                                <button
+                                    type="submit"
+                                    class="primary-button rc-submit-button"
+                                >
+                                    Add Resource
+                                </button>
+                                <button
+                                    id="close-item-form-button"
+                                    class="rc-submit-button"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                        <form
+                            id="converter-submission-form"
+                            class="popup-form hidden"
+                        >
+                            <div id="converter-amount-input">
+                                <fieldset>
+                                    <legend>Number of converters</legend>
+                                    <input
+                                        type="number"
+                                        name="amount"
+                                        value="1"
+                                        step="0.01"
+                                        autocomplete="off"
+                                    />
+                                </fieldset>
+                            </div>
+                            <div>
+                                <button
+                                    type="submit"
+                                    class="primary-button rc-submit-button"
+                                >
+                                    Add Converter
+                                </button>
+                                <button
+                                    id="close-converter-form-button"
+                                    class="rc-submit-button"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-------------------------------------------------------------------------->
+
+        <!-- Template for a resource displayed in the resource list -->
+        <template id="resource-delta-template">
+            <div class="resource-delta">
+                <img class="resource-image" />
+                <div class="resource-name"></div>
+                <div>
+                    <b class="resource-amount"></b>
+                </div>
+            </div>
+        </template>
+
+        <!-- Template for a resource converter displayed in the converter list -->
+        <template id="converter-template">
+            <div class="converter">
+                <img class="converter-image" />
+                <div class="converter-name"></div>
+                ⨉
+                <input type="number" class="converter-amount" />
+                <div class="flex-1"></div>
+                <!-- TODO: Visuals of what it converts? Just using images -->
+                <button class="remove-converter-button">
+                    <img src="icons/delete.svg" />
+                </button>
+            </div>
+        </template>
+
+        <!-- Template for an item or converter thumb in the selection lists -->
+        <template id="item-converter-thumb">
+            <div class="thumb">
+                <img class="thumb-image" />
+                <div class="thumb-name"></div>
+            </div>
+        </template>
+
+        <!-- Template for the info panel's look when selecting a resource -->
+        <template id="resource-info-template">
+            <div class="horizontal-center">
+                <img class="rc-info-image" />
+                <h2 class="rc-info-header flex-1"></h2>
+            </div>
+        </template>
+
+        <!-- Template for the info panel's look when selecting a converter -->
+        <template id="converter-info-template">
+            <div class="horizontal-center">
+                <img class="rc-info-image" />
+                <h2 class="rc-info-header flex-1"></h2>
+            </div>
+            <div class="horizontal-center">
+                <div class="c-info-ingredients flex-1"></div>
+                <img src="icons/arrow_right.svg" />
+                <div class="c-info-products flex-1"></div>
+            </div>
+        </template>
+
+        <!-- Template for elements in converters' infoboxes' lists of ingredients/products -->
+        <template id="converter-ingredient-template">
+            <div class="converter-ingredient">
+                <img class="converter-ingredient-image" />
+                <div class="converter-ingredient-name"></div>
+            </div>
+        </template>
+
+        <!-- Template for OR elements in converters ingr/prod trees -->
+        <template id="converter-select-template">
+            <div>
+                <div class="converter-ingredient converter-select">
+                    SELECT ONE:
+                </div>
+                <div class="flex">
+                    <div class="horiz-padding"></div>
+                    <div class="converter-select-children flex-1"></div>
+                </div>
+            </div>
+        </template>
+
+        <!-- Another template for handling ORs, this one is inserted in between the options -->
+        <template id="converter-or-template">
+            <div class="converter-ingredient converter-select">OR</div>
+        </template>
+
+        <script src="index.js"></script>
+    </body>
+</html>

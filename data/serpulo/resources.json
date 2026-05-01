@@ -1,0 +1,102 @@
+[
+    {
+        "id": "copper",
+        "displayName": "Copper",
+        "displayImage": "images/resources/copper.png"
+    },
+    {
+        "id": "lead",
+        "displayName": "Lead",
+        "displayImage": "images/resources/lead.png"
+    },
+    {
+        "id": "plastanium",
+        "displayName": "Plastanium",
+        "displayImage": "images/resources/plastanium.png"
+    },
+    {
+        "id": "phase_fabric",
+        "displayName": "Phase fabric",
+        "displayImage": "images/resources/phase_fabric.png"
+    },
+    {
+        "id": "surge_alloy",
+        "displayName": "Surge Alloy",
+        "displayImage": "images/resources/surge_alloy.png"
+    },
+    {
+        "id": "spore_pod",
+        "displayName": "Spore Pod",
+        "displayImage": "images/resources/spore_pod.png"
+    },
+    {
+        "id": "blast_compound",
+        "displayName": "Blast Compound",
+        "displayImage": "images/resources/blast_compound.png"
+    },
+    {
+        "id": "pyratite",
+        "displayName": "Pyratite",
+        "displayImage": "images/resources/pyratite.png"
+    },
+    {
+        "id": "metaglass",
+        "displayName": "Metaglass",
+        "displayImage": "images/resources/metaglass.png"
+    },
+    {
+        "id": "graphite",
+        "displayName": "Graphite",
+        "displayImage": "images/resources/graphite.png"
+    },
+    {
+        "id": "sand",
+        "displayName": "Sand",
+        "displayImage": "images/resources/sand.png"
+    },
+    {
+        "id": "coal",
+        "displayName": "Coal",
+        "displayImage": "images/resources/coal.png"
+    },
+    {
+        "id": "titanium",
+        "displayName": "Titanium",
+        "displayImage": "images/resources/titanium.png"
+    },
+    {
+        "id": "thorium",
+        "displayName": "Thorium",
+        "displayImage": "images/resources/thorium.png"
+    },
+    {
+        "id": "scrap",
+        "displayName": "Scrap",
+        "displayImage": "images/resources/scrap.png"
+    },
+    {
+        "id": "silicon",
+        "displayName": "Silicon",
+        "displayImage": "images/resources/silicon.png"
+    },
+    {
+        "id": "water",
+        "displayName": "Water",
+        "displayImage": "images/resources/water.png"
+    },
+    {
+        "id": "oil",
+        "displayName": "Oil",
+        "displayImage": "images/resources/oil.png"
+    },
+    {
+        "id": "slag",
+        "displayName": "Slag",
+        "displayImage": "images/resources/slag.png"
+    },
+    {
+        "id": "cryofluid",
+        "displayName": "Cryofluid",
+        "displayImage": "images/resources/cryofluid.png"
+    }
+]

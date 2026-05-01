@@ -1,0 +1,74 @@
+[
+    {
+        "id": "duplicant",
+        "displayName": "Normal Duplicant",
+        "displayImage": "images/dupe.png",
+        "consumes": [
+            {
+                "type": "RESOURCE",
+                "id": "food",
+                "amount": 1000
+            },
+            {
+                "type": "RESOURCE",
+                "id": "oxygen",
+                "amount": 60
+            }
+        ],
+        "produces": []
+    },
+    {
+        "id": "oxygen_diffuser",
+        "displayName": "Oxygen Diffuser",
+        "displayImage": "images/oxygen_diffuser.png",
+        "consumes": [],
+        "produces": [
+            {
+                "type": "RESOURCE",
+                "id": "oxygen",
+                "amount": 300
+            }
+        ]
+    },
+    {
+        "id": "electrolyzer",
+        "displayName": "Electrolyzer",
+        "displayImage": "images/electrolyzer.png",
+        "consumes": [{ "type": "RESOURCE", "id": "water", "amount": 600 }],
+        "produces": [{ "type": "RESOURCE", "id": "oxygen", "amount": 532.8 }]
+    },
+    {
+        "id": "water_sieve",
+        "displayName": "Water Sieve",
+        "displayImage": "images/water_sieve.png",
+        "consumes": [
+            {
+                "type": "RESOURCE",
+                "id": "polluted_water",
+                "amount": 3000
+            },
+            {
+                "type": "OR",
+                "resources": [
+                    {
+                        "type": "RESOURCE",
+                        "id": "regolith",
+                        "amount": 600
+                    },
+                    {
+                        "type": "RESOURCE",
+                        "id": "sand",
+                        "amount": 600
+                    }
+                ]
+            }
+        ],
+        "produces": [
+            {
+                "type": "RESOURCE",
+                "id": "water",
+                "amount": 3000
+            }
+        ]
+    }
+]

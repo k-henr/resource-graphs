@@ -1,0 +1,720 @@
+(() => {
+  // scripts/converter.ts
+  var Converter = class {
+    // All the inputs and outputs of this conversion
+    ingredients;
+    products;
+    name;
+    image;
+    constructor(name, image, ingredients, products) {
+      this.name = name;
+      this.image = image;
+      this.ingredients = ingredients;
+      this.products = products;
+    }
+    /**
+     * Apply this conversion to a given graph, consuming and adding items. This can
+     * be overriden by special converters
+     * @param graph The graph to apply the conversion to
+     * @param count The "count" of this converter
+     */
+    apply(deltas, count) {
+      for (const { resource, amount } of this.products) {
+        deltas.add(resource, amount * count);
+      }
+      for (const { resource, amount } of this.ingredients) {
+        deltas.add(resource, -amount * count);
+      }
+    }
+    getDisplayName() {
+      return this.name;
+    }
+    getDisplayImage() {
+      return this.image;
+    }
+    getIngredients() {
+      return this.ingredients;
+    }
+    // Get the number of this converter required to produce the given amount of the given resource
+    getAmountToProduce(resource, amount) {
+      for (const { resource: r, amount: amountProduced } of this.products) {
+        if (r !== resource) continue;
+        return -amount / amountProduced;
+      }
+      return 0;
+    }
+    consumesIngredient(ingr) {
+      for (const { resource } of this.ingredients) {
+        if (resource === ingr) return true;
+      }
+      return false;
+    }
+    producesProduct(prod) {
+      for (const { resource } of this.products) {
+        if (resource === prod) return true;
+      }
+      return false;
+    }
+  };
+
+  // scripts/util.ts
+  function getRoundedString(x) {
+    if (Math.abs(x) < 1e-12) return "0";
+    let rounded = x.toPrecision(5);
+    rounded = rounded.replace(/\.0*$|(\.\d*?)0+$/, "$1");
+    return rounded;
+  }
+  function resolveRational(x) {
+    return typeof x === "number" ? x : x[0] / x[1];
+  }
+
+  // scripts/intermediateConverter.ts
+  var IntermediateConverter = class _IntermediateConverter {
+    displayName;
+    displayImage;
+    // Ingredients and products are always wrapped in an AND node. Split AND and OR
+    // into two types to enforce this further?
+    ingredients;
+    products;
+    static infoTemplate = document.querySelector(
+      "#converter-info-template"
+    );
+    static converterIngredientTemplate = document.querySelector(
+      "template#converter-ingredient-template"
+    );
+    static converterSelectTemplate = document.querySelector(
+      "template#converter-select-template"
+    );
+    static converterOrTemplate = document.querySelector(
+      "template#converter-or-template"
+    );
+    constructor(displayName, displayImage, ingredients, products) {
+      this.displayName = displayName;
+      this.displayImage = displayImage;
+      this.ingredients = ingredients;
+      this.products = products;
+    }
+    getDisplayName() {
+      return this.displayName;
+    }
+    getDisplayImage() {
+      return this.displayImage;
+    }
+    // Returns a finalized converter, provided that all ambiguities are resolved
+    finalize() {
+      const ingr = this.resourceTreeToList(this.ingredients, []);
+      const prod = this.resourceTreeToList(this.products, []);
+      return new Converter(this.displayName, this.displayImage, ingr, prod);
+    }
+    // Returns the number of this converter that's required to produce the given
+    // amount of the given resource
+    getAmountToProduce(resource, amountToProduce) {
+      return -amountToProduce / this.tallyResourceCount(this.products, resource);
+    }
+    // Populate an info panel with information regarding this converter
+    // Assumes empty panel element!
+    populateInfoPanel(panel) {
+      const el = _IntermediateConverter.infoTemplate.content.cloneNode(
+        true
+      );
+      el.querySelector(".rc-info-header").innerText = this.getDisplayName();
+      el.querySelector(".rc-info-image").src = getSrc(
+        this.getDisplayImage()
+      );
+      this.addResourceTreeToElement(
+        this.ingredients,
+        null,
+        el.querySelector(".c-info-ingredients")
+      );
+      this.addResourceTreeToElement(
+        this.products,
+        null,
+        el.querySelector(".c-info-products")
+      );
+      panel.appendChild(el);
+    }
+    // (returns the newly created element)
+    addResourceTreeToElement(node, parentContext, el) {
+      switch (node.type) {
+        case "RESOURCE":
+          const resEl = this.createIngredientElement(node);
+          el.appendChild(resEl);
+          return resEl;
+        case "AND":
+          const andEl = document.createElement("div");
+          node.resources.map((child, index) => {
+            this.addResourceTreeToElement(
+              child,
+              { node, index },
+              andEl
+            );
+          });
+          el.appendChild(andEl);
+          return andEl;
+        case "OR":
+          const selectEl = _IntermediateConverter.converterSelectTemplate.content.cloneNode(
+            true
+          ).firstElementChild;
+          const selectList = selectEl.querySelector(
+            ".converter-select-children"
+          );
+          for (let i = 0; i < node.resources.length; i++) {
+            const res = node.resources[i];
+            const option = this.addResourceTreeToElement(
+              res,
+              { node, index: i },
+              selectList
+            );
+            option.onclick = () => {
+              if (!parentContext)
+                throw new Error("An OR node can't be a root node!");
+              parentContext.node.resources[parentContext.index] = res;
+              selectEl.replaceWith(option);
+              option.onclick = null;
+            };
+            if (i + 1 === node.resources.length) break;
+            const orEl = _IntermediateConverter.converterOrTemplate.content.cloneNode(
+              true
+            );
+            selectList.appendChild(orEl);
+          }
+          el.appendChild(selectEl);
+          return selectEl;
+      }
+    }
+    createIngredientElement(ingr) {
+      const el = _IntermediateConverter.converterIngredientTemplate.content.cloneNode(
+        true
+      ).firstElementChild;
+      const res = getResource(ingr.id);
+      el.querySelector(".converter-ingredient-name").innerText = `${res.getDisplayName()} \u2A09 ${getRoundedString(resolveRational(ingr.amount))}`;
+      el.querySelector(".converter-ingredient-image").src = getSrc(res.getDisplayImage());
+      return el;
+    }
+    // Parse the given resource tree and store it in the output list
+    resourceTreeToList(node, output) {
+      switch (node.type) {
+        case "RESOURCE":
+          output.push({
+            resource: getResource(node.id),
+            amount: resolveRational(node.amount)
+          });
+          break;
+        case "AND":
+          for (const child of node.resources)
+            this.resourceTreeToList(child, output);
+          break;
+        case "OR":
+          throw new Error(
+            "Resource tree isn't fully resolved, please select which of the available options to use!"
+          );
+      }
+      return output;
+    }
+    // Count the total amount of a given resource present in a resource tree
+    tallyResourceCount(node, resource) {
+      if (node.type === "RESOURCE") {
+        if (getResource(node.id) === resource)
+          return resolveRational(node.amount);
+        return 0;
+      } else if (node.type === "AND") {
+        return node.resources.reduce(
+          (acc, el) => acc + this.tallyResourceCount(el, resource),
+          0
+        );
+      } else {
+        throw new Error("Unresolved OR");
+      }
+    }
+  };
+
+  // scripts/resource.ts
+  var Resource = class _Resource {
+    static infoTemplate = document.querySelector(
+      "#resource-info-template"
+    );
+    displayName;
+    displayImage;
+    constructor(data) {
+      this.displayName = data.displayName;
+      this.displayImage = data.displayImage;
+    }
+    getDisplayName() {
+      return this.displayName;
+    }
+    getDisplayImage() {
+      return this.displayImage;
+    }
+    // (assumes an empty info panel element)
+    populateInfoPanel(panel) {
+      const el = _Resource.infoTemplate.content.cloneNode(
+        true
+      );
+      el.querySelector(".rc-info-header").innerText = this.getDisplayName();
+      el.querySelector(".rc-info-image").src = getSrc(
+        this.getDisplayImage()
+      );
+      panel.appendChild(el);
+    }
+  };
+
+  // scripts/data.ts
+  var loadedResources = /* @__PURE__ */ new Map();
+  var loadedConverterFactories = /* @__PURE__ */ new Map();
+  var graphName = window.location.hash.replace(/^#/, "");
+  function getSrc(src) {
+    return `data/${graphName}/${src}`;
+  }
+  async function loadAllResources() {
+    const res = await fetch(`data/${graphName}/resources.json`);
+    if (!res.ok) throw new Error("Error during resource loading!");
+    const json = await res.json();
+    for (const data of json) {
+      const r = new Resource(data);
+      loadedResources.set(data.id, r);
+    }
+  }
+  function getResource(id) {
+    const r = loadedResources.get(id);
+    if (!r) throw new Error(`Couldn't find resoure "${id}"!`);
+    return r;
+  }
+  function getResourcesWithFilter(searchString = "") {
+    const list = loadedResources.entries();
+    const output = [];
+    for (const [id, r] of list) {
+      if (searchString && !r.getDisplayName().toLowerCase().includes(searchString.toLowerCase()))
+        continue;
+      output.push([id, r]);
+    }
+    return output;
+  }
+  async function loadAllConverters() {
+    const res = await fetch(`data/${graphName}/converters.json`);
+    if (!res.ok) throw new Error("Error during resource loading!");
+    const json = await res.json();
+    for (const data of json) {
+      const possibleIngr = [];
+      parseIngredientListToAllPossible(possibleIngr, {
+        type: "AND",
+        resources: data.consumes
+      });
+      const possibleProd = [];
+      parseIngredientListToAllPossible(possibleProd, {
+        type: "AND",
+        resources: data.produces
+      });
+      loadedConverterFactories.set(data.id, {
+        name: data.displayName,
+        image: data.displayImage,
+        possibleIngredients: possibleIngr,
+        possibleProducts: possibleProd,
+        factory: createFactory(data)
+      });
+    }
+  }
+  function createFactory(data) {
+    return () => {
+      return new IntermediateConverter(
+        data.displayName,
+        data.displayImage,
+        { type: "AND", resources: [...data.consumes] },
+        { type: "AND", resources: [...data.produces] }
+      );
+    };
+  }
+  function parseIngredientListToAllPossible(output, node) {
+    switch (node.type) {
+      case "RESOURCE":
+        output.push(getResource(node.id));
+        break;
+      case "AND":
+      case "OR":
+        for (const n of node.resources)
+          parseIngredientListToAllPossible(output, n);
+        break;
+    }
+  }
+  function getConverterFactory(id) {
+    return loadedConverterFactories.get(id);
+  }
+  function getConverterFactoriesWithFilters(searchString = "", anyResourceProduced = [], anyResourceConsumed = []) {
+    const list = loadedConverterFactories.entries();
+    const output = [];
+    for (const [id, c] of list) {
+      if (searchString && !c.name.toLowerCase().includes(searchString.toLowerCase()))
+        continue;
+      let consumesPasses = anyResourceConsumed.length == 0;
+      for (const consFilter of anyResourceConsumed) {
+        if (c.possibleIngredients.indexOf(consFilter) !== -1) {
+          consumesPasses = true;
+          break;
+        }
+      }
+      if (!consumesPasses) continue;
+      let producePasses = anyResourceProduced.length == 0;
+      for (const prodFilter of anyResourceProduced) {
+        if (c.possibleProducts.indexOf(prodFilter) !== -1) {
+          producePasses = true;
+          break;
+        }
+      }
+      if (!producePasses) continue;
+      output.push([id, c]);
+    }
+    return output;
+  }
+
+  // scripts/resourceGraph.ts
+  var ResourceDeltaList = class {
+    deltas = /* @__PURE__ */ new Map();
+    add(resource, delta) {
+      this.deltas.set(resource, (this.deltas.get(resource) ?? 0) + delta);
+    }
+    getEntries() {
+      return this.deltas.entries();
+    }
+  };
+  var ResourceGraph = class {
+    // All conversions that are happening
+    converters = /* @__PURE__ */ new Map();
+    // A ConverterMenu to request converters from in case of adjusting to fit an item
+    converterRequestTarget;
+    // Whether the graph needs to be updated or not
+    requiresRecalculation = true;
+    // List elements to put the displays in
+    resourceDeltaList;
+    converterList;
+    resourceDeltaTemplate;
+    converterTemplate;
+    constructor(resourceDeltaList, converterList, resourceDeltaTemplate, converterTemplate) {
+      this.resourceDeltaList = resourceDeltaList;
+      this.converterList = converterList;
+      this.resourceDeltaTemplate = resourceDeltaTemplate;
+      this.converterTemplate = converterTemplate;
+      requestAnimationFrame(() => requestGraphUpdate(this));
+    }
+    setConverterRequestTarget(menu) {
+      this.converterRequestTarget = menu;
+    }
+    // Update the resource deltas and display. Runs automatically
+    recalculateIfNeeded() {
+      if (!this.requiresRecalculation) return;
+      this.requiresRecalculation = false;
+      const resourceDeltas = new ResourceDeltaList();
+      for (const [converter, count] of this.converters) {
+        converter.apply(resourceDeltas, count);
+      }
+      this.resourceDeltaList.innerHTML = "";
+      this.converterList.innerHTML = "";
+      for (const [resource, amount] of resourceDeltas.getEntries()) {
+        const el = this.resourceDeltaTemplate.content.cloneNode(
+          true
+        ).querySelector(".resource-delta");
+        el.querySelector(".resource-name").innerText = resource.getDisplayName();
+        el.querySelector(".resource-image").src = getSrc(
+          resource.getDisplayImage()
+        );
+        el.querySelector(".resource-amount").innerText = getRoundedString(amount);
+        if (amount < 0) {
+          el.classList.add("negative-resource-delta");
+          el.onclick = () => this.converterRequestTarget?.requestConverterForResource(
+            resource,
+            amount
+          );
+        }
+        this.resourceDeltaList.appendChild(el);
+      }
+      for (const [converter, number] of this.converters) {
+        const el = this.converterTemplate.content.cloneNode(true).firstElementChild;
+        el.querySelector(".converter-name").innerText = converter.getDisplayName();
+        el.querySelector(".converter-image").src = getSrc(converter.getDisplayImage());
+        const amountEl = el.querySelector(".converter-amount");
+        amountEl.value = String(number);
+        amountEl.onchange = (e) => {
+          this.setConverterAmount(
+            converter,
+            Number(e.target.value)
+          );
+        };
+        el.querySelector(".remove-converter-button").onclick = () => this.removeConverter(converter);
+        this.converterList.appendChild(el);
+      }
+    }
+    addConverter(converter, count) {
+      this.converters.set(
+        converter,
+        (this.converters.get(converter) ?? 0) + count
+      );
+      this.requiresRecalculation = true;
+    }
+    removeConverter(converter) {
+      this.converters.delete(converter);
+      this.requiresRecalculation = true;
+    }
+    setConverterAmount(converter, count) {
+      this.converters.set(converter, count);
+      this.requiresRecalculation = true;
+    }
+  };
+  function requestGraphUpdate(graph) {
+    requestAnimationFrame(() => requestGraphUpdate(graph));
+    graph.recalculateIfNeeded();
+  }
+
+  // scripts/menus.ts
+  var SubmitMenu = class {
+    static thumbTemplate = document.querySelector("#item-converter-thumb");
+    graph;
+    menuElement;
+    headerElement;
+    thumbList;
+    filterForm;
+    submissionForm;
+    infoPanel;
+    constructor(graph, menuElement, headerElement, thumbList, filterForm, submissionForm, infoPanel) {
+      this.graph = graph;
+      this.menuElement = menuElement;
+      this.headerElement = headerElement;
+      this.thumbList = thumbList;
+      this.filterForm = filterForm;
+      this.submissionForm = submissionForm;
+      this.infoPanel = infoPanel;
+      submissionForm.onsubmit = async (e) => {
+        e.preventDefault();
+        this.onSubmit();
+      };
+      filterForm.onsubmit = (e) => {
+        e.preventDefault();
+        this.applyCurrentFilters();
+      };
+      this.clearFilters();
+    }
+    open() {
+      this.applyCurrentFilters();
+      this.menuElement.classList.remove("hidden");
+      this.filterForm.classList.remove("hidden");
+      this.submissionForm.classList.remove("hidden");
+    }
+    close() {
+      this.clearFilters();
+      this.menuElement.classList.add("hidden");
+      this.filterForm.classList.add("hidden");
+      this.submissionForm.classList.add("hidden");
+      this.infoPanel.innerHTML = "";
+    }
+  };
+  var ConverterMenu = class _ConverterMenu extends SubmitMenu {
+    amountInput;
+    resourceBeingRequested = null;
+    amountOfResourceBeingRequested = 0;
+    searchString = "";
+    // Since settings can be changed, which requires a converter and not a factory,
+    // intermediate converter storage is required
+    intermediateConverter = null;
+    constructor(graph, menuElement, headerElement, thumbList, filterForm, converterForm, amountInput, infoPanel) {
+      super(
+        graph,
+        menuElement,
+        headerElement,
+        thumbList,
+        filterForm,
+        converterForm,
+        infoPanel
+      );
+      this.amountInput = amountInput;
+    }
+    onSubmit() {
+      if (!this.intermediateConverter) return;
+      const formData = new FormData(this.submissionForm);
+      const converter = this.intermediateConverter.finalize();
+      const amount = this.resourceBeingRequested ? this.intermediateConverter.getAmountToProduce(
+        this.resourceBeingRequested,
+        this.amountOfResourceBeingRequested
+      ) : Number(formData.get("amount").valueOf());
+      if (amount != 0) {
+        this.graph.addConverter(converter, amount);
+      }
+      this.close();
+    }
+    // Note: Does not apply changes!
+    clearFilters() {
+      this.filterForm.querySelector(
+        "input[name=search-string]"
+      ).value = "";
+      this.resourceBeingRequested = null;
+      this.amountOfResourceBeingRequested = 0;
+    }
+    applyCurrentFilters() {
+      this.thumbList.innerHTML = "";
+      const formData = new FormData(this.filterForm);
+      this.searchString = String(formData.get("search-string").valueOf());
+      const list = getConverterFactoriesWithFilters(
+        this.searchString,
+        this.resourceBeingRequested ? [this.resourceBeingRequested] : [],
+        []
+      );
+      for (const [_, cFact] of list) {
+        const thumb = _ConverterMenu.thumbTemplate.content.cloneNode(true).querySelector(".thumb");
+        thumb.querySelector(".thumb-name").innerText = cFact.name;
+        thumb.querySelector("img.thumb-image").src = getSrc(cFact.image);
+        thumb.onclick = () => {
+          this.infoPanel.innerHTML = "";
+          this.intermediateConverter = cFact.factory();
+          this.intermediateConverter.populateInfoPanel(this.infoPanel);
+        };
+        this.thumbList.appendChild(thumb);
+      }
+    }
+    open() {
+      super.open();
+      this.headerElement.innerText = "Add new converter";
+    }
+    close() {
+      super.close();
+      this.intermediateConverter = null;
+      this.amountInput.classList.remove("hidden");
+    }
+    // Request the user to choose a converter that produces the given amount of the
+    // given resource
+    requestConverterForResource(resource, amount) {
+      this.resourceBeingRequested = resource;
+      this.amountOfResourceBeingRequested = amount;
+      this.amountInput.classList.add("hidden");
+      this.open();
+      this.headerElement.innerText = `Choose a converter that produces ${resource.getDisplayName()}`;
+      this.applyCurrentFilters();
+    }
+  };
+  var ResourceMenu = class _ResourceMenu extends SubmitMenu {
+    searchString = "";
+    // To match with ConverterMenu, I'm also storing the resource to be added here instead of as a text input
+    resourceToBeAdded = null;
+    // Submit the form
+    onSubmit() {
+      if (!this.resourceToBeAdded) return;
+      const formData = new FormData(this.submissionForm);
+      const delta = Number(formData.get("delta").valueOf());
+      const resource = this.resourceToBeAdded;
+      if (delta != 0) {
+        const itemList = [{ resource, amount: 1 }];
+        const conv = new Converter(
+          `Resource ${delta > 0 ? "source" : "drain"}: ${resource.getDisplayName()}`,
+          resource.getDisplayImage(),
+          // Put the item either as an ingredient or a product, depending on
+          // whether this is a producer or consumer
+          delta < 0 ? itemList : [],
+          delta > 0 ? itemList : []
+        );
+        this.graph.addConverter(conv, Math.abs(delta));
+      }
+      this.close();
+    }
+    clearFilters() {
+      this.filterForm.querySelector(
+        "input[name=search-string]"
+      ).value = "";
+    }
+    applyCurrentFilters() {
+      this.thumbList.innerHTML = "";
+      const formData = new FormData(this.filterForm);
+      this.searchString = String(formData.get("search-string").valueOf());
+      const list = getResourcesWithFilter(this.searchString);
+      for (const [, r] of list) {
+        const thumb = _ResourceMenu.thumbTemplate.content.cloneNode(true).querySelector(".thumb");
+        thumb.querySelector(".thumb-name").innerText = r.getDisplayName();
+        thumb.querySelector("img.thumb-image").src = getSrc(r.getDisplayImage());
+        thumb.onclick = () => {
+          this.resourceToBeAdded = r;
+          this.infoPanel.innerHTML = "";
+          r.populateInfoPanel(this.infoPanel);
+        };
+        this.thumbList.appendChild(thumb);
+      }
+    }
+    close() {
+      this.resourceToBeAdded = null;
+      super.close();
+    }
+  };
+
+  // index.ts
+  (async () => {
+    const resourceDeltaList = document.querySelector(
+      "#resources"
+    );
+    const converterList = document.querySelector("#converters");
+    const resourceDeltaTemplate = document.querySelector(
+      "template#resource-delta-template"
+    );
+    const converterTemplate = document.querySelector(
+      "template#converter-template"
+    );
+    await loadAllResources();
+    await loadAllConverters();
+    const graph = new ResourceGraph(
+      resourceDeltaList,
+      converterList,
+      resourceDeltaTemplate,
+      converterTemplate
+    );
+    const addRcMenuWrapper = document.querySelector(
+      "#add-rc-menu-wrapper"
+    );
+    const header = addRcMenuWrapper.querySelector(
+      "#add-rc-menu-header"
+    );
+    const thumbList = document.querySelector("#add-rc-thumb-list");
+    const infoPanel = document.querySelector("#rc-info-panel");
+    const rFilter = document.querySelector(
+      "form#resource-filter-form"
+    );
+    const rSubmit = document.querySelector(
+      "form#resource-submission-form"
+    );
+    const resourceMenu = new ResourceMenu(
+      graph,
+      addRcMenuWrapper,
+      header,
+      thumbList,
+      rFilter,
+      rSubmit,
+      infoPanel
+    );
+    document.querySelector(
+      "#open-item-delta-menu-button"
+    ).onclick = () => resourceMenu.open();
+    document.querySelector("#close-item-form-button").onclick = () => resourceMenu.close();
+    const cFilter = document.querySelector(
+      "form#converter-filter-form"
+    );
+    const cSubmit = document.querySelector(
+      "form#converter-submission-form"
+    );
+    const cSubmitAmount = document.querySelector(
+      "#converter-amount-input"
+    );
+    const converterMenu = new ConverterMenu(
+      graph,
+      addRcMenuWrapper,
+      header,
+      thumbList,
+      cFilter,
+      cSubmit,
+      cSubmitAmount,
+      infoPanel
+    );
+    document.querySelector(
+      "#open-converter-menu-button"
+    ).onclick = () => converterMenu.open();
+    document.querySelector(
+      "#close-converter-form-button"
+    ).onclick = () => converterMenu.close();
+    graph.setConverterRequestTarget(converterMenu);
+    const water = getResource("water");
+    const dupe = getConverterFactory("duplicant").factory().finalize();
+    const electrolyzer = getConverterFactory("electrolyzer").factory().finalize();
+    graph.addConverter(dupe, 3);
+    graph.addConverter(electrolyzer, 1);
+  })();
+})();

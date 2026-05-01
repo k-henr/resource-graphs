@@ -1,0 +1,32 @@
+[
+    {
+        "id": "food",
+        "displayName": "Food",
+        "displayImage": "images/food.png"
+    },
+    {
+        "id": "oxygen",
+        "displayName": "Oxygen",
+        "displayImage": "images/oxygen.png"
+    },
+    {
+        "id": "water",
+        "displayName": "Water",
+        "displayImage": "images/water.png"
+    },
+    {
+        "id": "polluted_water",
+        "displayName": "Polluted Water",
+        "displayImage": "images/polluted_water.png"
+    },
+    {
+        "id": "sand",
+        "displayName": "Sand",
+        "displayImage": "images/sand.png"
+    },
+    {
+        "id": "regolith",
+        "displayName": "Regolith",
+        "displayImage": "images/regolith.png"
+    }
+]
