@@ -23,7 +23,18 @@ import { ConverterMenu, ResourceMenu } from "./scripts/menus";
         "template#converter-template",
     ) as HTMLTemplateElement;
 
-    // TODO: Complain if the graphname is invalid (by test-loading some file?)
+    // Set the legal disclaimer for this graph
+    const confRes = await fetch(
+        `/data/${window.location.hash.replace(/^#/, "")}/config.json`,
+    );
+    if (!confRes.ok) {
+        // TODO: Complain if no config was found (i.e. if the graph doesn't exist)
+        throw new Error("Config not found!");
+    }
+    const config = await confRes.json();
+    document.querySelector<HTMLElement>(
+        "#personal-legal-disclaimer",
+    )!.innerText = config.legalDisclaimer;
 
     // Load data files
     await loadAllResources();

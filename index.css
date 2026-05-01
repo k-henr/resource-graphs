@@ -18,13 +18,23 @@ body {
     margin: 0px;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     background-color: var(--background-color);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+footer {
+    padding: 4px;
+    border-top: 4px solid var(--muted-border);
+    font-size: small;
+    text-align: center;
 }
 
 /* Main/shared stuff */
 
 #main-view {
     display: flex;
-    height: 100vh;
+    flex: 1;
 }
 
 #main-view > div:first-child {

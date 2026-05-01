@@ -650,6 +650,16 @@
     const converterTemplate = document.querySelector(
       "template#converter-template"
     );
+    const confRes = await fetch(
+      `/data/${window.location.hash.replace(/^#/, "")}/config.json`
+    );
+    if (!confRes.ok) {
+      throw new Error("Config not found!");
+    }
+    const config = await confRes.json();
+    document.querySelector(
+      "#personal-legal-disclaimer"
+    ).innerText = config.legalDisclaimer;
     await loadAllResources();
     await loadAllConverters();
     const graph = new ResourceGraph(
