@@ -6,7 +6,17 @@
         "consumes": [
             {
                 "type": "MULTIPLIER",
-                "multiplier": 2,
+                "multiplier": {
+                    "type": "ENUMERATE",
+                    "name": "Bottomless stomach",
+                    "options": [
+                        ["Yes", 1.5],
+                        ["No", 1]
+                    ],
+                    "default": "No",
+                    "true": 1.5,
+                    "false": 1
+                },
                 "resource": {
                     "type": "RESOURCE",
                     "id": "food",
@@ -14,9 +24,19 @@
                 }
             },
             {
-                "type": "RESOURCE",
-                "id": "oxygen",
-                "amount": 60
+                "type": "MULTIPLIER",
+                "multiplier": {
+                    "type": "TOGGLE",
+                    "name": "Mouth breather",
+                    "default": false,
+                    "true": 1.5,
+                    "false": 1
+                },
+                "resource": {
+                    "type": "RESOURCE",
+                    "id": "oxygen",
+                    "amount": 60
+                }
             }
         ],
         "produces": []
@@ -72,6 +92,48 @@
                 "type": "RESOURCE",
                 "id": "water",
                 "amount": 3000
+            }
+        ]
+    },
+    {
+        "id": "hatch",
+        "displayName": "Hatch",
+        "displayImage": "images/hatch.png",
+        "consumes": [
+            {
+                "type": "RESOURCE",
+                "id": "hatch_egg",
+                "amount": 0.01
+            }
+        ],
+        "produces": [
+            {
+                "type": "MULTIPLIER",
+                "multiplier": {
+                    "type": "TOGGLE",
+                    "name": "Wild",
+                    "true": 0.06,
+                    "false": 1
+                },
+                "resource": {
+                    "type": "RESOURCE",
+                    "id": "hatch_egg",
+                    "amount": [5, 30]
+                }
+            },
+            {
+                "type": "MULTIPLIER",
+                "multiplier": {
+                    "type": "TOGGLE",
+                    "name": "Wild",
+                    "true": 0.25,
+                    "false": 1
+                },
+                "resource": {
+                    "type": "RESOURCE",
+                    "id": "coal",
+                    "amount": 70
+                }
             }
         ]
     }

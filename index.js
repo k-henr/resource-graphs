@@ -88,14 +88,30 @@
     static converterOrTemplate = document.querySelector(
       "template#converter-or-template"
     );
+    static infoPanel = document.querySelector("#rc-info-panel");
     static settingsForm = document.querySelector(
       "#converter-settings-form"
+    );
+    static settingInputTemplate = document.querySelector(
+      "#converter-setting-input-template"
+    );
+    static settingSelectTemplate = document.querySelector(
+      "#converter-setting-select-template"
     );
     constructor(displayName, displayImage, ingredients, products) {
       this.displayName = displayName;
       this.displayImage = displayImage;
       this.ingredients = ingredients;
       this.products = products;
+      _IntermediateConverter.settingsForm.innerHTML = "";
+      const convSettings = this.getAllConverterSettings(
+        this.products,
+        this.getAllConverterSettings(this.ingredients, [])
+      );
+      for (const node of convSettings) {
+        const settingEl = this.createSettingInput(node);
+        _IntermediateConverter.settingsForm.appendChild(settingEl);
+      }
     }
     getDisplayName() {
       return this.displayName;
@@ -105,13 +121,18 @@
     }
     // Returns a finalized converter, provided that all ambiguities are resolved
     finalize() {
-      const ingr = this.resourceTreeToList(this.ingredients, []);
-      const prod = this.resourceTreeToList(this.products, []);
+      const settingsData = new FormData(_IntermediateConverter.settingsForm);
+      const ingr = this.resourceTreeToList(
+        this.ingredients,
+        [],
+        settingsData
+      );
+      const prod = this.resourceTreeToList(this.products, [], settingsData);
       return new Converter(this.displayName, this.displayImage, ingr, prod);
     }
     // Populate an info panel with information regarding this converter
     // Assumes empty panel element!
-    populateInfoPanel(panel) {
+    populateInfoPanel() {
       const el = _IntermediateConverter.infoTemplate.content.cloneNode(
         true
       );
@@ -119,26 +140,117 @@
       el.querySelector(".rc-info-image").src = getSrc(
         this.getDisplayImage()
       );
-      const settings = [];
+      const settingsData = new FormData(_IntermediateConverter.settingsForm);
       this.addResourceTreeToElement(
         this.ingredients,
         null,
         el.querySelector(".c-info-ingredients"),
-        settings
+        settingsData
       );
       this.addResourceTreeToElement(
         this.products,
         null,
         el.querySelector(".c-info-products"),
-        settings
+        settingsData
       );
-      panel.appendChild(el);
+      _IntermediateConverter.infoPanel.appendChild(el);
     }
-    // (returns the newly created element)
-    addResourceTreeToElement(node, parentContext, el, settings) {
+    createSettingInput(node) {
+      switch (node.type) {
+        case "NUMBER": {
+          const [settingEl, , input] = this.createInputElement(node);
+          input.type = "number";
+          input.value = String(node.default);
+          return settingEl;
+        }
+        case "TOGGLE": {
+          const [settingEl, , input] = this.createInputElement(node);
+          input.type = "checkbox";
+          input.checked = node.default;
+          return settingEl;
+        }
+        case "ENUMERATE": {
+          const [settingEl, , select] = this.createSelectElement(node);
+          for (const [name] of node.options) {
+            const optionEl = document.createElement("option");
+            optionEl.value = name;
+            optionEl.innerText = name;
+            select.appendChild(optionEl);
+          }
+          return settingEl;
+        }
+      }
+    }
+    createInputElement(node) {
+      const settingEl = _IntermediateConverter.settingInputTemplate.content.cloneNode(
+        true
+      );
+      const label = settingEl.querySelector("label");
+      const input = settingEl.querySelector("input");
+      label.htmlFor = node.name;
+      label.innerText = node.name;
+      input.name = node.name;
+      input.onchange = () => {
+        _IntermediateConverter.infoPanel.innerHTML = "";
+        this.populateInfoPanel();
+      };
+      return [settingEl, label, input];
+    }
+    createSelectElement(node) {
+      const settingEl = _IntermediateConverter.settingSelectTemplate.content.cloneNode(
+        true
+      );
+      const label = settingEl.querySelector("label");
+      const input = settingEl.querySelector("select");
+      label.htmlFor = node.name;
+      label.innerText = node.name;
+      input.name = node.name;
+      input.onchange = () => {
+        _IntermediateConverter.infoPanel.innerHTML = "";
+        this.populateInfoPanel();
+      };
+      return [settingEl, label, input];
+    }
+    // Register all converter settings present in the given tree
+    getAllConverterSettings(node, output) {
       switch (node.type) {
         case "RESOURCE":
-          const resEl = this.createIngredientElement(node);
+          return output;
+        case "AND":
+        case "OR":
+          for (const child of node.resources)
+            this.getAllConverterSettings(child, output);
+          return output;
+        case "MULTIPLIER":
+          this.getSettingsFromAst(node.multiplier, output);
+          return output;
+      }
+    }
+    // Parse an AST node found in the previous function
+    getSettingsFromAst(astNode, output) {
+      if (typeof astNode === "number") return;
+      switch (astNode.type) {
+        case "NUMBER":
+          output.push(astNode);
+          return;
+        case "TOGGLE":
+          output.push(astNode);
+          this.getSettingsFromAst(astNode.true, output);
+          this.getSettingsFromAst(astNode.false, output);
+          return;
+        case "ENUMERATE":
+          output.push(astNode);
+          for (const [, option] of astNode.options) {
+            this.getSettingsFromAst(option, output);
+          }
+          return;
+      }
+    }
+    // (returns the newly created element)
+    addResourceTreeToElement(node, parentContext, el, settingsData, multiplier = 1) {
+      switch (node.type) {
+        case "RESOURCE":
+          const resEl = this.createIngredientElement(node, multiplier);
           el.appendChild(resEl);
           return resEl;
         case "AND":
@@ -148,7 +260,8 @@
               child,
               { node, index },
               andEl,
-              settings
+              settingsData,
+              multiplier
             );
           });
           el.appendChild(andEl);
@@ -166,7 +279,8 @@
               res,
               { node, index: i },
               selectList,
-              settings
+              settingsData,
+              multiplier
             );
             option.onclick = () => {
               if (!parentContext)
@@ -185,39 +299,61 @@
           return selectEl;
         case "MULTIPLIER":
           console.log("Multiplier found in resource tree");
+          multiplier *= this.evaluateSettingsTree(
+            node.multiplier,
+            settingsData
+          );
+          if (multiplier === 0) {
+          }
           return this.addResourceTreeToElement(
             node.resource,
             parentContext,
             el,
-            settings
+            settingsData,
+            multiplier
           );
       }
     }
-    createIngredientElement(ingr) {
+    createIngredientElement(ingr, multiplier) {
       const el = _IntermediateConverter.converterIngredientTemplate.content.cloneNode(
         true
       ).firstElementChild;
       const res = getResource(ingr.id);
-      el.querySelector(".converter-ingredient-name").innerText = `${res.getDisplayName()} \u2A09 ${getRoundedString(resolveRational(ingr.amount))}`;
+      el.querySelector(".converter-ingredient-name").innerText = `${res.getDisplayName()} \u2A09 ${getRoundedString(resolveRational(ingr.amount) * multiplier)}`;
       el.querySelector(".converter-ingredient-image").src = getSrc(res.getDisplayImage());
       return el;
     }
     // Parse the given resource tree and store it in the output list
-    resourceTreeToList(node, output) {
+    resourceTreeToList(node, output, settingsData, multiplier = 1) {
       switch (node.type) {
         case "RESOURCE":
           output.push({
             resource: getResource(node.id),
-            amount: resolveRational(node.amount)
+            amount: resolveRational(node.amount) * multiplier
           });
           break;
         case "AND":
           for (const child of node.resources)
-            this.resourceTreeToList(child, output);
+            this.resourceTreeToList(
+              child,
+              output,
+              settingsData,
+              multiplier
+            );
           break;
         case "MULTIPLIER":
-          console.warn("Multipliers not yet fully implemented!");
-          this.resourceTreeToList(node.resource, output);
+          console.log("Encountered multiplier");
+          multiplier *= this.evaluateSettingsTree(
+            node.multiplier,
+            settingsData
+          );
+          console.log("Multiplier: ", multiplier);
+          this.resourceTreeToList(
+            node.resource,
+            output,
+            settingsData,
+            multiplier
+          );
           break;
         case "OR":
           throw new Error(
@@ -225,6 +361,45 @@
           );
       }
       return output;
+    }
+    evaluateSettingsTree(treeNode, formData) {
+      console.log("Node:", treeNode);
+      if (typeof treeNode === "number") return treeNode;
+      switch (treeNode.type) {
+        case "NUMBER":
+          return Number(formData.get(treeNode.name).valueOf());
+        case "TOGGLE":
+          return this.evaluateSettingsTree(
+            formData.get(treeNode.name) ? treeNode.true : treeNode.false,
+            formData
+          );
+        case "ENUMERATE":
+          const chosen = formData.get(treeNode.name).valueOf();
+          for (const [name, option] of treeNode.options) {
+            if (name === chosen)
+              return this.evaluateSettingsTree(option, formData);
+          }
+          return 0;
+        case "MUL":
+          let p = 1;
+          for (const child of treeNode.factors)
+            p *= this.evaluateSettingsTree(child, formData);
+          return p;
+        case "DIV":
+          return this.evaluateSettingsTree(treeNode.numerator, formData) / this.evaluateSettingsTree(treeNode.denominator, formData);
+        case "ADD":
+          let s = 0;
+          for (const child of treeNode.terms)
+            s += this.evaluateSettingsTree(child, formData);
+          return s;
+        case "SUB":
+          return this.evaluateSettingsTree(treeNode.term1, formData) - this.evaluateSettingsTree(treeNode.term2, formData);
+        case "POW":
+          return Math.pow(
+            this.evaluateSettingsTree(treeNode.base, formData),
+            this.evaluateSettingsTree(treeNode.exponent, formData)
+          );
+      }
     }
   };
 
@@ -564,7 +739,7 @@
         thumb.onclick = () => {
           this.infoPanel.innerHTML = "";
           this.intermediateConverter = cFact.factory();
-          this.intermediateConverter.populateInfoPanel(this.infoPanel);
+          this.intermediateConverter.populateInfoPanel();
         };
         this.thumbList.appendChild(thumb);
       }

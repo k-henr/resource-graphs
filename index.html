@@ -104,7 +104,10 @@
                             </div>
                         </form>
                         <div id="converter-specific-footer">
-                            <form id="converter-settings-form"></form>
+                            <form
+                                id="converter-settings-form"
+                                class="popup-form"
+                            ></form>
                             <form
                                 id="converter-submission-form"
                                 class="popup-form hidden"
@@ -182,7 +185,7 @@
         <template id="resource-info-template">
             <div class="horizontal-center">
                 <img class="rc-info-image" />
-                <h2 class="rc-info-header flex-1"></h2>
+                <h2 class="rc-info-header"></h2>
             </div>
         </template>
 
@@ -190,12 +193,27 @@
         <template id="converter-info-template">
             <div class="horizontal-center">
                 <img class="rc-info-image" />
-                <h2 class="rc-info-header flex-1"></h2>
+                <h2 class="rc-info-header"></h2>
             </div>
             <div class="horizontal-center">
                 <div class="c-info-ingredients flex-1"></div>
                 <img src="icons/arrow_right.svg" />
                 <div class="c-info-products flex-1"></div>
+            </div>
+        </template>
+
+        <!-- Template for a custom per-converter input setting -->
+        <template id="converter-setting-input-template">
+            <div class="flex">
+                <label></label>
+                <input />
+            </div>
+        </template>
+        <!-- Template for a custom per-converter select setting -->
+        <template id="converter-setting-select-template">
+            <div class="flex">
+                <label></label>
+                <select></select>
             </div>
         </template>
 

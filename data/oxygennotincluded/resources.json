@@ -28,5 +28,15 @@
         "id": "regolith",
         "displayName": "Regolith",
         "displayImage": "images/regolith.png"
+    },
+    {
+        "id": "coal",
+        "displayName": "Coal",
+        "displayImage": "images/coal.png"
+    },
+    {
+        "id": "hatch_egg",
+        "displayName": "Hatch Egg",
+        "displayImage": "images/hatch_egg.png"
     }
 ]

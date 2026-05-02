@@ -179,7 +179,7 @@ export class ConverterMenu extends SubmitMenu {
             thumb.onclick = () => {
                 this.infoPanel.innerHTML = "";
                 this.intermediateConverter = cFact.factory();
-                this.intermediateConverter.populateInfoPanel(this.infoPanel);
+                this.intermediateConverter.populateInfoPanel();
             };
 
             this.thumbList.appendChild(thumb);
