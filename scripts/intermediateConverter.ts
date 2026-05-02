@@ -13,8 +13,8 @@ export class IntermediateConverter {
 
     // Ingredients and products are always wrapped in an AND node. Split AND and OR
     // into two types to enforce this further?
-    private ingredients: ConverterResourceTreeNode;
-    private products: ConverterResourceTreeNode;
+    private ingredients: ResourceTreeBooleanNode;
+    private products: ResourceTreeBooleanNode;
 
     private static infoTemplate = document.querySelector<HTMLTemplateElement>(
         "#converter-info-template",
@@ -32,11 +32,15 @@ export class IntermediateConverter {
             "template#converter-or-template",
         )!;
 
+    private static settingsForm = document.querySelector<HTMLFormElement>(
+        "#converter-settings-form",
+    );
+
     constructor(
         displayName: string,
         displayImage: string,
-        ingredients: ConverterResourceTreeNode,
-        products: ConverterResourceTreeNode,
+        ingredients: ResourceTreeBooleanNode,
+        products: ResourceTreeBooleanNode,
     ) {
         this.displayName = displayName;
         this.displayImage = displayImage;
@@ -59,19 +63,6 @@ export class IntermediateConverter {
         return new Converter(this.displayName, this.displayImage, ingr, prod);
     }
 
-    // Returns the number of this converter that's required to produce the given
-    // amount of the given resource
-    public getAmountToProduce(
-        resource: Resource,
-        amountToProduce: number,
-    ): number {
-        // DFS the tree (complaining on any unresolved ORs) and look for the resource
-        // and sum up how much of it's being produced
-        return (
-            -amountToProduce / this.tallyResourceCount(this.products, resource)
-        );
-    }
-
     // Populate an info panel with information regarding this converter
     // Assumes empty panel element!
     public populateInfoPanel(panel: HTMLElement) {
@@ -87,16 +78,21 @@ export class IntermediateConverter {
         );
 
         // Populate the info panel recursively with ingredients and products
+        const settings: [string, SettingType][] = [];
         this.addResourceTreeToElement(
             this.ingredients,
             null,
             el.querySelector<Element>(".c-info-ingredients")!,
+            settings,
         );
         this.addResourceTreeToElement(
             this.products,
             null,
             el.querySelector<Element>(".c-info-products")!,
+            settings,
         );
+
+        // TODO: Add all required settings to the settings form
 
         panel.appendChild(el);
     }
@@ -105,10 +101,11 @@ export class IntermediateConverter {
     private addResourceTreeToElement(
         node: ConverterResourceTree,
         parentContext: {
-            node: ConverterResourceTreeNode;
+            node: ResourceTreeBooleanNode;
             index: number;
         } | null,
         el: Element,
+        settings: [string, SettingType][],
     ): HTMLElement {
         switch (node.type) {
             case "RESOURCE":
@@ -125,6 +122,7 @@ export class IntermediateConverter {
                         child,
                         { node, index },
                         andEl,
+                        settings,
                     );
                 });
                 el.appendChild(andEl);
@@ -150,6 +148,7 @@ export class IntermediateConverter {
                         res,
                         { node, index: i },
                         selectList,
+                        settings,
                     );
 
                     // Add a listener for selecting an option
@@ -174,6 +173,19 @@ export class IntermediateConverter {
 
                 el.appendChild(selectEl);
                 return selectEl;
+
+            case "MULTIPLIER":
+                console.log("Multiplier found in resource tree");
+
+                // TODO: Parse the settings
+
+                // For now, just ignore it, but add some kind of listener later
+                return this.addResourceTreeToElement(
+                    node.resource,
+                    parentContext,
+                    el,
+                    settings,
+                );
         }
     }
 
@@ -210,6 +222,11 @@ export class IntermediateConverter {
                 for (const child of node.resources)
                     this.resourceTreeToList(child, output);
                 break;
+            case "MULTIPLIER":
+                // TODO: Get form data and evaluate
+                console.warn("Multipliers not yet fully implemented!");
+                this.resourceTreeToList(node.resource, output);
+                break;
             case "OR":
                 throw new Error(
                     "Resource tree isn't fully resolved, please select which of the available options to use!",
@@ -217,25 +234,6 @@ export class IntermediateConverter {
         }
 
         return output;
-    }
-
-    // Count the total amount of a given resource present in a resource tree
-    private tallyResourceCount(
-        node: ConverterResourceTree,
-        resource: Resource,
-    ): number {
-        if (node.type === "RESOURCE") {
-            if (getResource(node.id) === resource)
-                return resolveRational(node.amount);
-            return 0;
-        } else if (node.type === "AND") {
-            return node.resources.reduce(
-                (acc, el) => acc + this.tallyResourceCount(el, resource),
-                0,
-            );
-        } else {
-            throw new Error("Unresolved OR");
-        }
     }
 }
 
@@ -263,13 +261,31 @@ export type ConverterData = {
 // Types for representing an input tree that has not yet been resolved into a list
 export type ConverterResourceTree =
     | ConverterResourceTreeLeaf
-    | ConverterResourceTreeNode;
+    | ResourceTreeBooleanNode
+    | ResourceTreeMultiplierNode;
 type ConverterResourceTreeLeaf = {
     type: "RESOURCE";
     id: string;
     amount: number | [number, number]; // regular number or ratio
 };
-type ConverterResourceTreeNode = {
+type ResourceTreeBooleanNode = {
     type: "AND" | "OR";
     resources: ConverterResourceTree[];
 };
+type ResourceTreeMultiplierNode = {
+    type: "MULTIPLIER";
+    multiplier: SettingsTreeNode;
+    resource: ConverterResourceTree;
+};
+
+// Types for specifying an AST tree describing the efficiency of a process as the
+// result of a number of settings
+type SettingsTreeNode = SettingsTreeNumberNode | SettingsTreeInputNode;
+type SettingsTreeNumberNode = number;
+type SettingsTreeInputNode = {
+    name: string;
+    default: number;
+};
+// TODO: More node types
+
+type SettingType = "Number"; // TODO: Add more types of settings as they go

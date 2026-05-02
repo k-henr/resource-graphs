@@ -103,37 +103,40 @@
                                 </button>
                             </div>
                         </form>
-                        <form
-                            id="converter-submission-form"
-                            class="popup-form hidden"
-                        >
-                            <div id="converter-amount-input">
-                                <fieldset>
-                                    <legend>Number of converters</legend>
-                                    <input
-                                        type="number"
-                                        name="amount"
-                                        value="1"
-                                        step="0.01"
-                                        autocomplete="off"
-                                    />
-                                </fieldset>
-                            </div>
-                            <div>
-                                <button
-                                    type="submit"
-                                    class="primary-button rc-submit-button"
-                                >
-                                    Add Converter
-                                </button>
-                                <button
-                                    id="close-converter-form-button"
-                                    class="rc-submit-button"
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        </form>
+                        <div id="converter-specific-footer">
+                            <form id="converter-settings-form"></form>
+                            <form
+                                id="converter-submission-form"
+                                class="popup-form hidden"
+                            >
+                                <div id="converter-amount-input">
+                                    <fieldset>
+                                        <legend>Number of converters</legend>
+                                        <input
+                                            type="number"
+                                            name="amount"
+                                            value="1"
+                                            step="0.01"
+                                            autocomplete="off"
+                                        />
+                                    </fieldset>
+                                </div>
+                                <div>
+                                    <button
+                                        type="submit"
+                                        class="primary-button rc-submit-button"
+                                    >
+                                        Add Converter
+                                    </button>
+                                    <button
+                                        id="close-converter-form-button"
+                                        class="rc-submit-button"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

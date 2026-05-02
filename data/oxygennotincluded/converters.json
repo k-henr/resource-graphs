@@ -1,13 +1,17 @@
 [
     {
         "id": "duplicant",
-        "displayName": "Normal Duplicant",
+        "displayName": "Duplicant",
         "displayImage": "images/dupe.png",
         "consumes": [
             {
-                "type": "RESOURCE",
-                "id": "food",
-                "amount": 1000
+                "type": "MULTIPLIER",
+                "multiplier": 2,
+                "resource": {
+                    "type": "RESOURCE",
+                    "id": "food",
+                    "amount": 1000
+                }
             },
             {
                 "type": "RESOURCE",

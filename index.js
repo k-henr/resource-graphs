@@ -88,6 +88,9 @@
     static converterOrTemplate = document.querySelector(
       "template#converter-or-template"
     );
+    static settingsForm = document.querySelector(
+      "#converter-settings-form"
+    );
     constructor(displayName, displayImage, ingredients, products) {
       this.displayName = displayName;
       this.displayImage = displayImage;
@@ -106,11 +109,6 @@
       const prod = this.resourceTreeToList(this.products, []);
       return new Converter(this.displayName, this.displayImage, ingr, prod);
     }
-    // Returns the number of this converter that's required to produce the given
-    // amount of the given resource
-    getAmountToProduce(resource, amountToProduce) {
-      return -amountToProduce / this.tallyResourceCount(this.products, resource);
-    }
     // Populate an info panel with information regarding this converter
     // Assumes empty panel element!
     populateInfoPanel(panel) {
@@ -121,20 +119,23 @@
       el.querySelector(".rc-info-image").src = getSrc(
         this.getDisplayImage()
       );
+      const settings = [];
       this.addResourceTreeToElement(
         this.ingredients,
         null,
-        el.querySelector(".c-info-ingredients")
+        el.querySelector(".c-info-ingredients"),
+        settings
       );
       this.addResourceTreeToElement(
         this.products,
         null,
-        el.querySelector(".c-info-products")
+        el.querySelector(".c-info-products"),
+        settings
       );
       panel.appendChild(el);
     }
     // (returns the newly created element)
-    addResourceTreeToElement(node, parentContext, el) {
+    addResourceTreeToElement(node, parentContext, el, settings) {
       switch (node.type) {
         case "RESOURCE":
           const resEl = this.createIngredientElement(node);
@@ -146,7 +147,8 @@
             this.addResourceTreeToElement(
               child,
               { node, index },
-              andEl
+              andEl,
+              settings
             );
           });
           el.appendChild(andEl);
@@ -163,7 +165,8 @@
             const option = this.addResourceTreeToElement(
               res,
               { node, index: i },
-              selectList
+              selectList,
+              settings
             );
             option.onclick = () => {
               if (!parentContext)
@@ -180,6 +183,14 @@
           }
           el.appendChild(selectEl);
           return selectEl;
+        case "MULTIPLIER":
+          console.log("Multiplier found in resource tree");
+          return this.addResourceTreeToElement(
+            node.resource,
+            parentContext,
+            el,
+            settings
+          );
       }
     }
     createIngredientElement(ingr) {
@@ -204,27 +215,16 @@
           for (const child of node.resources)
             this.resourceTreeToList(child, output);
           break;
+        case "MULTIPLIER":
+          console.warn("Multipliers not yet fully implemented!");
+          this.resourceTreeToList(node.resource, output);
+          break;
         case "OR":
           throw new Error(
             "Resource tree isn't fully resolved, please select which of the available options to use!"
           );
       }
       return output;
-    }
-    // Count the total amount of a given resource present in a resource tree
-    tallyResourceCount(node, resource) {
-      if (node.type === "RESOURCE") {
-        if (getResource(node.id) === resource)
-          return resolveRational(node.amount);
-        return 0;
-      } else if (node.type === "AND") {
-        return node.resources.reduce(
-          (acc, el) => acc + this.tallyResourceCount(el, resource),
-          0
-        );
-      } else {
-        throw new Error("Unresolved OR");
-      }
     }
   };
 
@@ -472,7 +472,8 @@
     filterForm;
     submissionForm;
     infoPanel;
-    constructor(graph, menuElement, headerElement, thumbList, filterForm, submissionForm, infoPanel) {
+    showOnOpen;
+    constructor(graph, menuElement, headerElement, thumbList, filterForm, submissionForm, infoPanel, showOnOpen) {
       this.graph = graph;
       this.menuElement = menuElement;
       this.headerElement = headerElement;
@@ -480,6 +481,7 @@
       this.filterForm = filterForm;
       this.submissionForm = submissionForm;
       this.infoPanel = infoPanel;
+      this.showOnOpen = showOnOpen;
       submissionForm.onsubmit = async (e) => {
         e.preventDefault();
         this.onSubmit();
@@ -512,7 +514,7 @@
     // Since settings can be changed, which requires a converter and not a factory,
     // intermediate converter storage is required
     intermediateConverter = null;
-    constructor(graph, menuElement, headerElement, thumbList, filterForm, converterForm, amountInput, infoPanel) {
+    constructor(graph, menuElement, headerElement, thumbList, filterForm, converterForm, amountInput, infoPanel, showOnOpen) {
       super(
         graph,
         menuElement,
@@ -520,7 +522,8 @@
         thumbList,
         filterForm,
         converterForm,
-        infoPanel
+        infoPanel,
+        showOnOpen
       );
       this.amountInput = amountInput;
     }
@@ -528,7 +531,7 @@
       if (!this.intermediateConverter) return;
       const formData = new FormData(this.submissionForm);
       const converter = this.intermediateConverter.finalize();
-      const amount = this.resourceBeingRequested ? this.intermediateConverter.getAmountToProduce(
+      const amount = this.resourceBeingRequested ? converter.getAmountToProduce(
         this.resourceBeingRequested,
         this.amountOfResourceBeingRequested
       ) : Number(formData.get("amount").valueOf());
@@ -689,7 +692,10 @@
       thumbList,
       rFilter,
       rSubmit,
-      infoPanel
+      infoPanel,
+      rSubmit
+      // For now, this only hides the submission form. If I for some
+      // reason need to hide more, this is what to change
     );
     document.querySelector(
       "#open-item-delta-menu-button"
@@ -704,6 +710,9 @@
     const cSubmitAmount = document.querySelector(
       "#converter-amount-input"
     );
+    const cFormWrapper = document.querySelector(
+      "#converter-specific-footer"
+    );
     const converterMenu = new ConverterMenu(
       graph,
       addRcMenuWrapper,
@@ -712,7 +721,8 @@
       cFilter,
       cSubmit,
       cSubmitAmount,
-      infoPanel
+      infoPanel,
+      cFormWrapper
     );
     document.querySelector(
       "#open-converter-menu-button"

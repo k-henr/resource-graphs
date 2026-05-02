@@ -12,8 +12,6 @@ import {
 import { Resource } from "./resource";
 import { IntermediateConverter } from "./intermediateConverter";
 
-import { ConverterFactory } from "./intermediateConverter";
-
 abstract class SubmitMenu {
     protected static thumbTemplate =
         document.querySelector<HTMLTemplateElement>("#item-converter-thumb")!;
@@ -25,6 +23,7 @@ abstract class SubmitMenu {
     protected filterForm: HTMLFormElement;
     protected submissionForm: HTMLFormElement;
     protected infoPanel: HTMLElement;
+    protected showOnOpen: HTMLElement;
 
     constructor(
         graph: ResourceGraph,
@@ -34,6 +33,7 @@ abstract class SubmitMenu {
         filterForm: HTMLFormElement,
         submissionForm: HTMLFormElement,
         infoPanel: HTMLElement,
+        showOnOpen: HTMLElement,
     ) {
         this.graph = graph;
         this.menuElement = menuElement;
@@ -42,6 +42,7 @@ abstract class SubmitMenu {
         this.filterForm = filterForm;
         this.submissionForm = submissionForm;
         this.infoPanel = infoPanel;
+        this.showOnOpen = showOnOpen;
 
         // Listener for submitting
         submissionForm.onsubmit = async (e) => {
@@ -104,6 +105,7 @@ export class ConverterMenu extends SubmitMenu {
         converterForm: HTMLFormElement,
         amountInput: HTMLElement,
         infoPanel: HTMLElement,
+        showOnOpen: HTMLElement,
     ) {
         super(
             graph,
@@ -113,6 +115,7 @@ export class ConverterMenu extends SubmitMenu {
             filterForm,
             converterForm,
             infoPanel,
+            showOnOpen,
         );
 
         this.amountInput = amountInput;
@@ -128,7 +131,7 @@ export class ConverterMenu extends SubmitMenu {
 
         // If being requested by item, get the amount automatically from the converter
         const amount = this.resourceBeingRequested
-            ? this.intermediateConverter.getAmountToProduce(
+            ? converter.getAmountToProduce(
                   this.resourceBeingRequested,
                   this.amountOfResourceBeingRequested,
               )

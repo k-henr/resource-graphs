@@ -75,6 +75,8 @@ import { ConverterMenu, ResourceMenu } from "./scripts/menus";
         rFilter,
         rSubmit,
         infoPanel,
+        rSubmit, // For now, this only hides the submission form. If I for some
+        // reason need to hide more, this is what to change
     );
 
     // Add listeners for opening/closing the resource menu
@@ -93,6 +95,9 @@ import { ConverterMenu, ResourceMenu } from "./scripts/menus";
     const cSubmitAmount = document.querySelector<HTMLElement>(
         "#converter-amount-input",
     )!;
+    const cFormWrapper = document.querySelector<HTMLElement>(
+        "#converter-specific-footer",
+    )!;
 
     const converterMenu = new ConverterMenu(
         graph,
@@ -103,6 +108,7 @@ import { ConverterMenu, ResourceMenu } from "./scripts/menus";
         cSubmit,
         cSubmitAmount,
         infoPanel,
+        cFormWrapper,
     );
 
     // Open/close converter menu too
