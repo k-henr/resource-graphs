@@ -1,4 +1,10 @@
 import { Converter, ConverterIngredient } from "./converter";
+import {
+    ConverterSettings,
+    Setting,
+    SettingsTreeInputNode,
+    SettingsTreeNode,
+} from "./converterSettings";
 import { getResource, getSrc } from "./data";
 import { Resource } from "./resource";
 import { getRoundedString, resolveRational } from "./util";
@@ -63,12 +69,15 @@ export class IntermediateConverter {
         // Get all the settings present in this converter
         const convSettings = this.getAllConverterSettings(
             this.products,
-            this.getAllConverterSettings(this.ingredients, []),
+            this.getAllConverterSettings(
+                this.ingredients,
+                new ConverterSettings(),
+            ),
         );
 
         // Add all the settings to the settings form
-        for (const node of convSettings) {
-            const settingEl = this.createSettingInput(node);
+        for (const [name, setting] of convSettings.getAllSettings()) {
+            const settingEl = this.createSettingInput(name, setting);
 
             IntermediateConverter.settingsForm.appendChild(settingEl);
         }
@@ -128,31 +137,34 @@ export class IntermediateConverter {
         IntermediateConverter.infoPanel.appendChild(el);
     }
 
-    private createSettingInput(node: SettingsTreeInputNode): DocumentFragment {
-        switch (node.type) {
+    private createSettingInput(
+        name: string,
+        setting: Setting,
+    ): DocumentFragment {
+        switch (setting.type) {
             case "NUMBER": {
-                const [settingEl, , input] = this.createInputElement(node);
+                const [settingEl, , input] = this.createInputElement(name);
                 // Add a number input with the correct name and label
                 input.type = "number";
-                input.value = String(node.default);
+                input.value = String(setting.default);
                 return settingEl;
             }
 
             case "TOGGLE": {
-                const [settingEl, , input] = this.createInputElement(node);
+                const [settingEl, , input] = this.createInputElement(name);
                 // Add a toggle box
                 input.type = "checkbox";
-                input.checked = node.default;
+                input.checked = setting.default;
                 return settingEl;
             }
 
             case "ENUMERATE": {
-                const [settingEl, , select] = this.createSelectElement(node);
+                const [settingEl, , select] = this.createSelectElement(name);
                 // Add all the options
-                for (const [name] of node.options) {
+                for (const optionName of setting.options) {
                     const optionEl = document.createElement("option");
-                    optionEl.value = name;
-                    optionEl.innerText = name;
+                    optionEl.value = optionName;
+                    optionEl.innerText = optionName;
                     select.appendChild(optionEl);
                 }
 
@@ -162,7 +174,7 @@ export class IntermediateConverter {
     }
 
     private createInputElement(
-        node: SettingsTreeInputNode,
+        name: string,
     ): [DocumentFragment, HTMLLabelElement, HTMLInputElement] {
         const settingEl =
             IntermediateConverter.settingInputTemplate.content.cloneNode(
@@ -171,9 +183,10 @@ export class IntermediateConverter {
         const label = settingEl.querySelector<HTMLLabelElement>("label")!;
         const input = settingEl.querySelector<HTMLInputElement>("input")!;
 
-        label.htmlFor = node.name;
-        label.innerText = node.name;
-        input.name = node.name;
+        label.htmlFor = name;
+        label.innerText = name;
+        input.name = name;
+
         input.onchange = () => {
             // Clear info panel and show again
             IntermediateConverter.infoPanel.innerHTML = "";
@@ -184,7 +197,7 @@ export class IntermediateConverter {
     }
 
     private createSelectElement(
-        node: SettingsTreeInputNode,
+        name: string,
     ): [DocumentFragment, HTMLLabelElement, HTMLSelectElement] {
         const settingEl =
             IntermediateConverter.settingSelectTemplate.content.cloneNode(
@@ -193,10 +206,12 @@ export class IntermediateConverter {
         const label = settingEl.querySelector<HTMLLabelElement>("label")!;
         const input = settingEl.querySelector<HTMLSelectElement>("select")!;
 
-        label.htmlFor = node.name;
-        label.innerText = node.name;
-        input.name = node.name;
+        label.htmlFor = name;
+        label.innerText = name;
+        input.name = name;
+
         input.onchange = () => {
+            // Clear info panel and show again
             IntermediateConverter.infoPanel.innerHTML = "";
             this.populateInfoPanel();
         };
@@ -207,51 +222,21 @@ export class IntermediateConverter {
     // Register all converter settings present in the given tree
     private getAllConverterSettings(
         node: ConverterResourceTree,
-        output: SettingsTreeInputNode[],
+        settings: ConverterSettings,
     ) {
         switch (node.type) {
             case "RESOURCE":
-                return output;
+                return settings;
 
             case "AND":
             case "OR":
                 for (const child of node.resources)
-                    this.getAllConverterSettings(child, output);
-                return output;
+                    this.getAllConverterSettings(child, settings);
+                return settings;
 
             case "MULTIPLIER":
-                this.getSettingsFromAst(node.multiplier, output);
-                return output;
-        }
-    }
-
-    // Parse an AST node found in the previous function
-    private getSettingsFromAst(
-        astNode: SettingsTreeNode,
-        output: SettingsTreeInputNode[],
-    ) {
-        // TODO: Check that there's not already a setting with the same name. If
-        // there is, combine or complain
-
-        if (typeof astNode === "number") return;
-
-        switch (astNode.type) {
-            case "NUMBER":
-                output.push(astNode);
-                return;
-
-            case "TOGGLE":
-                output.push(astNode);
-                this.getSettingsFromAst(astNode.true, output);
-                this.getSettingsFromAst(astNode.false, output);
-                return;
-
-            case "ENUMERATE":
-                output.push(astNode);
-                for (const [, option] of astNode.options) {
-                    this.getSettingsFromAst(option, output);
-                }
-                return;
+                settings.registerSettingsFromAst(node.multiplier);
+                return settings;
         }
     }
 
@@ -336,8 +321,6 @@ export class IntermediateConverter {
                 return selectEl;
 
             case "MULTIPLIER":
-                console.log("Multiplier found in resource tree");
-
                 // Parse the settings to modify the multiplier
                 multiplier *= this.evaluateSettingsTree(
                     node.multiplier,
@@ -405,12 +388,10 @@ export class IntermediateConverter {
                 break;
             case "MULTIPLIER":
                 // Evaluate the settings tree
-                console.log("Encountered multiplier");
                 multiplier *= this.evaluateSettingsTree(
                     node.multiplier,
                     settingsData,
                 );
-                console.log("Multiplier: ", multiplier);
                 this.resourceTreeToList(
                     node.resource,
                     output,
@@ -431,7 +412,6 @@ export class IntermediateConverter {
         treeNode: SettingsTreeNode,
         formData: FormData,
     ): number {
-        console.log("Node:", treeNode);
         if (typeof treeNode === "number") return treeNode;
 
         switch (treeNode.type) {
@@ -501,8 +481,8 @@ export type ConverterFactory = {
     factory: () => IntermediateConverter;
 };
 
-// The data is wrapped in implicit ANDs; if there are multiple entries in the input,
-// it assumes you need them all
+// The resource list is wrapped in implicit ANDs; if there are multiple entries in
+// the input/output, it assumes you need/get them all
 export type ConverterData = {
     id: string;
     displayName: string;
@@ -529,63 +509,4 @@ type ResourceTreeMultiplierNode = {
     type: "MULTIPLIER";
     multiplier: SettingsTreeNode;
     resource: ConverterResourceTree;
-};
-
-// Types for specifying an AST tree describing the efficiency of a process as the
-// result of a number of settings
-type SettingsTreeNode =
-    | SettingsTreeNumberNode
-    | SettingsTreeInputNode
-    | SettingsTreeMathNode;
-type SettingsTreeNumberNode = number;
-type SettingsTreeInputNode =
-    | SettingsTreeNumberInput
-    | SettingsTreeToggleInput
-    | SettingsTreeEnumerateInput;
-type SettingsTreeNumberInput = {
-    type: "NUMBER";
-    name: string;
-    default: number;
-};
-type SettingsTreeToggleInput = {
-    type: "TOGGLE";
-    name: string;
-    true: SettingsTreeNode;
-    false: SettingsTreeNode;
-    default: boolean;
-};
-type SettingsTreeEnumerateInput = {
-    type: "ENUMERATE";
-    name: string;
-    options: [string, SettingsTreeNode][];
-    default: string;
-};
-type SettingsTreeMathNode =
-    | SettingsTreeMulNode
-    | SettingsTreeDivNode
-    | SettingsTreeAddNode
-    | SettingsTreeSubNode
-    | SettingsTreePowNode;
-type SettingsTreeMulNode = {
-    type: "MUL";
-    factors: SettingsTreeNode[];
-};
-type SettingsTreeDivNode = {
-    type: "DIV";
-    numerator: SettingsTreeNode;
-    denominator: SettingsTreeNode;
-};
-type SettingsTreeAddNode = {
-    type: "ADD";
-    terms: SettingsTreeNode[];
-};
-type SettingsTreeSubNode = {
-    type: "SUB";
-    term1: SettingsTreeNode;
-    term2: SettingsTreeNode;
-};
-type SettingsTreePowNode = {
-    type: "POW";
-    base: SettingsTreeNode;
-    exponent: SettingsTreeNode;
 };

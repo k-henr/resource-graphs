@@ -113,8 +113,10 @@
                                 class="popup-form hidden"
                             >
                                 <div id="converter-amount-input">
-                                    <fieldset>
-                                        <legend>Number of converters</legend>
+                                    <div class="rc-form-option">
+                                        <label for="amount"
+                                            >Number of converters</label
+                                        >
                                         <input
                                             type="number"
                                             name="amount"
@@ -122,7 +124,7 @@
                                             step="0.01"
                                             autocomplete="off"
                                         />
-                                    </fieldset>
+                                    </div>
                                 </div>
                                 <div>
                                     <button
@@ -204,14 +206,14 @@
 
         <!-- Template for a custom per-converter input setting -->
         <template id="converter-setting-input-template">
-            <div class="flex">
+            <div class="rc-form-option">
                 <label></label>
                 <input />
             </div>
         </template>
         <!-- Template for a custom per-converter select setting -->
         <template id="converter-setting-select-template">
-            <div class="flex">
+            <div class="rc-form-option">
                 <label></label>
                 <select></select>
             </div>

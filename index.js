@@ -57,6 +57,79 @@
     }
   };
 
+  // scripts/converterSettings.ts
+  var ConverterSettings = class {
+    settingsLookup = /* @__PURE__ */ new Map();
+    settingsOrder = [];
+    // Parse an AST node and register all settings in it
+    registerSettingsFromAst(astNode) {
+      if (typeof astNode === "number") return;
+      switch (astNode.type) {
+        case "NUMBER":
+          this.registerSetting(astNode);
+          return;
+        case "TOGGLE":
+          this.registerSetting(astNode);
+          this.registerSettingsFromAst(astNode.true);
+          this.registerSettingsFromAst(astNode.false);
+          return;
+        case "ENUMERATE":
+          this.registerSetting(astNode);
+          for (const [, option] of astNode.options) {
+            this.registerSettingsFromAst(option);
+          }
+          return;
+      }
+    }
+    registerSetting(node) {
+      if (this.settingsLookup.has(node.name)) {
+        const prev = this.settingsLookup.get(node.name);
+        if (node.type !== prev.type)
+          throw new Error(
+            `Mismatched type for converter setting ${node.name}`
+          );
+        if (node.type === "ENUMERATE") {
+          if (prev.type !== "ENUMERATE") return;
+          for (const [name] of node.options) {
+            if (prev.options.indexOf(name) === -1)
+              prev.options.push(name);
+          }
+        }
+      } else {
+        this.settingsOrder.push(node.name);
+        this.settingsLookup.set(node.name, this.makeNewSettingObject(node));
+      }
+    }
+    // Construct a list of all settings that have been registered
+    getAllSettings() {
+      const output = [];
+      for (const name of this.settingsOrder) {
+        output.push([name, this.settingsLookup.get(name)]);
+      }
+      return output;
+    }
+    makeNewSettingObject(node) {
+      switch (node.type) {
+        case "NUMBER":
+          return {
+            type: "NUMBER",
+            default: node.default
+          };
+        case "TOGGLE":
+          return {
+            type: "TOGGLE",
+            default: node.default
+          };
+        case "ENUMERATE":
+          return {
+            type: "ENUMERATE",
+            options: node.options.map((el) => el[0]),
+            default: node.default
+          };
+      }
+    }
+  };
+
   // scripts/util.ts
   function getRoundedString(x) {
     if (Math.abs(x) < 1e-12) return "0";
@@ -106,10 +179,13 @@
       _IntermediateConverter.settingsForm.innerHTML = "";
       const convSettings = this.getAllConverterSettings(
         this.products,
-        this.getAllConverterSettings(this.ingredients, [])
+        this.getAllConverterSettings(
+          this.ingredients,
+          new ConverterSettings()
+        )
       );
-      for (const node of convSettings) {
-        const settingEl = this.createSettingInput(node);
+      for (const [name, setting] of convSettings.getAllSettings()) {
+        const settingEl = this.createSettingInput(name, setting);
         _IntermediateConverter.settingsForm.appendChild(settingEl);
       }
     }
@@ -155,56 +231,56 @@
       );
       _IntermediateConverter.infoPanel.appendChild(el);
     }
-    createSettingInput(node) {
-      switch (node.type) {
+    createSettingInput(name, setting) {
+      switch (setting.type) {
         case "NUMBER": {
-          const [settingEl, , input] = this.createInputElement(node);
+          const [settingEl, , input] = this.createInputElement(name);
           input.type = "number";
-          input.value = String(node.default);
+          input.value = String(setting.default);
           return settingEl;
         }
         case "TOGGLE": {
-          const [settingEl, , input] = this.createInputElement(node);
+          const [settingEl, , input] = this.createInputElement(name);
           input.type = "checkbox";
-          input.checked = node.default;
+          input.checked = setting.default;
           return settingEl;
         }
         case "ENUMERATE": {
-          const [settingEl, , select] = this.createSelectElement(node);
-          for (const [name] of node.options) {
+          const [settingEl, , select] = this.createSelectElement(name);
+          for (const optionName of setting.options) {
             const optionEl = document.createElement("option");
-            optionEl.value = name;
-            optionEl.innerText = name;
+            optionEl.value = optionName;
+            optionEl.innerText = optionName;
             select.appendChild(optionEl);
           }
           return settingEl;
         }
       }
     }
-    createInputElement(node) {
+    createInputElement(name) {
       const settingEl = _IntermediateConverter.settingInputTemplate.content.cloneNode(
         true
       );
       const label = settingEl.querySelector("label");
       const input = settingEl.querySelector("input");
-      label.htmlFor = node.name;
-      label.innerText = node.name;
-      input.name = node.name;
+      label.htmlFor = name;
+      label.innerText = name;
+      input.name = name;
       input.onchange = () => {
         _IntermediateConverter.infoPanel.innerHTML = "";
         this.populateInfoPanel();
       };
       return [settingEl, label, input];
     }
-    createSelectElement(node) {
+    createSelectElement(name) {
       const settingEl = _IntermediateConverter.settingSelectTemplate.content.cloneNode(
         true
       );
       const label = settingEl.querySelector("label");
       const input = settingEl.querySelector("select");
-      label.htmlFor = node.name;
-      label.innerText = node.name;
-      input.name = node.name;
+      label.htmlFor = name;
+      label.innerText = name;
+      input.name = name;
       input.onchange = () => {
         _IntermediateConverter.infoPanel.innerHTML = "";
         this.populateInfoPanel();
@@ -212,38 +288,18 @@
       return [settingEl, label, input];
     }
     // Register all converter settings present in the given tree
-    getAllConverterSettings(node, output) {
+    getAllConverterSettings(node, settings) {
       switch (node.type) {
         case "RESOURCE":
-          return output;
+          return settings;
         case "AND":
         case "OR":
           for (const child of node.resources)
-            this.getAllConverterSettings(child, output);
-          return output;
+            this.getAllConverterSettings(child, settings);
+          return settings;
         case "MULTIPLIER":
-          this.getSettingsFromAst(node.multiplier, output);
-          return output;
-      }
-    }
-    // Parse an AST node found in the previous function
-    getSettingsFromAst(astNode, output) {
-      if (typeof astNode === "number") return;
-      switch (astNode.type) {
-        case "NUMBER":
-          output.push(astNode);
-          return;
-        case "TOGGLE":
-          output.push(astNode);
-          this.getSettingsFromAst(astNode.true, output);
-          this.getSettingsFromAst(astNode.false, output);
-          return;
-        case "ENUMERATE":
-          output.push(astNode);
-          for (const [, option] of astNode.options) {
-            this.getSettingsFromAst(option, output);
-          }
-          return;
+          settings.registerSettingsFromAst(node.multiplier);
+          return settings;
       }
     }
     // (returns the newly created element)
@@ -298,7 +354,6 @@
           el.appendChild(selectEl);
           return selectEl;
         case "MULTIPLIER":
-          console.log("Multiplier found in resource tree");
           multiplier *= this.evaluateSettingsTree(
             node.multiplier,
             settingsData
@@ -342,12 +397,10 @@
             );
           break;
         case "MULTIPLIER":
-          console.log("Encountered multiplier");
           multiplier *= this.evaluateSettingsTree(
             node.multiplier,
             settingsData
           );
-          console.log("Multiplier: ", multiplier);
           this.resourceTreeToList(
             node.resource,
             output,
@@ -363,7 +416,6 @@
       return output;
     }
     evaluateSettingsTree(treeNode, formData) {
-      console.log("Node:", treeNode);
       if (typeof treeNode === "number") return treeNode;
       switch (treeNode.type) {
         case "NUMBER":
@@ -818,6 +870,9 @@
 
   // index.ts
   (async () => {
+    window.onhashchange = () => {
+      window.location.reload();
+    };
     const resourceDeltaList = document.querySelector(
       "#resources"
     );

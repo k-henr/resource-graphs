@@ -124,10 +124,29 @@
             {
                 "type": "MULTIPLIER",
                 "multiplier": {
-                    "type": "TOGGLE",
-                    "name": "Wild",
-                    "true": 0.25,
-                    "false": 1
+                    "type": "ENUMERATE",
+                    "name": "Mood",
+                    "options": [
+                        [
+                            "Glum",
+                            {
+                                "type": "TOGGLE",
+                                "name": "Wild",
+                                "true": 0.1,
+                                "false": 0.2
+                            }
+                        ],
+                        [
+                            "Satisfied",
+                            {
+                                "type": "TOGGLE",
+                                "name": "Wild",
+                                "true": 0.25,
+                                "false": 1
+                            }
+                        ]
+                    ],
+                    "default": "Satisfied"
                 },
                 "resource": {
                     "type": "RESOURCE",

@@ -12,6 +12,11 @@ import { ResourceGraph } from "./scripts/resourceGraph";
 import { ConverterMenu, ResourceMenu } from "./scripts/menus";
 
 (async () => {
+    // Forcibly reload when the hash changes since the loading needs to reset
+    window.onhashchange = () => {
+        window.location.reload();
+    };
+
     const resourceDeltaList = document.querySelector(
         "#resources",
     ) as HTMLElement;

@@ -244,6 +244,12 @@ footer {
     aspect-ratio: 1;
 }
 
+.rc-form-option {
+    display: flex;
+    margin: 8px;
+    gap: 8px;
+}
+
 .rc-submit-button {
     padding: 8px;
     font-size: large;
