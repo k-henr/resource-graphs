@@ -120,6 +120,9 @@ function parseIngredientListToAllPossible(
             for (const n of node.resources)
                 parseIngredientListToAllPossible(output, n);
             break;
+        case "MULTIPLIER":
+            parseIngredientListToAllPossible(output, node.resource);
+            break;
     }
 }
 
@@ -147,19 +150,15 @@ export function getConverterFactoriesWithFilters(
         // (always allow through if no filter is set)
         let consumesPasses = anyResourceConsumed.length == 0;
         for (const consFilter of anyResourceConsumed) {
-            if (c.possibleIngredients.indexOf(consFilter) !== -1) {
-                consumesPasses = true;
-                break;
-            }
+            consumesPasses = c.possibleIngredients.indexOf(consFilter) !== -1;
+            if (consumesPasses) break;
         }
         if (!consumesPasses) continue;
 
         let producePasses = anyResourceProduced.length == 0;
         for (const prodFilter of anyResourceProduced) {
-            if (c.possibleProducts.indexOf(prodFilter) !== -1) {
-                producePasses = true;
-                break;
-            }
+            producePasses = c.possibleProducts.indexOf(prodFilter) !== -1;
+            if (producePasses) break;
         }
         if (!producePasses) continue;
 

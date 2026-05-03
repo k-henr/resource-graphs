@@ -79,6 +79,26 @@
             this.registerSettingsFromAst(option);
           }
           return;
+        case "MUL":
+          for (const factor of astNode.factors)
+            this.registerSettingsFromAst(factor);
+          return;
+        case "DIV":
+          this.registerSettingsFromAst(astNode.numerator);
+          this.registerSettingsFromAst(astNode.denominator);
+          return;
+        case "ADD":
+          for (const term of astNode.terms)
+            this.registerSettingsFromAst(term);
+          return;
+        case "SUB":
+          this.registerSettingsFromAst(astNode.term1);
+          this.registerSettingsFromAst(astNode.term2);
+          return;
+        case "POW":
+          this.registerSettingsFromAst(astNode.base);
+          this.registerSettingsFromAst(astNode.exponent);
+          return;
       }
     }
     registerSetting(node) {
@@ -274,13 +294,13 @@
         case "NUMBER": {
           const [settingEl, , input] = this.createInputElement(name);
           input.type = "number";
-          input.value = String(setting.default);
+          input.value = String(setting.default ?? 0);
           return settingEl;
         }
         case "TOGGLE": {
           const [settingEl, , input] = this.createInputElement(name);
           input.type = "checkbox";
-          input.checked = setting.default;
+          input.checked = setting.default ?? false;
           return settingEl;
         }
         case "ENUMERATE": {
@@ -290,6 +310,8 @@
             optionEl.value = optionName;
             optionEl.innerText = optionName;
             select.appendChild(optionEl);
+            const defIndex = setting.options.indexOf(setting.default);
+            select.selectedIndex = defIndex !== -1 ? defIndex : 0;
           }
           return settingEl;
         }
@@ -604,6 +626,9 @@
         for (const n of node.resources)
           parseIngredientListToAllPossible(output, n);
         break;
+      case "MULTIPLIER":
+        parseIngredientListToAllPossible(output, node.resource);
+        break;
     }
   }
   function getConverterFactory(id) {
@@ -617,18 +642,14 @@
         continue;
       let consumesPasses = anyResourceConsumed.length == 0;
       for (const consFilter of anyResourceConsumed) {
-        if (c.possibleIngredients.indexOf(consFilter) !== -1) {
-          consumesPasses = true;
-          break;
-        }
+        consumesPasses = c.possibleIngredients.indexOf(consFilter) !== -1;
+        if (consumesPasses) break;
       }
       if (!consumesPasses) continue;
       let producePasses = anyResourceProduced.length == 0;
       for (const prodFilter of anyResourceProduced) {
-        if (c.possibleProducts.indexOf(prodFilter) !== -1) {
-          producePasses = true;
-          break;
-        }
+        producePasses = c.possibleProducts.indexOf(prodFilter) !== -1;
+        if (producePasses) break;
       }
       if (!producePasses) continue;
       output.push([id, c]);

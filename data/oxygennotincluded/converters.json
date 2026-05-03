@@ -8,13 +8,9 @@
             {
                 "type": "MULTIPLIER",
                 "multiplier": {
-                    "type": "ENUMERATE",
+                    "type": "TOGGLE",
                     "name": "Bottomless stomach",
-                    "options": [
-                        ["Yes", 1.5],
-                        ["No", 1]
-                    ],
-                    "default": "No",
+                    "default": false,
                     "true": 1.5,
                     "false": 1
                 },
@@ -159,6 +155,70 @@
                     "type": "RESOURCE",
                     "id": "hatch_egg",
                     "amount": [5, 30]
+                }
+            }
+        ]
+    },
+    {
+        "id": "steam_turbine",
+        "displayName": "Steam Turbine ({Steam temperature}°C)",
+        "thumbName": "Steam Turbine",
+        "displayImage": "images/steam_turbine.png",
+        "consumes": [
+            {
+                "type": "MULTIPLIER",
+                "resource": {
+                    "type": "RESOURCE",
+                    "id": "steam",
+                    "amount": 600
+                },
+                "multiplier": {
+                    "type": "NUMBER",
+                    "name": "Flow rate",
+                    "default": 2
+                }
+            }
+        ],
+        "produces": [
+            {
+                "type": "MULTIPLIER",
+                "resource": {
+                    "type": "RESOURCE",
+                    "id": "water",
+                    "amount": 600
+                },
+                "multiplier": { "type": "NUMBER", "name": "Flow rate" }
+            },
+            {
+                "type": "MULTIPLIER",
+                "resource": {
+                    "type": "RESOURCE",
+                    "id": "power",
+                    "amount": 1
+                },
+                "multiplier": {
+                    "type": "MUL",
+                    "factors": [
+                        {
+                            "type": "DIV",
+                            "numerator": 85,
+                            "denominator": 21
+                        },
+                        {
+                            "type": "NUMBER",
+                            "name": "Flow rate",
+                            "default": 2
+                        },
+                        {
+                            "type": "SUB",
+                            "term1": {
+                                "type": "NUMBER",
+                                "name": "Steam temperature",
+                                "default": 125
+                            },
+                            "term2": 95
+                        }
+                    ]
                 }
             }
         ]

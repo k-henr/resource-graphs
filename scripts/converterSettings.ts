@@ -23,6 +23,31 @@ export class ConverterSettings {
                     this.registerSettingsFromAst(option);
                 }
                 return;
+
+            case "MUL":
+                for (const factor of astNode.factors)
+                    this.registerSettingsFromAst(factor);
+                return;
+
+            case "DIV":
+                this.registerSettingsFromAst(astNode.numerator);
+                this.registerSettingsFromAst(astNode.denominator);
+                return;
+
+            case "ADD":
+                for (const term of astNode.terms)
+                    this.registerSettingsFromAst(term);
+                return;
+
+            case "SUB":
+                this.registerSettingsFromAst(astNode.term1);
+                this.registerSettingsFromAst(astNode.term2);
+                return;
+
+            case "POW":
+                this.registerSettingsFromAst(astNode.base);
+                this.registerSettingsFromAst(astNode.exponent);
+                return;
         }
     }
 

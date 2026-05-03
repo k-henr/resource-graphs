@@ -199,7 +199,7 @@ export class IntermediateConverter {
                 const [settingEl, , input] = this.createInputElement(name);
                 // Add a number input with the correct name and label
                 input.type = "number";
-                input.value = String(setting.default);
+                input.value = String(setting.default ?? 0);
                 return settingEl;
             }
 
@@ -207,7 +207,7 @@ export class IntermediateConverter {
                 const [settingEl, , input] = this.createInputElement(name);
                 // Add a toggle box
                 input.type = "checkbox";
-                input.checked = setting.default;
+                input.checked = setting.default ?? false;
                 return settingEl;
             }
 
@@ -219,6 +219,9 @@ export class IntermediateConverter {
                     optionEl.value = optionName;
                     optionEl.innerText = optionName;
                     select.appendChild(optionEl);
+
+                    const defIndex = setting.options.indexOf(setting.default);
+                    select.selectedIndex = defIndex !== -1 ? defIndex : 0;
                 }
 
                 return settingEl;

@@ -38,5 +38,15 @@
         "id": "hatch_egg",
         "displayName": "Hatch Egg",
         "displayImage": "images/hatch_egg.png"
+    },
+    {
+        "id": "steam",
+        "displayName": "Steam",
+        "displayImage": "images/steam.png"
+    },
+    {
+        "id": "power",
+        "displayName": "Power",
+        "displayImage": "images/power.png"
     }
 ]
