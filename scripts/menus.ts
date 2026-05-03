@@ -96,6 +96,8 @@ export class ConverterMenu extends SubmitMenu {
     // intermediate converter storage is required
     private intermediateConverter: IntermediateConverter | null = null;
 
+    private converterSettingsForm: HTMLElement;
+
     constructor(
         graph: ResourceGraph,
         menuElement: HTMLElement,
@@ -103,6 +105,7 @@ export class ConverterMenu extends SubmitMenu {
         thumbList: HTMLElement,
         filterForm: HTMLFormElement,
         converterForm: HTMLFormElement,
+        converterSettingsForm: HTMLElement,
         amountInput: HTMLElement,
         infoPanel: HTMLElement,
         showOnOpen: HTMLElement,
@@ -119,6 +122,7 @@ export class ConverterMenu extends SubmitMenu {
         );
 
         this.amountInput = amountInput;
+        this.converterSettingsForm = converterSettingsForm;
     }
 
     protected override onSubmit() {
@@ -194,6 +198,7 @@ export class ConverterMenu extends SubmitMenu {
     public override close() {
         super.close();
         this.intermediateConverter = null;
+        this.converterSettingsForm.innerHTML = "";
         this.amountInput.classList.remove("hidden");
     }
 

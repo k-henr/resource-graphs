@@ -56,6 +56,10 @@ export class ConverterSettings {
         }
     }
 
+    public getSetting(name: string) {
+        return this.settingsLookup.get(name);
+    }
+
     // Construct a list of all settings that have been registered
     public getAllSettings(): [string, Setting][] {
         const output: [string, Setting][] = [];

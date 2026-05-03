@@ -100,6 +100,9 @@
         this.settingsLookup.set(node.name, this.makeNewSettingObject(node));
       }
     }
+    getSetting(name) {
+      return this.settingsLookup.get(name);
+    }
     // Construct a list of all settings that have been registered
     getAllSettings() {
       const output = [];
@@ -144,7 +147,10 @@
   // scripts/intermediateConverter.ts
   var IntermediateConverter = class _IntermediateConverter {
     displayName;
+    // Stored unformatted
+    thumbName;
     displayImage;
+    settings;
     // Ingredients and products are always wrapped in an AND node. Split AND and OR
     // into two types to enforce this further?
     ingredients;
@@ -171,26 +177,34 @@
     static settingSelectTemplate = document.querySelector(
       "#converter-setting-select-template"
     );
-    constructor(displayName, displayImage, ingredients, products) {
+    constructor(displayName, thumbName, displayImage, ingredients, products) {
       this.displayName = displayName;
+      this.thumbName = thumbName;
       this.displayImage = displayImage;
       this.ingredients = ingredients;
       this.products = products;
       _IntermediateConverter.settingsForm.innerHTML = "";
-      const convSettings = this.getAllConverterSettings(
+      this.settings = this.getAllConverterSettings(
         this.products,
         this.getAllConverterSettings(
           this.ingredients,
           new ConverterSettings()
         )
       );
-      for (const [name, setting] of convSettings.getAllSettings()) {
+      for (const [name, setting] of this.settings.getAllSettings()) {
         const settingEl = this.createSettingInput(name, setting);
         _IntermediateConverter.settingsForm.appendChild(settingEl);
       }
     }
+    getThumbName() {
+      return this.thumbName;
+    }
     getDisplayName() {
-      return this.displayName;
+      const formData = new FormData(_IntermediateConverter.settingsForm);
+      return this.displayName.replaceAll(
+        /\{(.*?)\}/gim,
+        (match, inner) => this.parseFormatting(inner, formData)
+      );
     }
     getDisplayImage() {
       return this.displayImage;
@@ -204,7 +218,12 @@
         settingsData
       );
       const prod = this.resourceTreeToList(this.products, [], settingsData);
-      return new Converter(this.displayName, this.displayImage, ingr, prod);
+      return new Converter(
+        this.getDisplayName(),
+        this.displayImage,
+        ingr,
+        prod
+      );
     }
     // Populate an info panel with information regarding this converter
     // Assumes empty panel element!
@@ -230,6 +249,25 @@
         settingsData
       );
       _IntermediateConverter.infoPanel.appendChild(el);
+    }
+    parseFormatting(toFormat, formData) {
+      console.log(toFormat);
+      const args = toFormat.split("|");
+      const settingName = args[0];
+      const setting = this.settings.getSetting(settingName);
+      if (!setting)
+        throw new Error(
+          `Formatting error: Setting "${settingName}" not found!`
+        );
+      switch (setting.type) {
+        case "TOGGLE": {
+          return formData.get(settingName) ? args[1] ?? "" : args[2] ?? "";
+        }
+        case "NUMBER":
+        case "ENUMERATE": {
+          return String(formData.get(settingName).valueOf());
+        }
+      }
     }
     createSettingInput(name, setting) {
       switch (setting.type) {
@@ -431,6 +469,11 @@
             if (name === chosen)
               return this.evaluateSettingsTree(option, formData);
           }
+          for (const [name, option] of treeNode.options) {
+            if (name === treeNode.default)
+              return this.evaluateSettingsTree(option, formData);
+          }
+          console.log("Couldn't find default value");
           return 0;
         case "MUL":
           let p = 1;
@@ -532,7 +575,7 @@
         resources: data.produces
       });
       loadedConverterFactories.set(data.id, {
-        name: data.displayName,
+        name: data.thumbName ?? data.displayName,
         image: data.displayImage,
         possibleIngredients: possibleIngr,
         possibleProducts: possibleProd,
@@ -544,6 +587,7 @@
     return () => {
       return new IntermediateConverter(
         data.displayName,
+        data.thumbName ?? data.displayName,
         data.displayImage,
         { type: "AND", resources: [...data.consumes] },
         { type: "AND", resources: [...data.produces] }
@@ -741,7 +785,8 @@
     // Since settings can be changed, which requires a converter and not a factory,
     // intermediate converter storage is required
     intermediateConverter = null;
-    constructor(graph, menuElement, headerElement, thumbList, filterForm, converterForm, amountInput, infoPanel, showOnOpen) {
+    converterSettingsForm;
+    constructor(graph, menuElement, headerElement, thumbList, filterForm, converterForm, converterSettingsForm, amountInput, infoPanel, showOnOpen) {
       super(
         graph,
         menuElement,
@@ -753,6 +798,7 @@
         showOnOpen
       );
       this.amountInput = amountInput;
+      this.converterSettingsForm = converterSettingsForm;
     }
     onSubmit() {
       if (!this.intermediateConverter) return;
@@ -803,6 +849,7 @@
     close() {
       super.close();
       this.intermediateConverter = null;
+      this.converterSettingsForm.innerHTML = "";
       this.amountInput.classList.remove("hidden");
     }
     // Request the user to choose a converter that produces the given amount of the
@@ -934,6 +981,9 @@
     const cFilter = document.querySelector(
       "form#converter-filter-form"
     );
+    const cSettings = document.querySelector(
+      "#converter-settings-form"
+    );
     const cSubmit = document.querySelector(
       "form#converter-submission-form"
     );
@@ -950,6 +1000,7 @@
       thumbList,
       cFilter,
       cSubmit,
+      cSettings,
       cSubmitAmount,
       infoPanel,
       cFormWrapper

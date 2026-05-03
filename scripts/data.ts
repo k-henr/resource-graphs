@@ -84,7 +84,7 @@ export async function loadAllConverters() {
 
         // Create a new converter factory object
         loadedConverterFactories.set(data.id, {
-            name: data.displayName,
+            name: data.thumbName ?? data.displayName,
             image: data.displayImage,
             possibleIngredients: possibleIngr,
             possibleProducts: possibleProd,
@@ -97,6 +97,7 @@ function createFactory(data: ConverterData) {
     return () => {
         return new IntermediateConverter(
             data.displayName,
+            data.thumbName ?? data.displayName,
             data.displayImage,
             { type: "AND", resources: [...data.consumes] },
             { type: "AND", resources: [...data.produces] },

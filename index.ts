@@ -94,6 +94,9 @@ import { ConverterMenu, ResourceMenu } from "./scripts/menus";
     const cFilter = document.querySelector<HTMLFormElement>(
         "form#converter-filter-form",
     )!;
+    const cSettings = document.querySelector<HTMLElement>(
+        "#converter-settings-form",
+    )!;
     const cSubmit = document.querySelector<HTMLFormElement>(
         "form#converter-submission-form",
     )!;
@@ -111,6 +114,7 @@ import { ConverterMenu, ResourceMenu } from "./scripts/menus";
         thumbList,
         cFilter,
         cSubmit,
+        cSettings,
         cSubmitAmount,
         infoPanel,
         cFormWrapper,

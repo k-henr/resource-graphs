@@ -1,7 +1,8 @@
 [
     {
         "id": "duplicant",
-        "displayName": "Duplicant",
+        "displayName": "Duplicant{Bottomless stomach| (bottomless stomach)}{Mouth breather| (mouth breather)}",
+        "thumbName": "Duplicant",
         "displayImage": "images/dupe.png",
         "consumes": [
             {
@@ -97,7 +98,8 @@
     },
     {
         "id": "hatch",
-        "displayName": "Hatch",
+        "displayName": "{Mood} {Wild|wild }Hatch",
+        "thumbName": "Hatch",
         "displayImage": "images/hatch.png",
         "consumes": [
             {
@@ -107,20 +109,6 @@
             }
         ],
         "produces": [
-            {
-                "type": "MULTIPLIER",
-                "multiplier": {
-                    "type": "TOGGLE",
-                    "name": "Wild",
-                    "true": 0.06,
-                    "false": 1
-                },
-                "resource": {
-                    "type": "RESOURCE",
-                    "id": "hatch_egg",
-                    "amount": [5, 30]
-                }
-            },
             {
                 "type": "MULTIPLIER",
                 "multiplier": {
@@ -152,6 +140,25 @@
                     "type": "RESOURCE",
                     "id": "coal",
                     "amount": 70
+                }
+            },
+            {
+                "type": "MULTIPLIER",
+                "multiplier": {
+                    "type": "TOGGLE",
+                    "name": "Wild",
+                    "true": 0.06,
+                    "false": {
+                        "type": "ENUMERATE",
+                        "name": "Mood",
+                        "options": [["Glum", 100]],
+                        "default": "Glum"
+                    }
+                },
+                "resource": {
+                    "type": "RESOURCE",
+                    "id": "hatch_egg",
+                    "amount": [5, 30]
                 }
             }
         ]

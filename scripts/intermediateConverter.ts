@@ -14,8 +14,11 @@ import { getRoundedString, resolveRational } from "./util";
  * in-between beinng resolved and not
  */
 export class IntermediateConverter {
-    private displayName: string;
+    private displayName: string; // Stored unformatted
+    private thumbName: string;
     private displayImage: string;
+
+    private settings: ConverterSettings;
 
     // Ingredients and products are always wrapped in an AND node. Split AND and OR
     // into two types to enforce this further?
@@ -55,11 +58,13 @@ export class IntermediateConverter {
 
     constructor(
         displayName: string,
+        thumbName: string,
         displayImage: string,
         ingredients: ResourceTreeBooleanNode,
         products: ResourceTreeBooleanNode,
     ) {
         this.displayName = displayName;
+        this.thumbName = thumbName;
         this.displayImage = displayImage;
         this.ingredients = ingredients;
         this.products = products;
@@ -67,7 +72,7 @@ export class IntermediateConverter {
         IntermediateConverter.settingsForm.innerHTML = "";
 
         // Get all the settings present in this converter
-        const convSettings = this.getAllConverterSettings(
+        this.settings = this.getAllConverterSettings(
             this.products,
             this.getAllConverterSettings(
                 this.ingredients,
@@ -76,16 +81,28 @@ export class IntermediateConverter {
         );
 
         // Add all the settings to the settings form
-        for (const [name, setting] of convSettings.getAllSettings()) {
+        for (const [name, setting] of this.settings.getAllSettings()) {
             const settingEl = this.createSettingInput(name, setting);
 
             IntermediateConverter.settingsForm.appendChild(settingEl);
         }
     }
 
-    public getDisplayName() {
-        return this.displayName;
+    public getThumbName() {
+        return this.thumbName;
     }
+    public getDisplayName() {
+        // TODO: Format the display name based on the settings
+        // Regex replace formatting stuff with the correct thing
+        // \{(.*?)\}
+
+        const formData = new FormData(IntermediateConverter.settingsForm);
+
+        return this.displayName.replaceAll(/\{(.*?)\}/gim, (match, inner) =>
+            this.parseFormatting(inner, formData),
+        );
+    }
+
     public getDisplayImage() {
         return this.displayImage;
     }
@@ -101,7 +118,12 @@ export class IntermediateConverter {
         );
         const prod = this.resourceTreeToList(this.products, [], settingsData);
 
-        return new Converter(this.displayName, this.displayImage, ingr, prod);
+        return new Converter(
+            this.getDisplayName(),
+            this.displayImage,
+            ingr,
+            prod,
+        );
     }
 
     // Populate an info panel with information regarding this converter
@@ -135,6 +157,37 @@ export class IntermediateConverter {
         );
 
         IntermediateConverter.infoPanel.appendChild(el);
+    }
+
+    private parseFormatting(toFormat: string, formData: FormData): string {
+        console.log(toFormat);
+        const args = toFormat.split("|");
+
+        // The first argument is always the name of the setting
+        const settingName = args[0];
+        const setting = this.settings.getSetting(settingName);
+
+        if (!setting)
+            throw new Error(
+                `Formatting error: Setting "${settingName}" not found!`,
+            );
+
+        // Depending on the type of the setting, do different things
+        switch (setting.type) {
+            case "TOGGLE": {
+                // Depending on if the toggle is on or not, return the first or
+                // second alternative
+                return formData.get(settingName)
+                    ? (args[1] ?? "")
+                    : (args[2] ?? "");
+            }
+
+            case "NUMBER":
+            case "ENUMERATE": {
+                // Return the name/number of the setting
+                return String(formData.get(settingName)!.valueOf());
+            }
+        }
     }
 
     private createSettingInput(
@@ -435,6 +488,16 @@ export class IntermediateConverter {
                 }
                 // Fallback in case of multiple toggles with the same name and
                 // different options
+                // In case of multiple enumerates with the same name and different
+                // options, sometimes the chosen option won't exist on the node. In
+                // that case, choose the default value instead
+                for (const [name, option] of treeNode.options) {
+                    if (name === treeNode.default)
+                        return this.evaluateSettingsTree(option, formData);
+                }
+                // TODO: Error handling in case of graph error where the default
+                // option doesn't exist
+                console.log("Couldn't find default value");
                 return 0;
 
             case "MUL":
@@ -486,6 +549,7 @@ export type ConverterFactory = {
 export type ConverterData = {
     id: string;
     displayName: string;
+    thumbName: string | undefined;
     displayImage: string;
     consumes: ConverterResourceTree[];
     produces: ConverterResourceTree[];
