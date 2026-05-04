@@ -1,10 +1,12 @@
+import { RationalNumber } from "./rational";
+
 export class ConverterSettings {
     private settingsLookup = new Map<string, Setting>();
     private settingsOrder: string[] = [];
 
     // Parse an AST node and register all settings in it
     public registerSettingsFromAst(astNode: SettingsTreeNode) {
-        if (typeof astNode === "number") return;
+        if (typeof astNode === "number" || Array.isArray(astNode)) return;
 
         switch (astNode.type) {
             case "NUMBER":
@@ -122,7 +124,7 @@ export class ConverterSettings {
 export type Setting = NumberSetting | ToggleSetting | EnumerateSetting;
 type NumberSetting = {
     type: "NUMBER";
-    default: number;
+    default: RationalNumber;
 };
 type ToggleSetting = {
     type: "TOGGLE";
@@ -140,7 +142,7 @@ export type SettingsTreeNode =
     | SettingsTreeNumberNode
     | SettingsTreeInputNode
     | SettingsTreeMathNode;
-type SettingsTreeNumberNode = number;
+type SettingsTreeNumberNode = RationalNumber;
 
 export type SettingsTreeInputNode =
     | SettingsTreeNumberInput
@@ -149,7 +151,7 @@ export type SettingsTreeInputNode =
 type SettingsTreeNumberInput = {
     type: "NUMBER";
     name: string;
-    default: number;
+    default: RationalNumber;
 };
 type SettingsTreeToggleInput = {
     type: "TOGGLE";

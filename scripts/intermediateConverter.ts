@@ -2,12 +2,11 @@ import { Converter, ConverterIngredient } from "./converter";
 import {
     ConverterSettings,
     Setting,
-    SettingsTreeInputNode,
     SettingsTreeNode,
 } from "./converterSettings";
 import { getResource, getSrc } from "./data";
+import { Rational, RationalNumber } from "./rational";
 import { Resource } from "./resource";
-import { getRoundedString, resolveRational } from "./util";
 
 /**
  * A class for holding a converter currently being constructed, with ORs and settings
@@ -92,13 +91,10 @@ export class IntermediateConverter {
         return this.thumbName;
     }
     public getDisplayName() {
-        // TODO: Format the display name based on the settings
-        // Regex replace formatting stuff with the correct thing
-        // \{(.*?)\}
-
         const formData = new FormData(IntermediateConverter.settingsForm);
 
-        return this.displayName.replaceAll(/\{(.*?)\}/gim, (match, inner) =>
+        // Format the string
+        return this.displayName.replaceAll(/\{(.*?)\}/gim, (_, inner) =>
             this.parseFormatting(inner, formData),
         );
     }
@@ -109,14 +105,16 @@ export class IntermediateConverter {
 
     // Returns a finalized converter, provided that all ambiguities are resolved
     public finalize(): Converter {
-        const settingsData = new FormData(IntermediateConverter.settingsForm);
-
         const ingr = this.resourceTreeToList(
             this.ingredients,
             [],
-            settingsData,
+            IntermediateConverter.settingsForm,
         );
-        const prod = this.resourceTreeToList(this.products, [], settingsData);
+        const prod = this.resourceTreeToList(
+            this.products,
+            [],
+            IntermediateConverter.settingsForm,
+        );
 
         return new Converter(
             this.getDisplayName(),
@@ -140,20 +138,18 @@ export class IntermediateConverter {
             this.getDisplayImage(),
         );
 
-        const settingsData = new FormData(IntermediateConverter.settingsForm);
-
         // Populate the info panel recursively with ingredients and products
         this.addResourceTreeToElement(
             this.ingredients,
             null,
             el.querySelector<Element>(".c-info-ingredients")!,
-            settingsData,
+            IntermediateConverter.settingsForm,
         );
         this.addResourceTreeToElement(
             this.products,
             null,
             el.querySelector<Element>(".c-info-products")!,
-            settingsData,
+            IntermediateConverter.settingsForm,
         );
 
         IntermediateConverter.infoPanel.appendChild(el);
@@ -185,7 +181,12 @@ export class IntermediateConverter {
             case "NUMBER":
             case "ENUMERATE": {
                 // Return the name/number of the setting
-                return String(formData.get(settingName)!.valueOf());
+                const rational = Rational.fromInput(
+                    String(formData.get(settingName)!.valueOf()),
+                    null,
+                );
+                if (!rational) return "?";
+                return rational.getDecimalString();
             }
         }
     }
@@ -197,8 +198,9 @@ export class IntermediateConverter {
         switch (setting.type) {
             case "NUMBER": {
                 const [settingEl, , input] = this.createInputElement(name);
-                // Add a number input with the correct name and label
-                input.type = "number";
+                // Add a text input (which will be parsed to a rational) with the
+                // correct name and label
+                input.type = "text";
                 input.value = String(setting.default ?? 0);
                 return settingEl;
             }
@@ -304,8 +306,8 @@ export class IntermediateConverter {
             index: number;
         } | null,
         el: Element,
-        settingsData: FormData,
-        multiplier: number = 1,
+        settingsForm: HTMLFormElement,
+        multiplier: Rational = Rational.one,
     ): HTMLElement {
         switch (node.type) {
             case "RESOURCE":
@@ -322,7 +324,7 @@ export class IntermediateConverter {
                         child,
                         { node, index },
                         andEl,
-                        settingsData,
+                        settingsForm,
                         multiplier,
                     );
                 });
@@ -349,7 +351,7 @@ export class IntermediateConverter {
                         res,
                         { node, index: i },
                         selectList,
-                        settingsData,
+                        settingsForm,
                         multiplier,
                     );
 
@@ -378,12 +380,15 @@ export class IntermediateConverter {
 
             case "MULTIPLIER":
                 // Parse the settings to modify the multiplier
-                multiplier *= this.evaluateSettingsTree(
-                    node.multiplier,
-                    settingsData,
+                multiplier = multiplier.mul(
+                    this.evaluateSettingsTree(
+                        node.multiplier,
+                        settingsForm,
+                        new FormData(settingsForm),
+                    ),
                 );
 
-                if (multiplier === 0) {
+                if (multiplier.equals(Rational.zero)) {
                     // TODO: Don't add anything, preferably without adding a dummy
                     // element
                 }
@@ -393,7 +398,7 @@ export class IntermediateConverter {
                     node.resource,
                     parentContext,
                     el,
-                    settingsData,
+                    settingsForm,
                     multiplier,
                 );
         }
@@ -401,7 +406,7 @@ export class IntermediateConverter {
 
     private createIngredientElement(
         ingr: ConverterResourceTreeLeaf,
-        multiplier: number,
+        multiplier: Rational,
     ) {
         const el = (
             IntermediateConverter.converterIngredientTemplate.content.cloneNode(
@@ -412,7 +417,7 @@ export class IntermediateConverter {
         const res = getResource(ingr.id);
 
         el.querySelector<HTMLElement>(".converter-ingredient-name")!.innerText =
-            `${res.getDisplayName()} ⨉ ${getRoundedString(resolveRational(ingr.amount) * multiplier)}`;
+            `${res.getDisplayName()} ⨉ ${Rational.fromData(ingr.amount).mul(multiplier).getDecimalString()}`;
         el.querySelector<HTMLImageElement>(".converter-ingredient-image")!.src =
             getSrc(res.getDisplayImage());
 
@@ -423,35 +428,33 @@ export class IntermediateConverter {
     private resourceTreeToList(
         node: ConverterResourceTree,
         output: ConverterIngredient[],
-        settingsData: FormData,
-        multiplier: number = 1,
+        form: HTMLFormElement,
+        multiplier: Rational = Rational.one,
     ) {
         switch (node.type) {
             case "RESOURCE":
                 output.push({
                     resource: getResource(node.id),
-                    amount: resolveRational(node.amount) * multiplier,
+                    amount: Rational.fromData(node.amount).mul(multiplier),
                 });
                 break;
             case "AND":
                 for (const child of node.resources)
-                    this.resourceTreeToList(
-                        child,
-                        output,
-                        settingsData,
-                        multiplier,
-                    );
+                    this.resourceTreeToList(child, output, form, multiplier);
                 break;
             case "MULTIPLIER":
                 // Evaluate the settings tree
-                multiplier *= this.evaluateSettingsTree(
-                    node.multiplier,
-                    settingsData,
+                multiplier = multiplier.mul(
+                    this.evaluateSettingsTree(
+                        node.multiplier,
+                        form,
+                        new FormData(form),
+                    ),
                 );
                 this.resourceTreeToList(
                     node.resource,
                     output,
-                    settingsData,
+                    form,
                     multiplier,
                 );
                 break;
@@ -466,28 +469,52 @@ export class IntermediateConverter {
 
     private evaluateSettingsTree(
         treeNode: SettingsTreeNode,
+        form: HTMLFormElement,
         formData: FormData,
-    ): number {
-        if (typeof treeNode === "number") return treeNode;
+    ): Rational {
+        if (typeof treeNode === "number" || Array.isArray(treeNode))
+            return Rational.fromData(treeNode);
 
         switch (treeNode.type) {
             case "NUMBER":
                 // Get the setting from the form data
-                return Number(formData.get(treeNode.name)!.valueOf());
+                const el = form.querySelector<HTMLInputElement>(
+                    `input[name="${treeNode.name}"]`,
+                )!;
+                const num = Rational.fromInput(
+                    String(formData.get(treeNode.name)!.valueOf()),
+                    el,
+                );
+                if (!num) {
+                    // TODO: popup
+                    throw new Error("Bad formatting!");
+                }
+                return num;
 
             case "TOGGLE":
                 return this.evaluateSettingsTree(
-                    formData.get(treeNode.name)
+                    form.querySelector<HTMLInputElement>(
+                        `input[name="${treeNode.name}"]`,
+                    )!.checked
                         ? treeNode.true
                         : treeNode.false,
+                    form,
                     formData,
                 );
 
             case "ENUMERATE":
-                const chosen = formData.get(treeNode.name)!.valueOf();
+                const chosen = form
+                    .querySelector<HTMLInputElement>(
+                        `input[name="${treeNode.name}"]`,
+                    )!
+                    .value.valueOf();
                 for (const [name, option] of treeNode.options) {
                     if (name === chosen)
-                        return this.evaluateSettingsTree(option, formData);
+                        return this.evaluateSettingsTree(
+                            option,
+                            form,
+                            formData,
+                        );
                 }
                 // Fallback in case of multiple toggles with the same name and
                 // different options
@@ -496,42 +523,58 @@ export class IntermediateConverter {
                 // that case, choose the default value instead
                 for (const [name, option] of treeNode.options) {
                     if (name === treeNode.default)
-                        return this.evaluateSettingsTree(option, formData);
+                        return this.evaluateSettingsTree(
+                            option,
+                            form,
+                            formData,
+                        );
                 }
                 // TODO: Error handling in case of graph error where the default
                 // option doesn't exist
                 console.log("Couldn't find default value");
-                return 0;
+                return Rational.zero;
 
             case "MUL":
-                let p = 1;
+                let p = Rational.one;
                 for (const child of treeNode.factors)
-                    p *= this.evaluateSettingsTree(child, formData);
+                    p = p.mul(this.evaluateSettingsTree(child, form, formData));
                 return p;
 
             case "DIV":
-                return (
-                    this.evaluateSettingsTree(treeNode.numerator, formData) /
-                    this.evaluateSettingsTree(treeNode.denominator, formData)
+                return this.evaluateSettingsTree(
+                    treeNode.numerator,
+                    form,
+                    formData,
+                ).div(
+                    this.evaluateSettingsTree(
+                        treeNode.denominator,
+                        form,
+                        formData,
+                    ),
                 );
 
             case "ADD":
-                let s = 0;
+                let s = Rational.zero;
                 for (const child of treeNode.terms)
-                    s += this.evaluateSettingsTree(child, formData);
+                    s = s.add(this.evaluateSettingsTree(child, form, formData));
                 return s;
 
             case "SUB":
-                return (
-                    this.evaluateSettingsTree(treeNode.term1, formData) -
-                    this.evaluateSettingsTree(treeNode.term2, formData)
+                return this.evaluateSettingsTree(
+                    treeNode.term1,
+                    form,
+                    formData,
+                ).sub(
+                    this.evaluateSettingsTree(treeNode.term2, form, formData),
                 );
 
             case "POW":
-                return Math.pow(
-                    this.evaluateSettingsTree(treeNode.base, formData),
-                    this.evaluateSettingsTree(treeNode.exponent, formData),
-                );
+                // Hmmmmmm... need to think how to do this
+                throw new Error("Powers aren't supported yet!");
+            // return Math.pow(
+            //     this.evaluateSettingsTree(treeNode.base, form),
+            //     this.evaluateSettingsTree(treeNode.exponent, form),
+            // );
         }
     }
 }
@@ -566,7 +609,7 @@ export type ConverterResourceTree =
 type ConverterResourceTreeLeaf = {
     type: "RESOURCE";
     id: string;
-    amount: number | [number, number]; // regular number or ratio
+    amount: RationalNumber;
 };
 type ResourceTreeBooleanNode = {
     type: "AND" | "OR";

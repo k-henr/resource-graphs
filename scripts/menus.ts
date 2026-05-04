@@ -11,6 +11,7 @@ import {
 } from "./data";
 import { Resource } from "./resource";
 import { IntermediateConverter } from "./intermediateConverter";
+import { Rational } from "./rational";
 
 abstract class SubmitMenu {
     protected static thumbTemplate =
@@ -88,7 +89,7 @@ export class ConverterMenu extends SubmitMenu {
     private amountInput: HTMLElement;
 
     private resourceBeingRequested: Resource | null = null;
-    private amountOfResourceBeingRequested: number = 0;
+    private amountOfResourceBeingRequested: Rational = Rational.zero;
 
     private searchString: string = "";
 
@@ -126,26 +127,51 @@ export class ConverterMenu extends SubmitMenu {
     }
 
     protected override onSubmit() {
+        console.log("Submitting");
         // If no converter is "loaded", ignore
         if (!this.intermediateConverter) return;
-
-        const formData = new FormData(this.submissionForm);
 
         const converter = this.intermediateConverter.finalize();
 
         // If being requested by item, get the amount automatically from the converter
-        const amount = this.resourceBeingRequested
-            ? converter.getAmountToProduce(
-                  this.resourceBeingRequested,
-                  this.amountOfResourceBeingRequested,
-              )
-            : Number(formData.get("amount")!.valueOf());
+        const amount = this.getAmountToProduce(
+            converter,
+            this.submissionForm.querySelector<HTMLInputElement>(
+                "input[name=amount]",
+            )!,
+        );
 
-        if (amount != 0) {
+        if (!amount) {
+            // TODO: Proper error feedback that an input was badly formatted
+            throw new Error("Bad formatting!");
+        }
+
+        if (!amount.equals(Rational.zero)) {
             this.graph.addConverter(converter, amount);
         }
 
         this.close();
+    }
+
+    private getAmountToProduce(
+        converter: Converter,
+        input: HTMLInputElement,
+    ): Rational | null {
+        if (this.resourceBeingRequested) {
+            return converter.getAmountToProduce(
+                this.resourceBeingRequested,
+                this.amountOfResourceBeingRequested,
+            );
+        }
+
+        const amount = Rational.fromInput(input.value, input);
+
+        if (amount) {
+            input.classList.add("input-invalic-amount");
+            return amount;
+        }
+
+        return null;
     }
 
     // Note: Does not apply changes!
@@ -154,7 +180,7 @@ export class ConverterMenu extends SubmitMenu {
             "input[name=search-string]",
         )!.value = "";
         this.resourceBeingRequested = null;
-        this.amountOfResourceBeingRequested = 0;
+        this.amountOfResourceBeingRequested = Rational.zero;
     }
 
     public override applyCurrentFilters() {
@@ -204,7 +230,7 @@ export class ConverterMenu extends SubmitMenu {
 
     // Request the user to choose a converter that produces the given amount of the
     // given resource
-    public requestConverterForResource(resource: Resource, amount: number) {
+    public requestConverterForResource(resource: Resource, amount: Rational) {
         this.resourceBeingRequested = resource;
         this.amountOfResourceBeingRequested = amount;
 
@@ -226,25 +252,33 @@ export class ResourceMenu extends SubmitMenu {
     protected override onSubmit() {
         if (!this.resourceToBeAdded) return;
 
-        const formData = new FormData(this.submissionForm);
-        const delta = Number(formData.get("delta")!.valueOf());
         const resource = this.resourceToBeAdded;
+        const el =
+            this.submissionForm.querySelector<HTMLInputElement>(
+                "input[name=delta]",
+            )!;
+        const delta = Rational.fromInput(el.value, el);
+        if (!delta) {
+            // TODO: popup
+            throw new Error("Bad formatting");
+        }
 
         // Only add the item delta if it'll actually add or remove resources
-        if (delta != 0) {
+        if (!delta?.equals(Rational.zero)) {
             // Construct a "dummy converter" that either produces or consumes the item
-            const itemList = [{ resource, amount: 1 }];
+            const itemList = [{ resource, amount: Rational.one }];
+            const positiveDelta = delta.greaterThan(Rational.zero);
             const conv = new Converter(
-                `Resource ${delta > 0 ? "source" : "drain"}: ${resource.getDisplayName()}`,
+                `Resource ${positiveDelta ? "source" : "drain"}: ${resource.getDisplayName()}`,
                 resource.getDisplayImage(),
                 // Put the item either as an ingredient or a product, depending on
                 // whether this is a producer or consumer
-                delta < 0 ? itemList : [],
-                delta > 0 ? itemList : [],
+                !positiveDelta ? itemList : [],
+                positiveDelta ? itemList : [],
             );
             // By modifying the delta in here instead of in the ingr/prod lists,
             // it's possible to update them on an already existing item delta
-            this.graph.addConverter(conv, Math.abs(delta));
+            this.graph.addConverter(conv, delta.abs());
         }
 
         this.close();

@@ -10,6 +10,7 @@ import {
 } from "./scripts/data";
 import { ResourceGraph } from "./scripts/resourceGraph";
 import { ConverterMenu, ResourceMenu } from "./scripts/menus";
+import { Rational } from "./scripts/rational";
 
 (async () => {
     // Forcibly reload when the hash changes since the loading needs to reset
@@ -137,6 +138,6 @@ import { ConverterMenu, ResourceMenu } from "./scripts/menus";
     const electrolyzer = getConverterFactory("electrolyzer")!
         .factory()
         .finalize();
-    graph.addConverter(dupe, 3);
-    graph.addConverter(electrolyzer, 1);
+    graph.addConverter(dupe, new Rational(3));
+    graph.addConverter(electrolyzer, new Rational(3 / 5));
 })();

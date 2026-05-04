@@ -2,12 +2,13 @@
  * The class for a conversion which consumes and produces resources
  */
 
+import { Rational } from "./rational";
 import { Resource } from "./resource";
-import { ResourceDeltaList } from "./resourceGraph";
+import { NumberedSet } from "./resourceGraph";
 
 export type ConverterIngredient = {
     resource: Resource;
-    amount: number;
+    amount: Rational;
 };
 
 export class Converter {
@@ -36,13 +37,13 @@ export class Converter {
      * @param graph The graph to apply the conversion to
      * @param count The "count" of this converter
      */
-    public apply(deltas: ResourceDeltaList, count: number) {
+    public apply(deltas: NumberedSet<Resource>, count: Rational) {
         // Add products and remove ingredients
         for (const { resource, amount } of this.products) {
-            deltas.add(resource, amount * count);
+            deltas.add(resource, amount.mul(count));
         }
         for (const { resource, amount } of this.ingredients) {
-            deltas.add(resource, -amount * count);
+            deltas.add(resource, amount.mul(count).negate());
         }
     }
 
@@ -59,14 +60,14 @@ export class Converter {
     }
 
     // Get the number of this converter required to produce the given amount of the given resource
-    public getAmountToProduce(resource: Resource, amount: number) {
+    public getAmountToProduce(resource: Resource, amount: Rational) {
         // Find the product
         for (const { resource: r, amount: amountProduced } of this.products) {
             if (r !== resource) continue;
-            return -amount / amountProduced;
+            return amount.div(amountProduced).negate();
         }
 
-        return 0;
+        return Rational.zero;
     }
 
     public consumesIngredient(ingr: Resource) {

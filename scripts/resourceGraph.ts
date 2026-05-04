@@ -6,23 +6,34 @@ import { ConverterMenu } from "./menus";
 import { Converter } from "./converter";
 import { getSrc } from "./data";
 import { Resource } from "./resource";
-import { getRoundedString } from "./util";
+import { Rational } from "./rational";
 
-export class ResourceDeltaList {
-    private deltas = new Map<Resource, number>();
+export class NumberedSet<T> {
+    private numberMap = new Map<T, Rational>();
 
-    public add(resource: Resource, delta: number) {
-        this.deltas.set(resource, (this.deltas.get(resource) ?? 0) + delta);
+    public set(object: T, newNumber: Rational) {
+        this.numberMap.set(object, newNumber);
+    }
+
+    public add(object: T, delta: Rational) {
+        this.numberMap.set(
+            object,
+            (this.numberMap.get(object) ?? Rational.zero).add(delta),
+        );
+    }
+
+    public remove(object: T) {
+        this.numberMap.delete(object);
     }
 
     public getEntries() {
-        return this.deltas.entries();
+        return this.numberMap.entries();
     }
 }
 
 export class ResourceGraph {
     // All conversions that are happening
-    private converters: Map<Converter, number> = new Map();
+    private converters = new NumberedSet<Converter>();
 
     // A ConverterMenu to request converters from in case of adjusting to fit an item
     private converterRequestTarget: ConverterMenu | undefined;
@@ -62,9 +73,9 @@ export class ResourceGraph {
         this.requiresRecalculation = false;
 
         // Reset resource deltas, then go through all the conversions and apply them
-        const resourceDeltas = new ResourceDeltaList();
+        const resourceDeltas = new NumberedSet<Resource>();
 
-        for (const [converter, count] of this.converters) {
+        for (const [converter, count] of this.converters.getEntries()) {
             converter.apply(resourceDeltas, count);
         }
 
@@ -89,10 +100,10 @@ export class ResourceGraph {
                 resource.getDisplayImage(),
             );
             el.querySelector<HTMLElement>(".resource-amount")!.innerText =
-                getRoundedString(amount);
+                amount.getDecimalString();
 
             // If there's a negative delta for this resource, highlight it and add a listener for opening the converter menu with that as a filter
-            if (amount < 0) {
+            if (amount.lessThan(Rational.zero)) {
                 el.classList.add("negative-resource-delta");
                 el.onclick = () =>
                     this.converterRequestTarget?.requestConverterForResource(
@@ -105,7 +116,7 @@ export class ResourceGraph {
         }
 
         // Add converter displays
-        for (const [converter, number] of this.converters) {
+        for (const [converter, number] of this.converters.getEntries()) {
             const el = (
                 this.converterTemplate.content.cloneNode(true) as HTMLElement
             ).firstElementChild as HTMLElement;
@@ -118,12 +129,13 @@ export class ResourceGraph {
 
             const amountEl =
                 el.querySelector<HTMLInputElement>(".converter-amount")!;
-            amountEl.value = String(number);
+            amountEl.value = number.getMixedFractionString();
             amountEl.onchange = (e) => {
-                this.setConverterAmount(
-                    converter,
-                    Number((<HTMLInputElement>e.target).value),
-                );
+                const el = <HTMLInputElement>e.target;
+
+                // Parse input into a rational
+                const amount = Rational.fromInput(el.value, el);
+                if (amount) this.setConverterAmount(converter, amount);
             };
 
             // Button to remove
@@ -134,20 +146,17 @@ export class ResourceGraph {
         }
     }
 
-    public addConverter(converter: Converter, count: number) {
-        this.converters.set(
-            converter,
-            (this.converters.get(converter) ?? 0) + count,
-        );
+    public addConverter(converter: Converter, amount: Rational) {
+        this.converters.add(converter, amount);
         this.requiresRecalculation = true;
     }
 
     public removeConverter(converter: Converter) {
-        this.converters.delete(converter);
+        this.converters.remove(converter);
         this.requiresRecalculation = true;
     }
 
-    public setConverterAmount(converter: Converter, count: number) {
+    public setConverterAmount(converter: Converter, count: Rational) {
         // Keeps converters set to 0, since you may not want to readd the whole converter
         this.converters.set(converter, count);
         this.requiresRecalculation = true;

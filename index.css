@@ -156,15 +156,20 @@ footer {
 }
 
 .converter-amount {
-    width: 48px;
+    width: 96px;
     min-height: 80%;
 
     border: 2px solid var(--muted-border);
     border-radius: 4px;
     background-color: transparent;
+    transition: color 0.2s;
 
     text-align: center;
     font-size: large;
+}
+
+.input-invalid-amount {
+    background-color: #b55545;
 }
 
 #open-converter-menu-button {

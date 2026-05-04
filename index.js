@@ -1,4 +1,122 @@
 (() => {
+  // scripts/rational.ts
+  var Rational = class _Rational {
+    // These are just normal numbers atm, do I need bigint?
+    numerator;
+    denominator;
+    static zero = new _Rational(0);
+    static one = new _Rational(1);
+    constructor(num, den = 1) {
+      function numDecimals(x) {
+        console.log(x);
+        if (Math.floor(x) !== x)
+          return x.toString().split(".")[1].length || 0;
+        return 0;
+      }
+      if (Math.floor(num) !== num || Math.floor(den) !== den) {
+        console.log(num, ",", den);
+        const maxDecimalLength = Math.max(
+          numDecimals(Math.abs(num)),
+          numDecimals(Math.abs(den))
+        );
+        const factor = Math.pow(10, maxDecimalLength);
+        num *= factor;
+        den *= factor;
+      }
+      function gcd(a, b) {
+        if (!b) return a;
+        return gcd(b, a % b);
+      }
+      const common = gcd(num, den);
+      this.numerator = num / common;
+      this.denominator = den / common;
+    }
+    static fromData(data) {
+      return typeof data === "number" ? new _Rational(data, 1) : new _Rational(data[0], data[1]);
+    }
+    // Parse the input from an input element into a rational, or make the input node
+    // red if unparsable
+    static fromInput(inputString, inputEl) {
+      const matcher = /^ *(?<NEG>-)? *(?:(?<FULL>\d+))? +(?:(?<NUM>\d+) *\/ *(?<DEN>\d+))? *$/;
+      const match = (" " + inputString + " ").match(matcher);
+      console.log(match);
+      if (!match || !match.groups) {
+        inputEl?.classList.add("input-invalid-amount");
+        return null;
+      }
+      inputEl?.classList.remove("input-invalid-amount");
+      const sgn = match.groups.NEG ? -1 : 1;
+      const full = match.groups.FULL ? Number(match.groups.FULL) : 0;
+      const num = match.groups.NUM ? Number(match.groups.NUM) : 0;
+      const den = match.groups.DEN ? Number(match.groups.DEN) : 1;
+      return new _Rational(sgn * (full * den + num), den);
+    }
+    add(v2) {
+      return new _Rational(
+        this.numerator * v2.denominator + v2.numerator * this.denominator,
+        this.denominator * v2.denominator
+      );
+    }
+    sub(v2) {
+      return new _Rational(
+        this.numerator * v2.denominator - v2.numerator * this.denominator,
+        this.denominator * v2.denominator
+      );
+    }
+    mul(v) {
+      if (typeof v === "number") {
+        return new _Rational(this.numerator * v, this.denominator);
+      } else {
+        return new _Rational(
+          this.numerator * v.numerator,
+          this.denominator * v.denominator
+        );
+      }
+    }
+    div(v2) {
+      return new _Rational(
+        this.numerator * v2.denominator,
+        this.denominator * v2.numerator
+      );
+    }
+    negate() {
+      return new _Rational(-this.numerator, this.denominator);
+    }
+    abs() {
+      return new _Rational(
+        Math.abs(this.numerator),
+        Math.abs(this.denominator)
+      );
+    }
+    equals(v2) {
+      return this.numerator === v2.numerator && this.denominator === v2.denominator;
+    }
+    lessThan(v2) {
+      const temp = this.numerator * v2.denominator < v2.numerator * this.denominator;
+      return temp && this.denominator < 0 === v2.denominator < 0;
+    }
+    greaterThan(v2) {
+      const temp = this.numerator * v2.denominator > v2.numerator * this.denominator;
+      return temp && this.denominator < 1 === v2.denominator < 1;
+    }
+    // Get decimals
+    getDecimalString() {
+      if (this.numerator === 0) return "0";
+      const x = this.numerator / this.denominator;
+      let rounded = x.toPrecision(5);
+      rounded = rounded.replace(/\.0*$|(\.\d*?)0+$/, "$1");
+      return rounded;
+    }
+    getMixedFractionString() {
+      const isNeg = Math.sign(this.numerator) !== 0 && Math.sign(this.numerator) !== Math.sign(this.denominator);
+      const num = Math.abs(this.numerator);
+      const den = Math.abs(this.denominator);
+      const whole = Math.floor(num / den);
+      const rest = num - whole * den;
+      return `${isNeg ? "-" : ""}${whole !== 0 ? whole : ""}${whole !== 0 && rest !== 0 ? " " : ""}${rest !== 0 ? `${rest}/${den}` : ""}`;
+    }
+  };
+
   // scripts/converter.ts
   var Converter = class {
     // All the inputs and outputs of this conversion
@@ -20,10 +138,10 @@
      */
     apply(deltas, count) {
       for (const { resource, amount } of this.products) {
-        deltas.add(resource, amount * count);
+        deltas.add(resource, amount.mul(count));
       }
       for (const { resource, amount } of this.ingredients) {
-        deltas.add(resource, -amount * count);
+        deltas.add(resource, amount.mul(count).negate());
       }
     }
     getDisplayName() {
@@ -39,9 +157,9 @@
     getAmountToProduce(resource, amount) {
       for (const { resource: r, amount: amountProduced } of this.products) {
         if (r !== resource) continue;
-        return -amount / amountProduced;
+        return amount.div(amountProduced).negate();
       }
-      return 0;
+      return Rational.zero;
     }
     consumesIngredient(ingr) {
       for (const { resource } of this.ingredients) {
@@ -63,7 +181,7 @@
     settingsOrder = [];
     // Parse an AST node and register all settings in it
     registerSettingsFromAst(astNode) {
-      if (typeof astNode === "number") return;
+      if (typeof astNode === "number" || Array.isArray(astNode)) return;
       switch (astNode.type) {
         case "NUMBER":
           this.registerSetting(astNode);
@@ -153,17 +271,6 @@
     }
   };
 
-  // scripts/util.ts
-  function getRoundedString(x) {
-    if (Math.abs(x) < 1e-12) return "0";
-    let rounded = x.toPrecision(5);
-    rounded = rounded.replace(/\.0*$|(\.\d*?)0+$/, "$1");
-    return rounded;
-  }
-  function resolveRational(x) {
-    return typeof x === "number" ? x : x[0] / x[1];
-  }
-
   // scripts/intermediateConverter.ts
   var IntermediateConverter = class _IntermediateConverter {
     displayName;
@@ -223,7 +330,7 @@
       const formData = new FormData(_IntermediateConverter.settingsForm);
       return this.displayName.replaceAll(
         /\{(.*?)\}/gim,
-        (match, inner) => this.parseFormatting(inner, formData)
+        (_, inner) => this.parseFormatting(inner, formData)
       );
     }
     getDisplayImage() {
@@ -231,13 +338,16 @@
     }
     // Returns a finalized converter, provided that all ambiguities are resolved
     finalize() {
-      const settingsData = new FormData(_IntermediateConverter.settingsForm);
       const ingr = this.resourceTreeToList(
         this.ingredients,
         [],
-        settingsData
+        _IntermediateConverter.settingsForm
       );
-      const prod = this.resourceTreeToList(this.products, [], settingsData);
+      const prod = this.resourceTreeToList(
+        this.products,
+        [],
+        _IntermediateConverter.settingsForm
+      );
       return new Converter(
         this.getDisplayName(),
         this.displayImage,
@@ -255,18 +365,17 @@
       el.querySelector(".rc-info-image").src = getSrc(
         this.getDisplayImage()
       );
-      const settingsData = new FormData(_IntermediateConverter.settingsForm);
       this.addResourceTreeToElement(
         this.ingredients,
         null,
         el.querySelector(".c-info-ingredients"),
-        settingsData
+        _IntermediateConverter.settingsForm
       );
       this.addResourceTreeToElement(
         this.products,
         null,
         el.querySelector(".c-info-products"),
-        settingsData
+        _IntermediateConverter.settingsForm
       );
       _IntermediateConverter.infoPanel.appendChild(el);
     }
@@ -285,7 +394,12 @@
         }
         case "NUMBER":
         case "ENUMERATE": {
-          return String(formData.get(settingName).valueOf());
+          const rational = Rational.fromInput(
+            String(formData.get(settingName).valueOf()),
+            null
+          );
+          if (!rational) return "?";
+          return rational.getDecimalString();
         }
       }
     }
@@ -293,7 +407,7 @@
       switch (setting.type) {
         case "NUMBER": {
           const [settingEl, , input] = this.createInputElement(name);
-          input.type = "number";
+          input.type = "text";
           input.value = String(setting.default ?? 0);
           return settingEl;
         }
@@ -363,7 +477,7 @@
       }
     }
     // (returns the newly created element)
-    addResourceTreeToElement(node, parentContext, el, settingsData, multiplier = 1) {
+    addResourceTreeToElement(node, parentContext, el, settingsForm, multiplier = Rational.one) {
       switch (node.type) {
         case "RESOURCE":
           const resEl = this.createIngredientElement(node, multiplier);
@@ -376,7 +490,7 @@
               child,
               { node, index },
               andEl,
-              settingsData,
+              settingsForm,
               multiplier
             );
           });
@@ -395,7 +509,7 @@
               res,
               { node, index: i },
               selectList,
-              settingsData,
+              settingsForm,
               multiplier
             );
             option.onclick = () => {
@@ -414,17 +528,20 @@
           el.appendChild(selectEl);
           return selectEl;
         case "MULTIPLIER":
-          multiplier *= this.evaluateSettingsTree(
-            node.multiplier,
-            settingsData
+          multiplier = multiplier.mul(
+            this.evaluateSettingsTree(
+              node.multiplier,
+              settingsForm,
+              new FormData(settingsForm)
+            )
           );
-          if (multiplier === 0) {
+          if (multiplier.equals(Rational.zero)) {
           }
           return this.addResourceTreeToElement(
             node.resource,
             parentContext,
             el,
-            settingsData,
+            settingsForm,
             multiplier
           );
       }
@@ -434,37 +551,35 @@
         true
       ).firstElementChild;
       const res = getResource(ingr.id);
-      el.querySelector(".converter-ingredient-name").innerText = `${res.getDisplayName()} \u2A09 ${getRoundedString(resolveRational(ingr.amount) * multiplier)}`;
+      el.querySelector(".converter-ingredient-name").innerText = `${res.getDisplayName()} \u2A09 ${Rational.fromData(ingr.amount).mul(multiplier).getDecimalString()}`;
       el.querySelector(".converter-ingredient-image").src = getSrc(res.getDisplayImage());
       return el;
     }
     // Parse the given resource tree and store it in the output list
-    resourceTreeToList(node, output, settingsData, multiplier = 1) {
+    resourceTreeToList(node, output, form, multiplier = Rational.one) {
       switch (node.type) {
         case "RESOURCE":
           output.push({
             resource: getResource(node.id),
-            amount: resolveRational(node.amount) * multiplier
+            amount: Rational.fromData(node.amount).mul(multiplier)
           });
           break;
         case "AND":
           for (const child of node.resources)
-            this.resourceTreeToList(
-              child,
-              output,
-              settingsData,
-              multiplier
-            );
+            this.resourceTreeToList(child, output, form, multiplier);
           break;
         case "MULTIPLIER":
-          multiplier *= this.evaluateSettingsTree(
-            node.multiplier,
-            settingsData
+          multiplier = multiplier.mul(
+            this.evaluateSettingsTree(
+              node.multiplier,
+              form,
+              new FormData(form)
+            )
           );
           this.resourceTreeToList(
             node.resource,
             output,
-            settingsData,
+            form,
             multiplier
           );
           break;
@@ -475,47 +590,84 @@
       }
       return output;
     }
-    evaluateSettingsTree(treeNode, formData) {
-      if (typeof treeNode === "number") return treeNode;
+    evaluateSettingsTree(treeNode, form, formData) {
+      if (typeof treeNode === "number" || Array.isArray(treeNode))
+        return Rational.fromData(treeNode);
       switch (treeNode.type) {
         case "NUMBER":
-          return Number(formData.get(treeNode.name).valueOf());
+          const el = form.querySelector(
+            `input[name="${treeNode.name}"]`
+          );
+          const num = Rational.fromInput(
+            String(formData.get(treeNode.name).valueOf()),
+            el
+          );
+          if (!num) {
+            throw new Error("Bad formatting!");
+          }
+          return num;
         case "TOGGLE":
           return this.evaluateSettingsTree(
-            formData.get(treeNode.name) ? treeNode.true : treeNode.false,
+            form.querySelector(
+              `input[name="${treeNode.name}"]`
+            ).checked ? treeNode.true : treeNode.false,
+            form,
             formData
           );
         case "ENUMERATE":
-          const chosen = formData.get(treeNode.name).valueOf();
+          const chosen = form.querySelector(
+            `input[name="${treeNode.name}"]`
+          ).value.valueOf();
           for (const [name, option] of treeNode.options) {
             if (name === chosen)
-              return this.evaluateSettingsTree(option, formData);
+              return this.evaluateSettingsTree(
+                option,
+                form,
+                formData
+              );
           }
           for (const [name, option] of treeNode.options) {
             if (name === treeNode.default)
-              return this.evaluateSettingsTree(option, formData);
+              return this.evaluateSettingsTree(
+                option,
+                form,
+                formData
+              );
           }
           console.log("Couldn't find default value");
-          return 0;
+          return Rational.zero;
         case "MUL":
-          let p = 1;
+          let p = Rational.one;
           for (const child of treeNode.factors)
-            p *= this.evaluateSettingsTree(child, formData);
+            p = p.mul(this.evaluateSettingsTree(child, form, formData));
           return p;
         case "DIV":
-          return this.evaluateSettingsTree(treeNode.numerator, formData) / this.evaluateSettingsTree(treeNode.denominator, formData);
+          return this.evaluateSettingsTree(
+            treeNode.numerator,
+            form,
+            formData
+          ).div(
+            this.evaluateSettingsTree(
+              treeNode.denominator,
+              form,
+              formData
+            )
+          );
         case "ADD":
-          let s = 0;
+          let s = Rational.zero;
           for (const child of treeNode.terms)
-            s += this.evaluateSettingsTree(child, formData);
+            s = s.add(this.evaluateSettingsTree(child, form, formData));
           return s;
         case "SUB":
-          return this.evaluateSettingsTree(treeNode.term1, formData) - this.evaluateSettingsTree(treeNode.term2, formData);
-        case "POW":
-          return Math.pow(
-            this.evaluateSettingsTree(treeNode.base, formData),
-            this.evaluateSettingsTree(treeNode.exponent, formData)
+          return this.evaluateSettingsTree(
+            treeNode.term1,
+            form,
+            formData
+          ).sub(
+            this.evaluateSettingsTree(treeNode.term2, form, formData)
           );
+        case "POW":
+          throw new Error("Powers aren't supported yet!");
       }
     }
   };
@@ -658,18 +810,27 @@
   }
 
   // scripts/resourceGraph.ts
-  var ResourceDeltaList = class {
-    deltas = /* @__PURE__ */ new Map();
-    add(resource, delta) {
-      this.deltas.set(resource, (this.deltas.get(resource) ?? 0) + delta);
+  var NumberedSet = class {
+    numberMap = /* @__PURE__ */ new Map();
+    set(object, newNumber) {
+      this.numberMap.set(object, newNumber);
+    }
+    add(object, delta) {
+      this.numberMap.set(
+        object,
+        (this.numberMap.get(object) ?? Rational.zero).add(delta)
+      );
+    }
+    remove(object) {
+      this.numberMap.delete(object);
     }
     getEntries() {
-      return this.deltas.entries();
+      return this.numberMap.entries();
     }
   };
   var ResourceGraph = class {
     // All conversions that are happening
-    converters = /* @__PURE__ */ new Map();
+    converters = new NumberedSet();
     // A ConverterMenu to request converters from in case of adjusting to fit an item
     converterRequestTarget;
     // Whether the graph needs to be updated or not
@@ -693,8 +854,8 @@
     recalculateIfNeeded() {
       if (!this.requiresRecalculation) return;
       this.requiresRecalculation = false;
-      const resourceDeltas = new ResourceDeltaList();
-      for (const [converter, count] of this.converters) {
+      const resourceDeltas = new NumberedSet();
+      for (const [converter, count] of this.converters.getEntries()) {
         converter.apply(resourceDeltas, count);
       }
       this.resourceDeltaList.innerHTML = "";
@@ -707,8 +868,8 @@
         el.querySelector(".resource-image").src = getSrc(
           resource.getDisplayImage()
         );
-        el.querySelector(".resource-amount").innerText = getRoundedString(amount);
-        if (amount < 0) {
+        el.querySelector(".resource-amount").innerText = amount.getDecimalString();
+        if (amount.lessThan(Rational.zero)) {
           el.classList.add("negative-resource-delta");
           el.onclick = () => this.converterRequestTarget?.requestConverterForResource(
             resource,
@@ -717,31 +878,27 @@
         }
         this.resourceDeltaList.appendChild(el);
       }
-      for (const [converter, number] of this.converters) {
+      for (const [converter, number] of this.converters.getEntries()) {
         const el = this.converterTemplate.content.cloneNode(true).firstElementChild;
         el.querySelector(".converter-name").innerText = converter.getDisplayName();
         el.querySelector(".converter-image").src = getSrc(converter.getDisplayImage());
         const amountEl = el.querySelector(".converter-amount");
-        amountEl.value = String(number);
+        amountEl.value = number.getMixedFractionString();
         amountEl.onchange = (e) => {
-          this.setConverterAmount(
-            converter,
-            Number(e.target.value)
-          );
+          const el2 = e.target;
+          const amount = Rational.fromInput(el2.value, el2);
+          if (amount) this.setConverterAmount(converter, amount);
         };
         el.querySelector(".remove-converter-button").onclick = () => this.removeConverter(converter);
         this.converterList.appendChild(el);
       }
     }
-    addConverter(converter, count) {
-      this.converters.set(
-        converter,
-        (this.converters.get(converter) ?? 0) + count
-      );
+    addConverter(converter, amount) {
+      this.converters.add(converter, amount);
       this.requiresRecalculation = true;
     }
     removeConverter(converter) {
-      this.converters.delete(converter);
+      this.converters.remove(converter);
       this.requiresRecalculation = true;
     }
     setConverterAmount(converter, count) {
@@ -801,7 +958,7 @@
   var ConverterMenu = class _ConverterMenu extends SubmitMenu {
     amountInput;
     resourceBeingRequested = null;
-    amountOfResourceBeingRequested = 0;
+    amountOfResourceBeingRequested = Rational.zero;
     searchString = "";
     // Since settings can be changed, which requires a converter and not a factory,
     // intermediate converter storage is required
@@ -822,17 +979,36 @@
       this.converterSettingsForm = converterSettingsForm;
     }
     onSubmit() {
+      console.log("Submitting");
       if (!this.intermediateConverter) return;
-      const formData = new FormData(this.submissionForm);
       const converter = this.intermediateConverter.finalize();
-      const amount = this.resourceBeingRequested ? converter.getAmountToProduce(
-        this.resourceBeingRequested,
-        this.amountOfResourceBeingRequested
-      ) : Number(formData.get("amount").valueOf());
-      if (amount != 0) {
+      const amount = this.getAmountToProduce(
+        converter,
+        this.submissionForm.querySelector(
+          "input[name=amount]"
+        )
+      );
+      if (!amount) {
+        throw new Error("Bad formatting!");
+      }
+      if (!amount.equals(Rational.zero)) {
         this.graph.addConverter(converter, amount);
       }
       this.close();
+    }
+    getAmountToProduce(converter, input) {
+      if (this.resourceBeingRequested) {
+        return converter.getAmountToProduce(
+          this.resourceBeingRequested,
+          this.amountOfResourceBeingRequested
+        );
+      }
+      const amount = Rational.fromInput(input.value, input);
+      if (amount) {
+        input.classList.add("input-invalic-amount");
+        return amount;
+      }
+      return null;
     }
     // Note: Does not apply changes!
     clearFilters() {
@@ -840,7 +1016,7 @@
         "input[name=search-string]"
       ).value = "";
       this.resourceBeingRequested = null;
-      this.amountOfResourceBeingRequested = 0;
+      this.amountOfResourceBeingRequested = Rational.zero;
     }
     applyCurrentFilters() {
       this.thumbList.innerHTML = "";
@@ -891,20 +1067,26 @@
     // Submit the form
     onSubmit() {
       if (!this.resourceToBeAdded) return;
-      const formData = new FormData(this.submissionForm);
-      const delta = Number(formData.get("delta").valueOf());
       const resource = this.resourceToBeAdded;
-      if (delta != 0) {
-        const itemList = [{ resource, amount: 1 }];
+      const el = this.submissionForm.querySelector(
+        "input[name=delta]"
+      );
+      const delta = Rational.fromInput(el.value, el);
+      if (!delta) {
+        throw new Error("Bad formatting");
+      }
+      if (!delta?.equals(Rational.zero)) {
+        const itemList = [{ resource, amount: Rational.one }];
+        const positiveDelta = delta.greaterThan(Rational.zero);
         const conv = new Converter(
-          `Resource ${delta > 0 ? "source" : "drain"}: ${resource.getDisplayName()}`,
+          `Resource ${positiveDelta ? "source" : "drain"}: ${resource.getDisplayName()}`,
           resource.getDisplayImage(),
           // Put the item either as an ingredient or a product, depending on
           // whether this is a producer or consumer
-          delta < 0 ? itemList : [],
-          delta > 0 ? itemList : []
+          !positiveDelta ? itemList : [],
+          positiveDelta ? itemList : []
         );
-        this.graph.addConverter(conv, Math.abs(delta));
+        this.graph.addConverter(conv, delta.abs());
       }
       this.close();
     }
@@ -1036,7 +1218,7 @@
     const water = getResource("water");
     const dupe = getConverterFactory("duplicant").factory().finalize();
     const electrolyzer = getConverterFactory("electrolyzer").factory().finalize();
-    graph.addConverter(dupe, 3);
-    graph.addConverter(electrolyzer, 1);
+    graph.addConverter(dupe, new Rational(3));
+    graph.addConverter(electrolyzer, new Rational(3 / 5));
   })();
 })();
