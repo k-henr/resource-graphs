@@ -279,7 +279,10 @@ footer {
 .converter-select {
     height: 12px;
 }
-
+.converter-select-children {
+    max-height: 250px;
+    overflow-y: auto;
+}
 .converter-select-children > :not(.converter-select) {
     background-color: var(--primary-background);
     transition-duration: 0.2s;

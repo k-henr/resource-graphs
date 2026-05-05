@@ -37,7 +37,7 @@
     // Parse the input from an input element into a rational, or make the input node
     // red if unparsable
     static fromInput(inputString, inputEl) {
-      const matcher = /^ *(?<NEG>-)? *(?:(?<FULL>\d+))? +(?:(?<NUM>\d+) *\/ *(?<DEN>\d+))? *$/;
+      const matcher = /^ *(?<NEG>-)? *(?:(?<FULL>\d+(\.\d*)?))? +(?:(?<NUM>\d+) *\/ *(?<DEN>\d+))? *$/;
       const match = (" " + inputString + " ").match(matcher);
       console.log(match);
       if (!match || !match.groups) {
@@ -93,11 +93,11 @@
     }
     lessThan(v2) {
       const temp = this.numerator * v2.denominator < v2.numerator * this.denominator;
-      return temp && this.denominator < 0 === v2.denominator < 0;
+      return temp === (this.denominator < 0 === v2.denominator < 0);
     }
     greaterThan(v2) {
       const temp = this.numerator * v2.denominator > v2.numerator * this.denominator;
-      return temp && this.denominator < 1 === v2.denominator < 1;
+      return temp === (this.denominator < 1 === v2.denominator < 1);
     }
     // Get decimals
     getDecimalString() {
@@ -155,11 +155,21 @@
     }
     // Get the number of this converter required to produce the given amount of the given resource
     getAmountToProduce(resource, amount) {
-      for (const { resource: r, amount: amountProduced } of this.products) {
-        if (r !== resource) continue;
-        return amount.div(amountProduced).negate();
+      let total = Rational.zero;
+      for (const { resource: r, amount: a } of this.ingredients) {
+        if (r === resource) {
+          total = total.sub(a);
+          break;
+        }
       }
-      return Rational.zero;
+      for (const { resource: r, amount: a } of this.products) {
+        if (r === resource) {
+          total = total.add(a);
+          break;
+        }
+      }
+      if (!total.greaterThan(Rational.zero)) return Rational.zero;
+      return amount.div(total).negate();
     }
     consumesIngredient(ingr) {
       for (const { resource } of this.ingredients) {
@@ -379,6 +389,7 @@
       );
       _IntermediateConverter.infoPanel.appendChild(el);
     }
+    // Replace a given string with the text it represents, given settings data
     parseFormatting(toFormat, formData) {
       console.log(toFormat);
       const args = toFormat.split("|");
@@ -392,14 +403,16 @@
         case "TOGGLE": {
           return formData.get(settingName) ? args[1] ?? "" : args[2] ?? "";
         }
-        case "NUMBER":
-        case "ENUMERATE": {
+        case "NUMBER": {
           const rational = Rational.fromInput(
             String(formData.get(settingName).valueOf()),
             null
           );
-          if (!rational) return "?";
+          if (!rational) return "???";
           return rational.getDecimalString();
+        }
+        case "ENUMERATE": {
+          return String(formData.get(settingName).valueOf());
         }
       }
     }
@@ -500,6 +513,9 @@
           const selectEl = _IntermediateConverter.converterSelectTemplate.content.cloneNode(
             true
           ).firstElementChild;
+          selectEl.querySelector(
+            ".converter-select-count"
+          ).innerText = String(node.resources.length);
           const selectList = selectEl.querySelector(
             ".converter-select-children"
           );
@@ -615,8 +631,9 @@
             formData
           );
         case "ENUMERATE":
+          console.log(treeNode.name);
           const chosen = form.querySelector(
-            `input[name="${treeNode.name}"]`
+            `select[name="${treeNode.name}"]`
           ).value.valueOf();
           for (const [name, option] of treeNode.options) {
             if (name === chosen)
@@ -1215,7 +1232,6 @@
       "#close-converter-form-button"
     ).onclick = () => converterMenu.close();
     graph.setConverterRequestTarget(converterMenu);
-    const water = getResource("water");
     const dupe = getConverterFactory("duplicant").factory().finalize();
     const electrolyzer = getConverterFactory("electrolyzer").factory().finalize();
     graph.addConverter(dupe, new Rational(3));

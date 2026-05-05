@@ -155,6 +155,7 @@ export class IntermediateConverter {
         IntermediateConverter.infoPanel.appendChild(el);
     }
 
+    // Replace a given string with the text it represents, given settings data
     private parseFormatting(toFormat: string, formData: FormData): string {
         console.log(toFormat);
         const args = toFormat.split("|");
@@ -178,15 +179,19 @@ export class IntermediateConverter {
                     : (args[2] ?? "");
             }
 
-            case "NUMBER":
-            case "ENUMERATE": {
-                // Return the name/number of the setting
+            case "NUMBER": {
+                // Return the value of the setting
                 const rational = Rational.fromInput(
                     String(formData.get(settingName)!.valueOf()),
                     null,
                 );
-                if (!rational) return "?";
+                if (!rational) return "???";
                 return rational.getDecimalString();
+            }
+
+            case "ENUMERATE": {
+                // Return the name of the chosen setting
+                return String(formData.get(settingName)!.valueOf());
             }
         }
     }
@@ -340,6 +345,10 @@ export class IntermediateConverter {
                         true,
                     ) as HTMLElement
                 ).firstElementChild! as HTMLElement; // #casting
+
+                selectEl.querySelector<HTMLElement>(
+                    ".converter-select-count",
+                )!.innerText = String(node.resources.length);
                 const selectList = selectEl.querySelector<Element>(
                     ".converter-select-children",
                 )!;
@@ -503,9 +512,10 @@ export class IntermediateConverter {
                 );
 
             case "ENUMERATE":
+                console.log(treeNode.name);
                 const chosen = form
                     .querySelector<HTMLInputElement>(
-                        `input[name="${treeNode.name}"]`,
+                        `select[name="${treeNode.name}"]`,
                     )!
                     .value.valueOf();
                 for (const [name, option] of treeNode.options) {

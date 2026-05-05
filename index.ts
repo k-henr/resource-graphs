@@ -133,7 +133,6 @@ import { Rational } from "./scripts/rational";
     graph.setConverterRequestTarget(converterMenu);
 
     // SAMPLE CONVERSION FOR ONI:
-    const water = getResource("water");
     const dupe = getConverterFactory("duplicant")!.factory().finalize();
     const electrolyzer = getConverterFactory("electrolyzer")!
         .factory()

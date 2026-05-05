@@ -61,13 +61,27 @@ export class Converter {
 
     // Get the number of this converter required to produce the given amount of the given resource
     public getAmountToProduce(resource: Resource, amount: Rational) {
-        // Find the product
-        for (const { resource: r, amount: amountProduced } of this.products) {
-            if (r !== resource) continue;
-            return amount.div(amountProduced).negate();
+        // Figure out how much of the product is being produced in total, accounting
+        // for cases where the converter also consumes the product
+        let total = Rational.zero;
+        for (const { resource: r, amount: a } of this.ingredients) {
+            if (r === resource) {
+                total = total.sub(a);
+                break;
+            }
+        }
+        for (const { resource: r, amount: a } of this.products) {
+            if (r === resource) {
+                total = total.add(a);
+                break;
+            }
         }
 
-        return Rational.zero;
+        // In case the converter isn't actually going positive, return 0
+        // (todo: popup)
+        if (!total.greaterThan(Rational.zero)) return Rational.zero;
+
+        return amount.div(total).negate();
     }
 
     public consumesIngredient(ingr: Resource) {

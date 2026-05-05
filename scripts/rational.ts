@@ -60,7 +60,7 @@ export class Rational {
         // I need to match against " +", but only if both FULL *and* NUM/DEN are
         // filled
         const matcher =
-            /^ *(?<NEG>-)? *(?:(?<FULL>\d+))? +(?:(?<NUM>\d+) *\/ *(?<DEN>\d+))? *$/;
+            /^ *(?<NEG>-)? *(?:(?<FULL>\d+(\.\d*)?))? +(?:(?<NUM>\d+) *\/ *(?<DEN>\d+))? *$/;
         // Need to padd with spaces atm to satisfy the bad matcher
         const match = (" " + inputString + " ").match(matcher);
 
@@ -132,14 +132,14 @@ export class Rational {
         // a/b < c/d => ad < cb, if 0 or 2 of b and d are negative
         const temp =
             this.numerator * v2.denominator < v2.numerator * this.denominator;
-        return temp && this.denominator < 0 === v2.denominator < 0;
+        return temp === (this.denominator < 0 === v2.denominator < 0);
     }
 
     public greaterThan(v2: Rational) {
         // See lessThan
         const temp =
             this.numerator * v2.denominator > v2.numerator * this.denominator;
-        return temp && this.denominator < 1 === v2.denominator < 1;
+        return temp === (this.denominator < 1 === v2.denominator < 1);
     }
 
     // Get decimals
