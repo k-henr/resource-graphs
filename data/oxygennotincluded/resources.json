@@ -2,51 +2,71 @@
     {
         "id": "food",
         "displayName": "Food",
-        "displayImage": "images/food.png"
+        "displayImage": "images/res/food.png"
     },
     {
         "id": "oxygen",
         "displayName": "Oxygen",
-        "displayImage": "images/oxygen.png"
+        "displayImage": "images/res/oxygen.png"
     },
     {
         "id": "water",
         "displayName": "Water",
-        "displayImage": "images/water.png"
+        "displayImage": "images/res/water.png"
     },
     {
         "id": "polluted_water",
         "displayName": "Polluted Water",
-        "displayImage": "images/polluted_water.png"
+        "displayImage": "images/res/polluted_water.png"
+    },
+    {
+        "id": "dirt",
+        "displayName": "Dirt",
+        "displayImage": "images/res/dirt.png"
+    },
+    {
+        "id": "sandstone",
+        "displayName": "Sandstone",
+        "displayImage": "images/res/sandstone.png"
+    },
+    {
+        "id": "sedimentary_rock",
+        "displayName": "Sedimentary Rock",
+        "displayImage": "images/res/sedimentary_rock.png"
+    },
+    {
+        "id": "shale",
+        "displayName": "Shale",
+        "displayImage": "images/res/shale.png"
     },
     {
         "id": "sand",
         "displayName": "Sand",
-        "displayImage": "images/sand.png"
+        "displayImage": "images/res/sand.png"
     },
     {
         "id": "regolith",
         "displayName": "Regolith",
-        "displayImage": "images/regolith.png"
+        "displayImage": "images/res/regolith.png"
     },
     {
         "id": "coal",
         "displayName": "Coal",
-        "displayImage": "images/coal.png"
+        "displayImage": "images/res/coal.png"
     },
     {
         "id": "hatch_egg",
         "displayName": "Hatch Egg",
-        "displayImage": "images/hatch_egg.png"
+        "displayImage": "images/res/hatch_egg.png"
     },
     {
         "id": "steam",
         "displayName": "Steam",
-        "displayImage": "images/steam.png"
+        "displayImage": "images/res/steam.png"
     },
     {
         "id": "power",
         "displayName": "Power",
-        "displayImage": "images/power.png"
+        "displayImage": "images/res/power.png"
     }
 ]

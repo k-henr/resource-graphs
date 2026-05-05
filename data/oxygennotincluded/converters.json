@@ -94,23 +94,25 @@
     },
     {
         "id": "hatch",
-        "displayName": "{Mood} {Wild|wild }Hatch",
+        "displayName": "{Cramped|Cramped }{Mood} {Wild|Wild }Hatch",
         "thumbName": "Hatch",
         "displayImage": "images/hatch.png",
         "consumes": [
-            {
-                "type": "RESOURCE",
-                "id": "hatch_egg",
-                "amount": 0.01
-            }
-        ],
-        "produces": [
             {
                 "type": "MULTIPLIER",
                 "multiplier": {
                     "type": "ENUMERATE",
                     "name": "Mood",
                     "options": [
+                        [
+                            "Miserable",
+                            {
+                                "type": "TOGGLE",
+                                "name": "Wild",
+                                "true": 0.1,
+                                "false": 0.2
+                            }
+                        ],
                         [
                             "Glum",
                             {
@@ -128,9 +130,101 @@
                                 "true": 0.25,
                                 "false": 1
                             }
+                        ],
+                        [
+                            "Happy",
+                            {
+                                "type": "TOGGLE",
+                                "name": "Wild",
+                                "true": 0.25,
+                                "false": 1
+                            }
                         ]
                     ],
-                    "default": "Satisfied"
+                    "default": "Happy"
+                },
+                "resource": {
+                    "type": "OR",
+                    "resources": [
+                        {
+                            "type": "RESOURCE",
+                            "id": "dirt",
+                            "amount": 140
+                        },
+                        {
+                            "type": "RESOURCE",
+                            "id": "sandstone",
+                            "amount": 140
+                        },
+                        {
+                            "type": "RESOURCE",
+                            "id": "sedimentary_rock",
+                            "amount": 140
+                        },
+                        {
+                            "type": "RESOURCE",
+                            "id": "shale",
+                            "amount": 140
+                        },
+                        {
+                            "type": "RESOURCE",
+                            "id": "sand",
+                            "amount": 140
+                        }
+                    ]
+                }
+            },
+            {
+                "type": "RESOURCE",
+                "id": "hatch_egg",
+                "amount": [1, 95]
+            }
+        ],
+        "produces": [
+            {
+                "type": "MULTIPLIER",
+                "multiplier": {
+                    "type": "ENUMERATE",
+                    "name": "Mood",
+                    "options": [
+                        [
+                            "Miserable",
+                            {
+                                "type": "TOGGLE",
+                                "name": "Wild",
+                                "true": 0.1,
+                                "false": 0.2
+                            }
+                        ],
+                        [
+                            "Glum",
+                            {
+                                "type": "TOGGLE",
+                                "name": "Wild",
+                                "true": 0.1,
+                                "false": 0.2
+                            }
+                        ],
+                        [
+                            "Satisfied",
+                            {
+                                "type": "TOGGLE",
+                                "name": "Wild",
+                                "true": 0.25,
+                                "false": 1
+                            }
+                        ],
+                        [
+                            "Happy",
+                            {
+                                "type": "TOGGLE",
+                                "name": "Wild",
+                                "true": 0.25,
+                                "false": 1
+                            }
+                        ]
+                    ],
+                    "default": "Happy"
                 },
                 "resource": {
                     "type": "RESOURCE",
@@ -142,19 +236,28 @@
                 "type": "MULTIPLIER",
                 "multiplier": {
                     "type": "TOGGLE",
-                    "name": "Wild",
-                    "true": 0.06,
+                    "name": "Cramped",
+                    "true": 0,
                     "false": {
-                        "type": "ENUMERATE",
-                        "name": "Mood",
-                        "options": [["Glum", 100]],
-                        "default": "Glum"
+                        "type": "TOGGLE",
+                        "name": "Wild",
+                        "true": [1, 95],
+                        "false": {
+                            "type": "ENUMERATE",
+                            "name": "Mood",
+                            "options": [
+                                ["Miserable", 0],
+                                ["Happy", [15, 95]],
+                                ["Satisfied", [1, 95]]
+                            ],
+                            "default": "Satisfied"
+                        }
                     }
                 },
                 "resource": {
                     "type": "RESOURCE",
                     "id": "hatch_egg",
-                    "amount": [5, 30]
+                    "amount": 1
                 }
             }
         ]
