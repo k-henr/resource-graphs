@@ -68,5 +68,10 @@
         "id": "power",
         "displayName": "Power",
         "displayImage": "images/res/power.png"
+    },
+    {
+        "id": "meat",
+        "displayName": "Meat",
+        "displayImage": "images/res/meat.png"
     }
 ]

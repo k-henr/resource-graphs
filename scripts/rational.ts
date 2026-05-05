@@ -155,9 +155,8 @@ export class Rational {
     }
 
     public getMixedFractionString(): string {
-        const isNeg =
-            Math.sign(this.numerator) !== 0 &&
-            Math.sign(this.numerator) !== Math.sign(this.denominator);
+        if (this.numerator === 0) return "0";
+        const isNeg = Math.sign(this.numerator) !== Math.sign(this.denominator);
         const num = Math.abs(this.numerator);
         const den = Math.abs(this.denominator);
         const whole = Math.floor(num / den);

@@ -259,7 +259,8 @@
                     "id": "hatch_egg",
                     "amount": 1
                 }
-            }
+            },
+            { "type": "RESOURCE", "id": "meat", "amount": [3200, 95] }
         ]
     },
     {
@@ -325,5 +326,31 @@
                 }
             }
         ]
+    },
+    {
+        "id": "hatch_evolution",
+        "displayName": "Hatch evolution",
+        "displayImage": "images/hatch.png",
+        "consumes": [
+            {
+                "type": "RESOURCE",
+                "id": "hatch_egg",
+                "amount": "1"
+            }
+        ],
+        "produces": [
+            {
+                "type": "RESOURCE",
+                "id": "meat",
+                "amount": 3200
+            }
+        ]
+    },
+    {
+        "id": "cook_bbq",
+        "displayName": "Cook Barbeque",
+        "displayImage": "images/barbeque.png",
+        "consumes": [{ "type": "RESOURCE", "id": "meat", "amount": 3200 }],
+        "produces": [{ "type": "RESOURCE", "id": "food", "amount": 4000 }]
     }
 ]

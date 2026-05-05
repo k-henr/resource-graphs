@@ -100,7 +100,7 @@ export class ResourceGraph {
                 resource.getDisplayImage(),
             );
             el.querySelector<HTMLElement>(".resource-amount")!.innerText =
-                amount.getDecimalString();
+                amount.getDecimalString(); // todo: option to switch between decimal and mixed?
 
             // If there's a negative delta for this resource, highlight it and add a listener for opening the converter menu with that as a filter
             if (amount.lessThan(Rational.zero)) {
