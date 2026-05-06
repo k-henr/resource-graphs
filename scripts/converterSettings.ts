@@ -71,9 +71,18 @@ export class ConverterSettings {
                 // that prev is also an enumerable at this point
                 if (prev.type !== "ENUMERATE") return;
 
-                for (const [name] of node.options) {
-                    if (prev.options.indexOf(name) === -1)
-                        prev.options.push(name);
+                for (const [selector] of node.options) {
+                    function addOptionNameIfNew(
+                        name: string,
+                        options: string[],
+                    ) {
+                        if (options.indexOf(name) === -1) options.push(name);
+                    }
+                    if (typeof selector === "string")
+                        addOptionNameIfNew(selector, prev.options);
+                    else
+                        for (const s of selector)
+                            addOptionNameIfNew(s, prev.options);
                 }
             }
         } else {
@@ -111,9 +120,15 @@ export class ConverterSettings {
                 };
 
             case "ENUMERATE":
+                const options = [];
+                // Flatten the options into a single list
+                for (const [selector] of node.options) {
+                    if (typeof selector === "string") options.push(selector);
+                    else for (const s of selector) options.push(s);
+                }
                 return {
                     type: "ENUMERATE",
-                    options: node.options.map((el) => el[0]),
+                    options: options,
                     default: node.default,
                 };
         }
@@ -163,7 +178,7 @@ type SettingsTreeToggleInput = {
 type SettingsTreeEnumerateInput = {
     type: "ENUMERATE";
     name: string;
-    options: [string, SettingsTreeNode][];
+    options: [string | string[], SettingsTreeNode][];
     default: string;
 };
 

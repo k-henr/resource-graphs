@@ -138,6 +138,8 @@ export class IntermediateConverter {
             this.getDisplayImage(),
         );
 
+        console.log("Repopulating info panel, ingredients:", this.ingredients);
+
         // Populate the info panel recursively with ingredients and products
         this.addResourceTreeToElement(
             this.ingredients,
@@ -307,7 +309,7 @@ export class IntermediateConverter {
     private addResourceTreeToElement(
         node: ConverterResourceTree,
         parentContext: {
-            node: ResourceTreeBooleanNode;
+            parent: ConverterResourceTreeNode;
             index: number;
         } | null,
         el: Element,
@@ -327,7 +329,7 @@ export class IntermediateConverter {
                 node.resources.map((child, index) => {
                     this.addResourceTreeToElement(
                         child,
-                        { node, index },
+                        { parent: node, index },
                         andEl,
                         settingsForm,
                         multiplier,
@@ -358,7 +360,7 @@ export class IntermediateConverter {
 
                     const option = this.addResourceTreeToElement(
                         res,
-                        { node, index: i },
+                        { parent: node, index: i },
                         selectList,
                         settingsForm,
                         multiplier,
@@ -369,7 +371,19 @@ export class IntermediateConverter {
                         if (!parentContext)
                             throw new Error("An OR node can't be a root node!");
 
-                        parentContext.node.resources[parentContext.index] = res;
+                        console.log(
+                            "Replacing OR node in parent context:",
+                            parentContext,
+                        );
+
+                        // Replace the OR node with the chosen option
+                        if (parentContext.parent.type === "MULTIPLIER") {
+                            parentContext.parent.resource = res;
+                        } else {
+                            parentContext.parent.resources[
+                                parentContext.index
+                            ] = res;
+                        }
                         selectEl.replaceWith(option);
 
                         option.onclick = null;
@@ -396,6 +410,16 @@ export class IntermediateConverter {
                         new FormData(settingsForm),
                     ),
                 );
+                console.log(
+                    "Parsed multiplier for",
+                    node.resource,
+                    ": ",
+                    node.multiplier,
+                );
+                console.log(
+                    "New multiplier:",
+                    multiplier.getMixedFractionString(),
+                );
 
                 if (multiplier.equals(Rational.zero)) {
                     // TODO: Don't add anything, preferably without adding a dummy
@@ -405,7 +429,7 @@ export class IntermediateConverter {
                 // For now, just ignore it, but add some kind of listener later
                 return this.addResourceTreeToElement(
                     node.resource,
-                    parentContext,
+                    { parent: node, index: 0 },
                     el,
                     settingsForm,
                     multiplier,
@@ -452,6 +476,7 @@ export class IntermediateConverter {
                     this.resourceTreeToList(child, output, form, multiplier);
                 break;
             case "MULTIPLIER":
+                console.log("Encountered multiplier when converting to list");
                 // Evaluate the settings tree
                 multiplier = multiplier.mul(
                     this.evaluateSettingsTree(
@@ -512,14 +537,17 @@ export class IntermediateConverter {
                 );
 
             case "ENUMERATE":
-                console.log(treeNode.name);
                 const chosen = form
                     .querySelector<HTMLInputElement>(
                         `select[name="${treeNode.name}"]`,
                     )!
                     .value.valueOf();
-                for (const [name, option] of treeNode.options) {
-                    if (name === chosen)
+                for (const [selector, option] of treeNode.options) {
+                    const selectorMatches =
+                        typeof selector === "string"
+                            ? selector === chosen
+                            : selector.indexOf(chosen) !== -1;
+                    if (selectorMatches)
                         return this.evaluateSettingsTree(
                             option,
                             form,
@@ -614,6 +642,8 @@ export type ConverterData = {
 // Types for representing an input tree that has not yet been resolved into a list
 export type ConverterResourceTree =
     | ConverterResourceTreeLeaf
+    | ConverterResourceTreeNode;
+type ConverterResourceTreeNode =
     | ResourceTreeBooleanNode
     | ResourceTreeMultiplierNode;
 type ConverterResourceTreeLeaf = {

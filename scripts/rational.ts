@@ -13,14 +13,12 @@ export class Rational {
     constructor(num: number, den: number = 1) {
         // https://stackoverflow.com/questions/17369098/
         function numDecimals(x: number) {
-            console.log(x);
             if (Math.floor(x) !== x)
                 return x.toString().split(".")[1].length || 0;
             return 0;
         }
         // Correct for decimal inputs
         if (Math.floor(num) !== num || Math.floor(den) !== den) {
-            console.log(num, ",", den);
             const maxDecimalLength = Math.max(
                 numDecimals(Math.abs(num)),
                 numDecimals(Math.abs(den)),
@@ -63,8 +61,6 @@ export class Rational {
             /^ *(?<NEG>-)? *(?:(?<FULL>\d+(\.\d*)?))? +(?:(?<NUM>\d+) *\/ *(?<DEN>\d+))? *$/;
         // Need to padd with spaces atm to satisfy the bad matcher
         const match = (" " + inputString + " ").match(matcher);
-
-        console.log(match);
 
         if (!match || !match.groups) {
             inputEl?.classList.add("input-invalid-amount");

@@ -105,7 +105,7 @@
                     "name": "Mood",
                     "options": [
                         [
-                            "Miserable",
+                            ["Miserable", "Glum"],
                             {
                                 "type": "TOGGLE",
                                 "name": "Wild",
@@ -114,25 +114,7 @@
                             }
                         ],
                         [
-                            "Glum",
-                            {
-                                "type": "TOGGLE",
-                                "name": "Wild",
-                                "true": 0.1,
-                                "false": 0.2
-                            }
-                        ],
-                        [
-                            "Satisfied",
-                            {
-                                "type": "TOGGLE",
-                                "name": "Wild",
-                                "true": 0.25,
-                                "false": 1
-                            }
-                        ],
-                        [
-                            "Happy",
+                            ["Satisfied", "Happy"],
                             {
                                 "type": "TOGGLE",
                                 "name": "Wild",
@@ -188,7 +170,7 @@
                     "name": "Mood",
                     "options": [
                         [
-                            "Miserable",
+                            ["Miserable", "Glum"],
                             {
                                 "type": "TOGGLE",
                                 "name": "Wild",
@@ -197,25 +179,7 @@
                             }
                         ],
                         [
-                            "Glum",
-                            {
-                                "type": "TOGGLE",
-                                "name": "Wild",
-                                "true": 0.1,
-                                "false": 0.2
-                            }
-                        ],
-                        [
-                            "Satisfied",
-                            {
-                                "type": "TOGGLE",
-                                "name": "Wild",
-                                "true": 0.25,
-                                "false": 1
-                            }
-                        ],
-                        [
-                            "Happy",
+                            ["Satisfied", "Happy"],
                             {
                                 "type": "TOGGLE",
                                 "name": "Wild",

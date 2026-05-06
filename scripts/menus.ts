@@ -127,7 +127,6 @@ export class ConverterMenu extends SubmitMenu {
     }
 
     protected override onSubmit() {
-        console.log("Submitting");
         // If no converter is "loaded", ignore
         if (!this.intermediateConverter) return;
 

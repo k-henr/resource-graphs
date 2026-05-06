@@ -8,13 +8,11 @@
     static one = new _Rational(1);
     constructor(num, den = 1) {
       function numDecimals(x) {
-        console.log(x);
         if (Math.floor(x) !== x)
           return x.toString().split(".")[1].length || 0;
         return 0;
       }
       if (Math.floor(num) !== num || Math.floor(den) !== den) {
-        console.log(num, ",", den);
         const maxDecimalLength = Math.max(
           numDecimals(Math.abs(num)),
           numDecimals(Math.abs(den))
@@ -39,7 +37,6 @@
     static fromInput(inputString, inputEl) {
       const matcher = /^ *(?<NEG>-)? *(?:(?<FULL>\d+(\.\d*)?))? +(?:(?<NUM>\d+) *\/ *(?<DEN>\d+))? *$/;
       const match = (" " + inputString + " ").match(matcher);
-      console.log(match);
       if (!match || !match.groups) {
         inputEl?.classList.add("input-invalid-amount");
         return null;
@@ -239,9 +236,15 @@
           );
         if (node.type === "ENUMERATE") {
           if (prev.type !== "ENUMERATE") return;
-          for (const [name] of node.options) {
-            if (prev.options.indexOf(name) === -1)
-              prev.options.push(name);
+          for (const [selector] of node.options) {
+            let addOptionNameIfNew = function(name, options) {
+              if (options.indexOf(name) === -1) options.push(name);
+            };
+            if (typeof selector === "string")
+              addOptionNameIfNew(selector, prev.options);
+            else
+              for (const s of selector)
+                addOptionNameIfNew(s, prev.options);
           }
         }
       } else {
@@ -273,9 +276,14 @@
             default: node.default
           };
         case "ENUMERATE":
+          const options = [];
+          for (const [selector] of node.options) {
+            if (typeof selector === "string") options.push(selector);
+            else for (const s of selector) options.push(s);
+          }
           return {
             type: "ENUMERATE",
-            options: node.options.map((el) => el[0]),
+            options,
             default: node.default
           };
       }
@@ -376,6 +384,7 @@
       el.querySelector(".rc-info-image").src = getSrc(
         this.getDisplayImage()
       );
+      console.log("Repopulating info panel, ingredients:", this.ingredients);
       this.addResourceTreeToElement(
         this.ingredients,
         null,
@@ -502,7 +511,7 @@
           node.resources.map((child, index) => {
             this.addResourceTreeToElement(
               child,
-              { node, index },
+              { parent: node, index },
               andEl,
               settingsForm,
               multiplier
@@ -524,7 +533,7 @@
             const res = node.resources[i];
             const option = this.addResourceTreeToElement(
               res,
-              { node, index: i },
+              { parent: node, index: i },
               selectList,
               settingsForm,
               multiplier
@@ -532,7 +541,15 @@
             option.onclick = () => {
               if (!parentContext)
                 throw new Error("An OR node can't be a root node!");
-              parentContext.node.resources[parentContext.index] = res;
+              console.log(
+                "Replacing OR node in parent context:",
+                parentContext
+              );
+              if (parentContext.parent.type === "MULTIPLIER") {
+                parentContext.parent.resource = res;
+              } else {
+                parentContext.parent.resources[parentContext.index] = res;
+              }
               selectEl.replaceWith(option);
               option.onclick = null;
             };
@@ -552,11 +569,21 @@
               new FormData(settingsForm)
             )
           );
+          console.log(
+            "Parsed multiplier for",
+            node.resource,
+            ": ",
+            node.multiplier
+          );
+          console.log(
+            "New multiplier:",
+            multiplier.getMixedFractionString()
+          );
           if (multiplier.equals(Rational.zero)) {
           }
           return this.addResourceTreeToElement(
             node.resource,
-            parentContext,
+            { parent: node, index: 0 },
             el,
             settingsForm,
             multiplier
@@ -586,6 +613,7 @@
             this.resourceTreeToList(child, output, form, multiplier);
           break;
         case "MULTIPLIER":
+          console.log("Encountered multiplier when converting to list");
           multiplier = multiplier.mul(
             this.evaluateSettingsTree(
               node.multiplier,
@@ -632,12 +660,12 @@
             formData
           );
         case "ENUMERATE":
-          console.log(treeNode.name);
           const chosen = form.querySelector(
             `select[name="${treeNode.name}"]`
           ).value.valueOf();
-          for (const [name, option] of treeNode.options) {
-            if (name === chosen)
+          for (const [selector, option] of treeNode.options) {
+            const selectorMatches = typeof selector === "string" ? selector === chosen : selector.indexOf(chosen) !== -1;
+            if (selectorMatches)
               return this.evaluateSettingsTree(
                 option,
                 form,
@@ -997,7 +1025,6 @@
       this.converterSettingsForm = converterSettingsForm;
     }
     onSubmit() {
-      console.log("Submitting");
       if (!this.intermediateConverter) return;
       const converter = this.intermediateConverter.finalize();
       const amount = this.getAmountToProduce(
