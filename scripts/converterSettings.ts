@@ -37,8 +37,7 @@ export class ConverterSettings {
                 return;
 
             case "ADD":
-                for (const term of astNode.terms)
-                    this.registerSettingsFromAst(term);
+                for (const term of astNode.terms) this.registerSettingsFromAst(term);
                 return;
 
             case "SUB":
@@ -72,10 +71,7 @@ export class ConverterSettings {
                 if (prev.type !== "ENUMERATE") return;
 
                 for (const [selector] of node.options) {
-                    function addOptionNameIfNew(
-                        name: string,
-                        options: string[],
-                    ) {
+                    function addOptionNameIfNew(name: string, options: string[]) {
                         if (options.indexOf(name) === -1) options.push(name);
                     }
                     if (typeof selector === "string")
@@ -157,6 +153,7 @@ export type SettingsTreeNode =
     | SettingsTreeNumberNode
     | SettingsTreeInputNode
     | SettingsTreeMathNode;
+
 type SettingsTreeNumberNode = RationalNumber;
 
 export type SettingsTreeInputNode =

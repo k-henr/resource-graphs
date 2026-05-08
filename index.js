@@ -214,8 +214,7 @@
           this.registerSettingsFromAst(astNode.denominator);
           return;
         case "ADD":
-          for (const term of astNode.terms)
-            this.registerSettingsFromAst(term);
+          for (const term of astNode.terms) this.registerSettingsFromAst(term);
           return;
         case "SUB":
           this.registerSettingsFromAst(astNode.term1);
@@ -737,9 +736,7 @@
     }
     // (assumes an empty info panel element)
     populateInfoPanel(panel) {
-      const el = _Resource.infoTemplate.content.cloneNode(
-        true
-      );
+      const el = _Resource.infoTemplate.content.cloneNode(true);
       el.querySelector(".rc-info-header").innerText = this.getDisplayName();
       el.querySelector(".rc-info-image").src = getSrc(
         this.getDisplayImage()
@@ -1168,9 +1165,7 @@
     window.onhashchange = () => {
       window.location.reload();
     };
-    const resourceDeltaList = document.querySelector(
-      "#resources"
-    );
+    const resourceDeltaList = document.querySelector("#resources");
     const converterList = document.querySelector("#converters");
     const resourceDeltaTemplate = document.querySelector(
       "template#resource-delta-template"
@@ -1185,9 +1180,7 @@
       throw new Error("Config not found!");
     }
     const config = await confRes.json();
-    document.querySelector(
-      "#personal-legal-disclaimer"
-    ).innerText = config.legalDisclaimer;
+    document.querySelector("#personal-legal-disclaimer").innerText = config.legalDisclaimer;
     await loadAllResources();
     await loadAllConverters();
     const graph = new ResourceGraph(
@@ -1199,9 +1192,7 @@
     const addRcMenuWrapper = document.querySelector(
       "#add-rc-menu-wrapper"
     );
-    const header = addRcMenuWrapper.querySelector(
-      "#add-rc-menu-header"
-    );
+    const header = addRcMenuWrapper.querySelector("#add-rc-menu-header");
     const thumbList = document.querySelector("#add-rc-thumb-list");
     const infoPanel = document.querySelector("#rc-info-panel");
     const rFilter = document.querySelector(
@@ -1222,9 +1213,7 @@
       // For now, this only hides the submission form. If I for some
       // reason need to hide more, this is what to change
     );
-    document.querySelector(
-      "#open-item-delta-menu-button"
-    ).onclick = () => resourceMenu.open();
+    document.querySelector("#open-item-delta-menu-button").onclick = () => resourceMenu.open();
     document.querySelector("#close-item-form-button").onclick = () => resourceMenu.close();
     const cFilter = document.querySelector(
       "form#converter-filter-form"
@@ -1253,12 +1242,8 @@
       infoPanel,
       cFormWrapper
     );
-    document.querySelector(
-      "#open-converter-menu-button"
-    ).onclick = () => converterMenu.open();
-    document.querySelector(
-      "#close-converter-form-button"
-    ).onclick = () => converterMenu.close();
+    document.querySelector("#open-converter-menu-button").onclick = () => converterMenu.open();
+    document.querySelector("#close-converter-form-button").onclick = () => converterMenu.close();
     graph.setConverterRequestTarget(converterMenu);
     const dupe = getConverterFactory("duplicant").factory().finalize();
     const electrolyzer = getConverterFactory("electrolyzer").factory().finalize();

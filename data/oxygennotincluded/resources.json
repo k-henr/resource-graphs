@@ -2,7 +2,8 @@
     {
         "id": "food",
         "displayName": "Food",
-        "displayImage": "images/res/food.png"
+        "displayImage": "images/res/food.png",
+        "unitGroup": "food"
     },
     {
         "id": "oxygen",
@@ -67,11 +68,13 @@
     {
         "id": "power",
         "displayName": "Power",
-        "displayImage": "images/res/power.png"
+        "displayImage": "images/res/power.png",
+        "unitGroup": "power"
     },
     {
         "id": "meat",
         "displayName": "Meat",
-        "displayImage": "images/res/meat.png"
+        "displayImage": "images/res/meat.png",
+        "unitGroup": "food"
     }
 ]

@@ -49,10 +49,7 @@ export function getResourcesWithFilter(searchString: string = "") {
     for (const [id, r] of list) {
         if (
             searchString &&
-            !r
-                .getDisplayName()
-                .toLowerCase()
-                .includes(searchString.toLowerCase())
+            !r.getDisplayName().toLowerCase().includes(searchString.toLowerCase())
         )
             continue;
 

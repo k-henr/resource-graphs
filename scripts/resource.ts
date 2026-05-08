@@ -27,9 +27,7 @@ export class Resource {
 
     // (assumes an empty info panel element)
     public populateInfoPanel(panel: HTMLElement) {
-        const el = Resource.infoTemplate.content.cloneNode(
-            true,
-        ) as DocumentFragment;
+        const el = Resource.infoTemplate.content.cloneNode(true) as DocumentFragment;
 
         el.querySelector<HTMLElement>(".rc-info-header")!.innerText =
             this.getDisplayName();
@@ -45,4 +43,5 @@ export type ResourceData = {
     id: string;
     displayName: string;
     displayImage: string;
+    unitGroup: string | undefined;
 };

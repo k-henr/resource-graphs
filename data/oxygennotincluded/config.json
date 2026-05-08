@@ -1,3 +1,35 @@
 {
-    "legalDisclaimer": "This website is made by khenr from the Oxygen not Included community, and is not made by or associated with Klei Entertainment, and are used in accordance with their Player Creation Guidelines. Any assets from the game belong to Klei.\n"
+    "legalDisclaimer": "This website is made by khenr from the Oxygen not Included community, and is not made by or associated with Klei Entertainment, and are used in accordance with their Player Creation Guidelines. Any assets from the game belong to Klei.\n",
+    "unitGroups": [
+        [
+            "mass/time",
+            {
+                "default": "kg/cycle",
+                "conversions": [
+                    ["kg/s", 600],
+                    ["g/s", 0.6],
+                    ["g/cycle", [1, 1000]]
+                ]
+            }
+        ],
+        [
+            "power",
+            {
+                "default": "W",
+                "conversions": [
+                    ["kW", [1000, 1]],
+                    ["J/cycle", [1, 600]],
+                    ["kJ/cycle", [10, 6]]
+                ]
+            }
+        ],
+        [
+            "food/time",
+            {
+                "default": "kcal/cycle",
+                "conversions": [["kcal/s", 600]]
+            }
+        ]
+    ],
+    "defaultUnitGroup": "mass/time"
 }

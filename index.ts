@@ -10,7 +10,7 @@ import {
 } from "./scripts/data";
 import { ResourceGraph } from "./scripts/resourceGraph";
 import { ConverterMenu, ResourceMenu } from "./scripts/menus";
-import { Rational } from "./scripts/rational";
+import { Rational, RationalNumber } from "./scripts/rational";
 
 (async () => {
     // Forcibly reload when the hash changes since the loading needs to reset
@@ -18,9 +18,7 @@ import { Rational } from "./scripts/rational";
         window.location.reload();
     };
 
-    const resourceDeltaList = document.querySelector(
-        "#resources",
-    ) as HTMLElement;
+    const resourceDeltaList = document.querySelector("#resources") as HTMLElement;
     const converterList = document.querySelector("#converters") as HTMLElement;
     const resourceDeltaTemplate = document.querySelector(
         "template#resource-delta-template",
@@ -38,9 +36,8 @@ import { Rational } from "./scripts/rational";
         throw new Error("Config not found!");
     }
     const config = await confRes.json();
-    document.querySelector<HTMLElement>(
-        "#personal-legal-disclaimer",
-    )!.innerText = config.legalDisclaimer;
+    document.querySelector<HTMLElement>("#personal-legal-disclaimer")!.innerText =
+        config.legalDisclaimer;
 
     // Load data files
     await loadAllResources();
@@ -59,11 +56,9 @@ import { Rational } from "./scripts/rational";
     const addRcMenuWrapper = document.querySelector<HTMLElement>(
         "#add-rc-menu-wrapper",
     )!;
-    const header = addRcMenuWrapper.querySelector<HTMLElement>(
-        "#add-rc-menu-header",
-    )!;
-    const thumbList =
-        document.querySelector<HTMLElement>("#add-rc-thumb-list")!;
+    const header =
+        addRcMenuWrapper.querySelector<HTMLElement>("#add-rc-menu-header")!;
+    const thumbList = document.querySelector<HTMLElement>("#add-rc-thumb-list")!;
     const infoPanel = document.querySelector<HTMLElement>("#rc-info-panel")!;
 
     const rFilter = document.querySelector<HTMLFormElement>(
@@ -86,11 +81,10 @@ import { Rational } from "./scripts/rational";
     );
 
     // Add listeners for opening/closing the resource menu
-    document.querySelector<HTMLElement>(
-        "#open-item-delta-menu-button",
-    )!.onclick = () => resourceMenu.open();
-    document.querySelector<HTMLElement>("#close-item-form-button")!.onclick =
-        () => resourceMenu.close();
+    document.querySelector<HTMLElement>("#open-item-delta-menu-button")!.onclick =
+        () => resourceMenu.open();
+    document.querySelector<HTMLElement>("#close-item-form-button")!.onclick = () =>
+        resourceMenu.close();
 
     const cFilter = document.querySelector<HTMLFormElement>(
         "form#converter-filter-form",
@@ -122,21 +116,35 @@ import { Rational } from "./scripts/rational";
     );
 
     // Open/close converter menu too
-    document.querySelector<HTMLElement>(
-        "#open-converter-menu-button",
-    )!.onclick = () => converterMenu.open();
-    document.querySelector<HTMLElement>(
-        "#close-converter-form-button",
-    )!.onclick = () => converterMenu.close();
+    document.querySelector<HTMLElement>("#open-converter-menu-button")!.onclick =
+        () => converterMenu.open();
+    document.querySelector<HTMLElement>("#close-converter-form-button")!.onclick =
+        () => converterMenu.close();
 
     // Set the graph's request target to the converter menu
     graph.setConverterRequestTarget(converterMenu);
 
     // SAMPLE CONVERSION FOR ONI:
     const dupe = getConverterFactory("duplicant")!.factory().finalize();
-    const electrolyzer = getConverterFactory("electrolyzer")!
-        .factory()
-        .finalize();
+    const electrolyzer = getConverterFactory("electrolyzer")!.factory().finalize();
     graph.addConverter(dupe, new Rational(3));
     graph.addConverter(electrolyzer, new Rational(3 / 5));
 })();
+
+type Config = {
+    // A system-specific disclaimer to put in the footer
+    legalDisclaimer: string;
+
+    // All unit groups present, like "mass", "power", "food" etc
+    unitGroups: [string, UnitGroup][];
+    // The unit group used when no override is specified
+    defaultUnitGroup: string;
+};
+
+type UnitGroup = {
+    // The "base unit" of this unit group
+    default: string;
+    // Does not contain the default unit, just the other units and their conversion
+    // ratios!
+    conversions: [string, RationalNumber][];
+};

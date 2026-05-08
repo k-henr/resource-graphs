@@ -212,7 +212,10 @@
                             "options": [
                                 ["Miserable", 0],
                                 ["Happy", [15, 95]],
-                                ["Satisfied", [1, 95]]
+                                [
+                                    ["Glum", "Satisfied"],
+                                    [1, 95]
+                                ]
                             ],
                             "default": "Satisfied"
                         }
