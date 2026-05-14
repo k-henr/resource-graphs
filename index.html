@@ -7,17 +7,14 @@
         <title>Resource calculator</title>
     </head>
     <body>
-        <div id="main-view">
+        <main>
             <div class="flex-2">
                 <h2>Converters</h2>
                 <div id="converter-wrapper">
                     <div id="converters">
                         <!-- Contains converters that are used and the "number" of conversions required -->
                     </div>
-                    <button
-                        id="open-converter-menu-button"
-                        class="primary-button"
-                    >
+                    <button id="open-converter-menu-button" class="primary-button">
                         <img src="icons/add.svg" />
                         Add new converter
                     </button>
@@ -33,13 +30,15 @@
                     Add new resource source/drain
                 </button>
             </div>
-        </div>
+        </main>
         <footer>
-            <span id="personal-legal-disclaimer"></span>
-            For more information, see the
-            <a href="https://github.com/k-henr/resource-graphs"
-                >github repository</a
-            >.
+            <small>
+                <span id="personal-legal-disclaimer"></span>
+                Icons from Google Fonts.<br />For more information, see the
+                <a href="https://github.com/k-henr/resource-graphs"
+                    >github repository</a
+                >.
+            </small>
         </footer>
 
         <!-- Menu for adding resources or converters to the graph -->
@@ -49,11 +48,7 @@
                 <!-- Filter form for when adding resources. -->
                 <form id="resource-filter-form" class="hidden">
                     <label for="search-string">Search</label>
-                    <input
-                        type="text"
-                        name="search-string"
-                        autocomplete="off"
-                    />
+                    <input type="text" name="search-string" autocomplete="off" />
                     <button type="submit">Apply</button>
                 </form>
                 <!-- Filter form for when adding converters. Currently the same as
@@ -61,11 +56,7 @@
                  different. Can also be expanded later -->
                 <form id="converter-filter-form" class="hidden">
                     <label for="search-string">Search</label>
-                    <input
-                        type="text"
-                        name="search-string"
-                        autocomplete="off"
-                    />
+                    <input type="text" name="search-string" autocomplete="off" />
                     <button type="submit">Apply</button>
                 </form>
                 <div id="add-rc-thumb-list">

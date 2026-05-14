@@ -2,79 +2,79 @@
     {
         "id": "food",
         "displayName": "Food",
-        "displayImage": "images/res/food.png",
+        "displayImage": "images/resources/food.png",
         "unitGroup": "food"
     },
     {
         "id": "oxygen",
         "displayName": "Oxygen",
-        "displayImage": "images/res/oxygen.png"
+        "displayImage": "images/resources/oxygen.png"
     },
     {
         "id": "water",
         "displayName": "Water",
-        "displayImage": "images/res/water.png"
+        "displayImage": "images/resources/water.png"
     },
     {
         "id": "polluted_water",
         "displayName": "Polluted Water",
-        "displayImage": "images/res/polluted_water.png"
+        "displayImage": "images/resources/polluted_water.png"
     },
     {
         "id": "dirt",
         "displayName": "Dirt",
-        "displayImage": "images/res/dirt.png"
+        "displayImage": "images/resources/dirt.png"
     },
     {
         "id": "sandstone",
         "displayName": "Sandstone",
-        "displayImage": "images/res/sandstone.png"
+        "displayImage": "images/resources/sandstone.png"
     },
     {
         "id": "sedimentary_rock",
         "displayName": "Sedimentary Rock",
-        "displayImage": "images/res/sedimentary_rock.png"
+        "displayImage": "images/resources/sedimentary_rock.png"
     },
     {
         "id": "shale",
         "displayName": "Shale",
-        "displayImage": "images/res/shale.png"
+        "displayImage": "images/resources/shale.png"
     },
     {
         "id": "sand",
         "displayName": "Sand",
-        "displayImage": "images/res/sand.png"
+        "displayImage": "images/resources/sand.png"
     },
     {
         "id": "regolith",
         "displayName": "Regolith",
-        "displayImage": "images/res/regolith.png"
+        "displayImage": "images/resources/regolith.png"
     },
     {
         "id": "coal",
         "displayName": "Coal",
-        "displayImage": "images/res/coal.png"
+        "displayImage": "images/resources/coal.png"
     },
     {
         "id": "hatch_egg",
         "displayName": "Hatch Egg",
-        "displayImage": "images/res/hatch_egg.png"
+        "displayImage": "images/resources/hatch_egg.png"
     },
     {
         "id": "steam",
         "displayName": "Steam",
-        "displayImage": "images/res/steam.png"
+        "displayImage": "images/resources/steam.png"
     },
     {
         "id": "power",
         "displayName": "Power",
-        "displayImage": "images/res/power.png",
+        "displayImage": "images/resources/power.png",
         "unitGroup": "power"
     },
     {
         "id": "meat",
         "displayName": "Meat",
-        "displayImage": "images/res/meat.png",
+        "displayImage": "images/resources/meat.png",
         "unitGroup": "food"
     }
 ]

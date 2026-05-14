@@ -8,8 +8,7 @@
     static one = new _Rational(1);
     constructor(num, den = 1) {
       function numDecimals(x) {
-        if (Math.floor(x) !== x)
-          return x.toString().split(".")[1].length || 0;
+        if (Math.floor(x) !== x) return x.toString().split(".")[1].length || 0;
         return 0;
       }
       if (Math.floor(num) !== num || Math.floor(den) !== den) {
@@ -80,10 +79,7 @@
       return new _Rational(-this.numerator, this.denominator);
     }
     abs() {
-      return new _Rational(
-        Math.abs(this.numerator),
-        Math.abs(this.denominator)
-      );
+      return new _Rational(Math.abs(this.numerator), Math.abs(this.denominator));
     }
     equals(v2) {
       return this.numerator === v2.numerator && this.denominator === v2.denominator;

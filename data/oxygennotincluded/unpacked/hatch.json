@@ -1,0 +1,136 @@
+{
+    "displayName": "{Cramped|Cramped }{Mood} {Wild|Wild }Hatch",
+    "thumbName": "Hatch",
+    "consumes": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "ENUMERATE",
+                "name": "Mood",
+                "options": [
+                    [
+                        ["Miserable", "Glum"],
+                        {
+                            "type": "TOGGLE",
+                            "name": "Wild",
+                            "true": 0.1,
+                            "false": 0.2
+                        }
+                    ],
+                    [
+                        ["Satisfied", "Happy"],
+                        {
+                            "type": "TOGGLE",
+                            "name": "Wild",
+                            "true": 0.25,
+                            "false": 1
+                        }
+                    ]
+                ],
+                "default": "Happy"
+            },
+            "resource": {
+                "type": "OR",
+                "resources": [
+                    {
+                        "type": "RESOURCE",
+                        "id": "dirt",
+                        "amount": 140
+                    },
+                    {
+                        "type": "RESOURCE",
+                        "id": "sandstone",
+                        "amount": 140
+                    },
+                    {
+                        "type": "RESOURCE",
+                        "id": "sedimentary_rock",
+                        "amount": 140
+                    },
+                    {
+                        "type": "RESOURCE",
+                        "id": "shale",
+                        "amount": 140
+                    },
+                    {
+                        "type": "RESOURCE",
+                        "id": "sand",
+                        "amount": 140
+                    }
+                ]
+            }
+        },
+        {
+            "type": "RESOURCE",
+            "id": "hatch_egg",
+            "amount": [1, 95]
+        }
+    ],
+    "produces": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "ENUMERATE",
+                "name": "Mood",
+                "options": [
+                    [
+                        ["Miserable", "Glum"],
+                        {
+                            "type": "TOGGLE",
+                            "name": "Wild",
+                            "true": 0.1,
+                            "false": 0.2
+                        }
+                    ],
+                    [
+                        ["Satisfied", "Happy"],
+                        {
+                            "type": "TOGGLE",
+                            "name": "Wild",
+                            "true": 0.25,
+                            "false": 1
+                        }
+                    ]
+                ],
+                "default": "Happy"
+            },
+            "resource": {
+                "type": "RESOURCE",
+                "id": "coal",
+                "amount": 70
+            }
+        },
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "TOGGLE",
+                "name": "Cramped",
+                "true": 0,
+                "false": {
+                    "type": "TOGGLE",
+                    "name": "Wild",
+                    "true": [1, 95],
+                    "false": {
+                        "type": "ENUMERATE",
+                        "name": "Mood",
+                        "options": [
+                            ["Miserable", 0],
+                            ["Happy", [15, 95]],
+                            [
+                                ["Glum", "Satisfied"],
+                                [1, 95]
+                            ]
+                        ],
+                        "default": "Satisfied"
+                    }
+                }
+            },
+            "resource": {
+                "type": "RESOURCE",
+                "id": "hatch_egg",
+                "amount": 1
+            }
+        },
+        { "type": "RESOURCE", "id": "meat", "amount": [3200, 95] }
+    ]
+}

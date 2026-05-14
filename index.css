@@ -32,17 +32,17 @@ footer {
 
 /* Main/shared stuff */
 
-#main-view {
+main {
     display: flex;
     flex: 1;
-}
 
-#main-view > div:first-child {
-    border-right: 4px solid var(--muted-border);
-}
+    & > div {
+        padding: 16px;
 
-#main-view > div {
-    padding: 16px;
+        &:first-child {
+            border-right: 4px solid var(--muted-border);
+        }
+    }
 }
 
 .remove-converter-button {
@@ -53,17 +53,17 @@ footer {
 
     display: flex; /* Gets rid of weird 3px button line padding. Can also use line-height:0 */
     padding: 4px;
-}
 
-.remove-converter-button:hover {
-    border-color: #7b3535;
-    background-color: #9b3535;
-}
+    &:hover {
+        border-color: #7b3535;
+        background-color: #9b3535;
+    }
 
-.remove-converter-button:active {
-    border-color: #6b2525;
-    background-color: #8b2525;
-    transition-duration: 0s;
+    &:active {
+        border-color: #6b2525;
+        background-color: #8b2525;
+        transition-duration: 0s;
+    }
 }
 
 #resources,
@@ -75,6 +75,9 @@ footer {
     gap: 4px;
 }
 
+/* TODO: Combine the three below classes using &, if .resource-name and
+.resource-image don't break. Also, why can't I just use .thumb in resource deltas as
+well? */
 .resource-delta,
 .thumb {
     height: 100px;
@@ -111,17 +114,17 @@ footer {
     border-color: #a55040;
     background-color: #b55545;
     transition-duration: 0.2s;
-}
 
-.negative-resource-delta:hover {
-    border-color: #954030;
-    background-color: #a54535;
-}
+    &:hover {
+        border-color: #954030;
+        background-color: #a54535;
+    }
 
-.negative-resource-delta:active {
-    border-color: #853020;
-    background-color: #953525;
-    transition-duration: 0s;
+    &:active {
+        border-color: #853020;
+        background-color: #953525;
+        transition-duration: 0s;
+    }
 }
 
 #open-item-delta-menu-button {
@@ -236,10 +239,10 @@ footer {
     align-items: center;
 
     overflow-y: auto;
-}
 
-#rc-info-panel > * {
-    width: 100%;
+    & > * {
+        width: 100%;
+    }
 }
 
 .rc-info-image {
@@ -282,13 +285,16 @@ footer {
 .converter-select-children {
     max-height: 250px;
     overflow-y: auto;
-}
-.converter-select-children > :not(.converter-select) {
-    background-color: var(--primary-background);
-    transition-duration: 0.2s;
-}
-.converter-select-children > :not(.converter-select):hover {
-    background-color: var(--primary-background-hover);
+
+    /* Styles selectable children but not the ORs interspersed between */
+    & > :not(.converter-select) {
+        background-color: var(--primary-background);
+        transition-duration: 0.2s;
+
+        &:hover {
+            background-color: var(--primary-background-hover);
+        }
+    }
 }
 
 .converter-ingredient-name {
@@ -330,17 +336,17 @@ footer {
     border-radius: 4px;
     background-color: var(--primary-background);
     transition-duration: 0.2s;
-}
 
-.primary-button:hover {
-    border-color: var(--primary-border-hover);
-    background-color: var(--primary-background-hover);
-}
+    &:hover {
+        border-color: var(--primary-border-hover);
+        background-color: var(--primary-background-hover);
+    }
 
-.primary-button:active {
-    border-color: var(--primary-border-active);
-    background-color: var(--primary-background-active);
-    transition-duration: 0s;
+    &:active {
+        border-color: var(--primary-border-active);
+        background-color: var(--primary-background-active);
+        transition-duration: 0s;
+    }
 }
 
 .hidden {

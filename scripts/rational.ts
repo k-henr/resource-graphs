@@ -13,8 +13,7 @@ export class Rational {
     constructor(num: number, den: number = 1) {
         // https://stackoverflow.com/questions/17369098/
         function numDecimals(x: number) {
-            if (Math.floor(x) !== x)
-                return x.toString().split(".")[1].length || 0;
+            if (Math.floor(x) !== x) return x.toString().split(".")[1].length || 0;
             return 0;
         }
         // Correct for decimal inputs
@@ -111,16 +110,12 @@ export class Rational {
     }
 
     public abs() {
-        return new Rational(
-            Math.abs(this.numerator),
-            Math.abs(this.denominator),
-        );
+        return new Rational(Math.abs(this.numerator), Math.abs(this.denominator));
     }
 
     public equals(v2: Rational) {
         return (
-            this.numerator === v2.numerator &&
-            this.denominator === v2.denominator
+            this.numerator === v2.numerator && this.denominator === v2.denominator
         );
     }
 

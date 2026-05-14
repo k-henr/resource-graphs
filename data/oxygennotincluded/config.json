@@ -17,7 +17,7 @@
             {
                 "default": "W",
                 "conversions": [
-                    ["kW", [1000, 1]],
+                    ["kW", 1000],
                     ["J/cycle", [1, 600]],
                     ["kJ/cycle", [10, 6]]
                 ]

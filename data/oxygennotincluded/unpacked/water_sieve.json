@@ -1,0 +1,33 @@
+{
+    "id": "water_sieve",
+    "displayName": "Water Sieve",
+    "consumes": [
+        {
+            "type": "RESOURCE",
+            "id": "polluted_water",
+            "amount": 3000
+        },
+        {
+            "type": "OR",
+            "resources": [
+                {
+                    "type": "RESOURCE",
+                    "id": "regolith",
+                    "amount": 600
+                },
+                {
+                    "type": "RESOURCE",
+                    "id": "sand",
+                    "amount": 600
+                }
+            ]
+        }
+    ],
+    "produces": [
+        {
+            "type": "RESOURCE",
+            "id": "water",
+            "amount": 3000
+        }
+    ]
+}

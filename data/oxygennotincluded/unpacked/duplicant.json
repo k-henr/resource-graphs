@@ -1,0 +1,37 @@
+{
+    "displayName": "Duplicant{Bottomless stomach| (bottomless stomach)}{Mouth breather| (mouth breather)}",
+    "thumbName": "Duplicant",
+    "consumes": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "TOGGLE",
+                "name": "Bottomless stomach",
+                "default": false,
+                "true": 1.5,
+                "false": 1
+            },
+            "resource": {
+                "type": "RESOURCE",
+                "id": "food",
+                "amount": 1000
+            }
+        },
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "TOGGLE",
+                "name": "Mouth breather",
+                "default": false,
+                "true": 1.5,
+                "false": 1
+            },
+            "resource": {
+                "type": "RESOURCE",
+                "id": "oxygen",
+                "amount": 60
+            }
+        }
+    ],
+    "produces": []
+}
