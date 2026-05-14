@@ -58,7 +58,8 @@
     {
         "id": "hatch_egg",
         "displayName": "Hatch Egg",
-        "displayImage": "images/resources/hatch_egg.png"
+        "displayImage": "images/resources/hatch_egg.png",
+        "unitGroup": "units/time"
     },
     {
         "id": "steam",

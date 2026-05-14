@@ -13,6 +13,13 @@
             }
         ],
         [
+            "units/time",
+            {
+                "default": "units/cycle",
+                "conversions": [["units/s", 600]]
+            }
+        ],
+        [
             "power",
             {
                 "default": "W",
