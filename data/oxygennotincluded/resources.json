@@ -3,7 +3,7 @@
         "id": "food",
         "displayName": "Food",
         "displayImage": "images/resources/food.png",
-        "unitGroup": "food"
+        "unitGroup": "food/time"
     },
     {
         "id": "oxygen",
@@ -75,6 +75,6 @@
         "id": "meat",
         "displayName": "Meat",
         "displayImage": "images/resources/meat.png",
-        "unitGroup": "food"
+        "unitGroup": "food/time"
     }
 ]

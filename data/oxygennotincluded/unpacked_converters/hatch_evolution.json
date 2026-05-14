@@ -1,6 +1,6 @@
 {
     "displayName": "Hatch evolution",
-    "displayImage": "images/hatch.png",
+    "displayImage": "images/converters/hatch.png",
     "consumes": [
         {
             "type": "RESOURCE",

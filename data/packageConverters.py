@@ -5,7 +5,7 @@ import os;
 import json;
 
 projName = "oxygennotincluded"
-unpackedDir = "unpacked"
+unpackedDir = "unpacked_converters"
 output = "converters.json"
 defaultImgPath = "images/converters"
 defaultImgExt = "png"
