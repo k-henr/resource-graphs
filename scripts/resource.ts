@@ -3,6 +3,7 @@
  */
 
 import { getSrc } from "./data";
+import { getDefaultUnitGroup } from "./units";
 
 export class Resource {
     private static infoTemplate = document.querySelector<HTMLTemplateElement>(
@@ -12,9 +13,12 @@ export class Resource {
     private displayName: string;
     private displayImage: string;
 
+    private unitGroupName: string;
+
     constructor(data: ResourceData) {
         this.displayName = data.displayName;
         this.displayImage = data.displayImage;
+        this.unitGroupName = data.unitGroup ?? getDefaultUnitGroup();
     }
 
     public getDisplayName() {
@@ -23,6 +27,10 @@ export class Resource {
 
     public getDisplayImage() {
         return this.displayImage;
+    }
+
+    public getUnitGroupName() {
+        return this.unitGroupName;
     }
 
     // (assumes an empty info panel element)

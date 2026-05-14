@@ -12,10 +12,12 @@ import {
 import { Resource } from "./resource";
 import { IntermediateConverter } from "./intermediateConverter";
 import { Rational } from "./rational";
+import { convertUnit, populateUnitDropdown } from "./units";
 
 abstract class SubmitMenu {
-    protected static thumbTemplate =
-        document.querySelector<HTMLTemplateElement>("#item-converter-thumb")!;
+    protected static thumbTemplate = document.querySelector<HTMLTemplateElement>(
+        "#item-converter-thumb",
+    )!;
 
     protected graph: ResourceGraph;
     protected menuElement: HTMLElement;
@@ -199,10 +201,10 @@ export class ConverterMenu extends SubmitMenu {
                 ConverterMenu.thumbTemplate.content.cloneNode(true)
             )).querySelector<HTMLElement>(".thumb")!;
 
-            thumb.querySelector<HTMLElement>(".thumb-name")!.innerText =
-                cFact.name;
-            thumb.querySelector<HTMLImageElement>("img.thumb-image")!.src =
-                getSrc(cFact.image);
+            thumb.querySelector<HTMLElement>(".thumb-name")!.innerText = cFact.name;
+            thumb.querySelector<HTMLImageElement>("img.thumb-image")!.src = getSrc(
+                cFact.image,
+            );
 
             // Create a converter when clicking the thumb (inefficient?)
             thumb.onclick = () => {
@@ -243,6 +245,31 @@ export class ConverterMenu extends SubmitMenu {
 
 export class ResourceMenu extends SubmitMenu {
     private searchString: string = "";
+    private unitDropdown: HTMLSelectElement;
+
+    constructor(
+        graph: ResourceGraph,
+        menuElement: HTMLElement,
+        headerElement: HTMLElement,
+        thumbList: HTMLElement,
+        filterForm: HTMLFormElement,
+        converterForm: HTMLFormElement,
+        unitDropdown: HTMLSelectElement,
+        infoPanel: HTMLElement,
+        showOnOpen: HTMLElement,
+    ) {
+        super(
+            graph,
+            menuElement,
+            headerElement,
+            thumbList,
+            filterForm,
+            converterForm,
+            infoPanel,
+            showOnOpen,
+        );
+        this.unitDropdown = unitDropdown;
+    }
 
     // To match with ConverterMenu, I'm also storing the resource to be added here instead of as a text input
     private resourceToBeAdded: Resource | null = null;
@@ -256,9 +283,12 @@ export class ResourceMenu extends SubmitMenu {
             this.submissionForm.querySelector<HTMLInputElement>(
                 "input[name=delta]",
             )!;
-        const delta = Rational.fromInput(el.value, el);
+        const delta = convertUnit(
+            resource.getUnitGroupName(),
+            Rational.fromInput(el.value, el) ?? Rational.zero,
+            this.unitDropdown.selectedOptions[0].innerText,
+        );
         if (!delta) {
-            // TODO: popup
             throw new Error("Bad formatting");
         }
 
@@ -305,8 +335,9 @@ export class ResourceMenu extends SubmitMenu {
 
             thumb.querySelector<HTMLElement>(".thumb-name")!.innerText =
                 r.getDisplayName();
-            thumb.querySelector<HTMLImageElement>("img.thumb-image")!.src =
-                getSrc(r.getDisplayImage());
+            thumb.querySelector<HTMLImageElement>("img.thumb-image")!.src = getSrc(
+                r.getDisplayImage(),
+            );
 
             // Add a listener for selecting the thumb
             thumb.onclick = () => {
@@ -314,6 +345,9 @@ export class ResourceMenu extends SubmitMenu {
 
                 this.infoPanel.innerHTML = "";
                 r.populateInfoPanel(this.infoPanel);
+
+                // Set the unit dropdown to contain the correct values
+                populateUnitDropdown(this.unitDropdown, r.getUnitGroupName());
             };
 
             this.thumbList.appendChild(thumb);

@@ -713,6 +713,51 @@
     }
   };
 
+  // scripts/units.ts
+  var unitGroups = /* @__PURE__ */ new Map();
+  var defaultUnitGroup = "UNINITIALIZED";
+  function getDefaultUnitGroup() {
+    return defaultUnitGroup;
+  }
+  function loadUnitGroups(groups, defaultGroup) {
+    defaultUnitGroup = defaultGroup;
+    for (const [name, group] of groups) {
+      unitGroups.set(name, {
+        default: group.default,
+        conversions: group.conversions.map(([name2, r]) => [
+          name2,
+          Rational.fromData(r)
+        ])
+      });
+    }
+  }
+  function convertUnit(groupName, amount, unit) {
+    const group = unitGroups.get(groupName);
+    if (!group) throw new Error(`Unit group ${groupName} not found!`);
+    if (group.default === unit) return amount;
+    const conv = group.conversions.find(([name]) => name === unit);
+    if (!conv)
+      throw new Error(`Unit ${unit} can't be found in unit group ${groupName}!`);
+    return amount.mul(conv[1]);
+  }
+  function getUnits(groupName) {
+    const group = unitGroups.get(groupName);
+    if (!group) throw new Error(`Group ${groupName} not found!`);
+    const output = group.conversions.map((el) => el[0]);
+    output.push(group.default);
+    return [output, group.default];
+  }
+  function populateUnitDropdown(selectEl, groupName) {
+    selectEl.innerHTML = "";
+    const [units, defaultUnit] = getUnits(groupName);
+    for (const unit of units) {
+      const optionEl = document.createElement("option");
+      optionEl.innerText = unit;
+      selectEl.appendChild(optionEl);
+      if (unit === defaultUnit) optionEl.selected = true;
+    }
+  }
+
   // scripts/resource.ts
   var Resource = class _Resource {
     static infoTemplate = document.querySelector(
@@ -720,15 +765,20 @@
     );
     displayName;
     displayImage;
+    unitGroupName;
     constructor(data) {
       this.displayName = data.displayName;
       this.displayImage = data.displayImage;
+      this.unitGroupName = data.unitGroup ?? getDefaultUnitGroup();
     }
     getDisplayName() {
       return this.displayName;
     }
     getDisplayImage() {
       return this.displayImage;
+    }
+    getUnitGroupName() {
+      return this.unitGroupName;
     }
     // (assumes an empty info panel element)
     populateInfoPanel(panel) {
@@ -900,14 +950,13 @@
       this.resourceDeltaList.innerHTML = "";
       this.converterList.innerHTML = "";
       for (const [resource, amount] of resourceDeltas.getEntries()) {
-        const el = this.resourceDeltaTemplate.content.cloneNode(
-          true
-        ).querySelector(".resource-delta");
+        const el = this.resourceDeltaTemplate.content.cloneNode(true).firstElementChild;
         el.querySelector(".resource-name").innerText = resource.getDisplayName();
         el.querySelector(".resource-image").src = getSrc(
           resource.getDisplayImage()
         );
-        el.querySelector(".resource-amount").innerText = amount.getDecimalString();
+        el.querySelector(".resource-amount").innerText = (amount.greaterThan(Rational.zero) ? "+" : "") + amount.getDecimalString();
+        el.querySelector(".resource-delta-unit").innerText = getUnits(resource.getUnitGroupName())[1];
         if (amount.lessThan(Rational.zero)) {
           el.classList.add("negative-resource-delta");
           el.onclick = () => this.converterRequestTarget?.requestConverterForResource(
@@ -920,7 +969,9 @@
       for (const [converter, number] of this.converters.getEntries()) {
         const el = this.converterTemplate.content.cloneNode(true).firstElementChild;
         el.querySelector(".converter-name").innerText = converter.getDisplayName();
-        el.querySelector(".converter-image").src = getSrc(converter.getDisplayImage());
+        el.querySelector(".converter-image").src = getSrc(
+          converter.getDisplayImage()
+        );
         const amountEl = el.querySelector(".converter-amount");
         amountEl.value = number.getMixedFractionString();
         amountEl.onchange = (e) => {
@@ -952,7 +1003,9 @@
 
   // scripts/menus.ts
   var SubmitMenu = class {
-    static thumbTemplate = document.querySelector("#item-converter-thumb");
+    static thumbTemplate = document.querySelector(
+      "#item-converter-thumb"
+    );
     graph;
     menuElement;
     headerElement;
@@ -1068,7 +1121,9 @@
       for (const [_, cFact] of list) {
         const thumb = _ConverterMenu.thumbTemplate.content.cloneNode(true).querySelector(".thumb");
         thumb.querySelector(".thumb-name").innerText = cFact.name;
-        thumb.querySelector("img.thumb-image").src = getSrc(cFact.image);
+        thumb.querySelector("img.thumb-image").src = getSrc(
+          cFact.image
+        );
         thumb.onclick = () => {
           this.infoPanel.innerHTML = "";
           this.intermediateConverter = cFact.factory();
@@ -1100,6 +1155,20 @@
   };
   var ResourceMenu = class _ResourceMenu extends SubmitMenu {
     searchString = "";
+    unitDropdown;
+    constructor(graph, menuElement, headerElement, thumbList, filterForm, converterForm, unitDropdown, infoPanel, showOnOpen) {
+      super(
+        graph,
+        menuElement,
+        headerElement,
+        thumbList,
+        filterForm,
+        converterForm,
+        infoPanel,
+        showOnOpen
+      );
+      this.unitDropdown = unitDropdown;
+    }
     // To match with ConverterMenu, I'm also storing the resource to be added here instead of as a text input
     resourceToBeAdded = null;
     // Submit the form
@@ -1109,7 +1178,11 @@
       const el = this.submissionForm.querySelector(
         "input[name=delta]"
       );
-      const delta = Rational.fromInput(el.value, el);
+      const delta = convertUnit(
+        resource.getUnitGroupName(),
+        Rational.fromInput(el.value, el) ?? Rational.zero,
+        this.unitDropdown.selectedOptions[0].innerText
+      );
       if (!delta) {
         throw new Error("Bad formatting");
       }
@@ -1141,11 +1214,14 @@
       for (const [, r] of list) {
         const thumb = _ResourceMenu.thumbTemplate.content.cloneNode(true).querySelector(".thumb");
         thumb.querySelector(".thumb-name").innerText = r.getDisplayName();
-        thumb.querySelector("img.thumb-image").src = getSrc(r.getDisplayImage());
+        thumb.querySelector("img.thumb-image").src = getSrc(
+          r.getDisplayImage()
+        );
         thumb.onclick = () => {
           this.resourceToBeAdded = r;
           this.infoPanel.innerHTML = "";
           r.populateInfoPanel(this.infoPanel);
+          populateUnitDropdown(this.unitDropdown, r.getUnitGroupName());
         };
         this.thumbList.appendChild(thumb);
       }
@@ -1177,6 +1253,7 @@
     }
     const config = await confRes.json();
     document.querySelector("#personal-legal-disclaimer").innerText = config.legalDisclaimer;
+    loadUnitGroups(config.unitGroups, config.defaultUnitGroup);
     await loadAllResources();
     await loadAllConverters();
     const graph = new ResourceGraph(
@@ -1191,6 +1268,9 @@
     const header = addRcMenuWrapper.querySelector("#add-rc-menu-header");
     const thumbList = document.querySelector("#add-rc-thumb-list");
     const infoPanel = document.querySelector("#rc-info-panel");
+    const rUnitDropdown = document.querySelector(
+      "select#resource-unit-select"
+    );
     const rFilter = document.querySelector(
       "form#resource-filter-form"
     );
@@ -1204,6 +1284,7 @@
       thumbList,
       rFilter,
       rSubmit,
+      rUnitDropdown,
       infoPanel,
       rSubmit
       // For now, this only hides the submission form. If I for some

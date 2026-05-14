@@ -11,6 +11,7 @@ import {
 import { ResourceGraph } from "./scripts/resourceGraph";
 import { ConverterMenu, ResourceMenu } from "./scripts/menus";
 import { Rational, RationalNumber } from "./scripts/rational";
+import { loadUnitGroups, UnitGroupData } from "./scripts/units";
 
 (async () => {
     // Forcibly reload when the hash changes since the loading needs to reset
@@ -32,12 +33,12 @@ import { Rational, RationalNumber } from "./scripts/rational";
         `/data/${window.location.hash.replace(/^#/, "")}/config.json`,
     );
     if (!confRes.ok) {
-        // TODO: Complain if no config was found (i.e. if the graph doesn't exist)
         throw new Error("Config not found!");
     }
-    const config = await confRes.json();
+    const config: Config = await confRes.json();
     document.querySelector<HTMLElement>("#personal-legal-disclaimer")!.innerText =
         config.legalDisclaimer;
+    loadUnitGroups(config.unitGroups, config.defaultUnitGroup);
 
     // Load data files
     await loadAllResources();
@@ -61,6 +62,9 @@ import { Rational, RationalNumber } from "./scripts/rational";
     const thumbList = document.querySelector<HTMLElement>("#add-rc-thumb-list")!;
     const infoPanel = document.querySelector<HTMLElement>("#rc-info-panel")!;
 
+    const rUnitDropdown = document.querySelector<HTMLSelectElement>(
+        "select#resource-unit-select",
+    )!;
     const rFilter = document.querySelector<HTMLFormElement>(
         "form#resource-filter-form",
     )!;
@@ -75,6 +79,7 @@ import { Rational, RationalNumber } from "./scripts/rational";
         thumbList,
         rFilter,
         rSubmit,
+        rUnitDropdown,
         infoPanel,
         rSubmit, // For now, this only hides the submission form. If I for some
         // reason need to hide more, this is what to change
@@ -136,15 +141,7 @@ type Config = {
     legalDisclaimer: string;
 
     // All unit groups present, like "mass", "power", "food" etc
-    unitGroups: [string, UnitGroup][];
+    unitGroups: [string, UnitGroupData][];
     // The unit group used when no override is specified
     defaultUnitGroup: string;
-};
-
-type UnitGroup = {
-    // The "base unit" of this unit group
-    default: string;
-    // Does not contain the default unit, just the other units and their conversion
-    // ratios!
-    conversions: [string, RationalNumber][];
 };

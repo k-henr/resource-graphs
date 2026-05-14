@@ -7,6 +7,7 @@ import { Converter } from "./converter";
 import { getSrc } from "./data";
 import { Resource } from "./resource";
 import { Rational } from "./rational";
+import { getUnits } from "./units";
 
 export class NumberedSet<T> {
     private numberMap = new Map<T, Rational>();
@@ -89,10 +90,8 @@ export class ResourceGraph {
         // Add resource displays
         for (const [resource, amount] of resourceDeltas.getEntries()) {
             const el = (
-                this.resourceDeltaTemplate.content.cloneNode(
-                    true,
-                ) as HTMLElement
-            ).querySelector<HTMLElement>(".resource-delta")!;
+                this.resourceDeltaTemplate.content.cloneNode(true) as HTMLElement
+            ).firstElementChild! as HTMLElement;
 
             el.querySelector<HTMLElement>(".resource-name")!.innerText =
                 resource.getDisplayName();
@@ -100,7 +99,10 @@ export class ResourceGraph {
                 resource.getDisplayImage(),
             );
             el.querySelector<HTMLElement>(".resource-amount")!.innerText =
+                (amount.greaterThan(Rational.zero) ? "+" : "") +
                 amount.getDecimalString(); // todo: option to switch between decimal and mixed?
+            el.querySelector<HTMLElement>(".resource-delta-unit")!.innerText =
+                getUnits(resource.getUnitGroupName())[1];
 
             // If there's a negative delta for this resource, highlight it and add a listener for opening the converter menu with that as a filter
             if (amount.lessThan(Rational.zero)) {
@@ -124,8 +126,9 @@ export class ResourceGraph {
             el.querySelector<HTMLElement>(".converter-name")!.innerText =
                 converter.getDisplayName();
 
-            el.querySelector<HTMLImageElement>(".converter-image")!.src =
-                getSrc(converter.getDisplayImage());
+            el.querySelector<HTMLImageElement>(".converter-image")!.src = getSrc(
+                converter.getDisplayImage(),
+            );
 
             const amountEl =
                 el.querySelector<HTMLInputElement>(".converter-amount")!;

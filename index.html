@@ -8,7 +8,7 @@
     </head>
     <body>
         <main>
-            <div class="flex-2">
+            <div class="flex-3">
                 <h2>Converters</h2>
                 <div id="converter-wrapper">
                     <div id="converters">
@@ -20,7 +20,7 @@
                     </button>
                 </div>
             </div>
-            <div class="flex-1">
+            <div class="flex-2">
                 <h2>Resources</h2>
                 <div id="resources">
                     <!-- Contains resources and their rate of consumption/production -->
@@ -78,6 +78,7 @@
                                     step="0.01"
                                     autocomplete="off"
                                 />
+                                <select id="resource-unit-select"></select>
                             </div>
                             <div>
                                 <button
@@ -142,11 +143,12 @@
 
         <!-- Template for a resource displayed in the resource list -->
         <template id="resource-delta-template">
-            <div class="resource-delta">
+            <div class="thumb">
                 <img class="resource-image" />
-                <div class="resource-name"></div>
+                <div class="resource-name small-text"></div>
                 <div>
                     <b class="resource-amount"></b>
+                    <span class="resource-delta-unit"></span>
                 </div>
             </div>
         </template>
