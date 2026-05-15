@@ -27,26 +27,31 @@
     },
     {
         "id": "sandstone",
+        "tags": ["Mineral"],
         "displayName": "Sandstone",
         "displayImage": "images/resources/sandstone.png"
     },
     {
         "id": "sedimentary_rock",
+        "tags": ["Mineral"],
         "displayName": "Sedimentary Rock",
         "displayImage": "images/resources/sedimentary_rock.png"
     },
     {
         "id": "shale",
+        "tags": ["Mineral"],
         "displayName": "Shale",
         "displayImage": "images/resources/shale.png"
     },
     {
         "id": "sand",
+        "tags": ["Filtration medium"],
         "displayName": "Sand",
         "displayImage": "images/resources/sand.png"
     },
     {
         "id": "regolith",
+        "tags": ["Filtration medium"],
         "displayName": "Regolith",
         "displayImage": "images/resources/regolith.png"
     },

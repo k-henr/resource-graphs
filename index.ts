@@ -28,7 +28,7 @@ import { ResourceMenu } from "./scripts/resourceMenu";
         "template#converter-template",
     ) as HTMLTemplateElement;
 
-    // Set the legal disclaimer for this graph
+    // Get the config file
     const confRes = await fetch(
         `/data/${window.location.hash.replace(/^#/, "")}/config.json`,
     );
@@ -36,8 +36,12 @@ import { ResourceMenu } from "./scripts/resourceMenu";
         throw new Error("Config not found!");
     }
     const config: Config = await confRes.json();
+
+    // Set the graph-specific legal disclaimer
     document.querySelector<HTMLElement>("#personal-legal-disclaimer")!.innerText =
         config.legalDisclaimer;
+
+    // Load unit groups
     loadUnitGroups(config.unitGroups, config.defaultUnitGroup);
 
     // Load data files

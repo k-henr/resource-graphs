@@ -91,23 +91,49 @@ export class ResourceMenu extends SubmitMenu {
 
         const resourceList = getResourcesWithFilter(this.searchString);
 
+        const tagLists = new Map<string, HTMLElement>();
+        // misc tag with special handling to be at the end
+        const miscTag = SubmitMenu.createTagListIfNotExists(
+            tagLists,
+            "Miscellaneous",
+            null,
+        );
+
         for (const [, r] of resourceList) {
-            const thumb = SubmitMenu.createThumb(
-                r.getDisplayName(),
-                r.getDisplayImage(),
-                () => {
-                    this.resourceToBeAdded = r;
+            console.log(r.getDisplayName());
+            // Get tags
+            let tags = r.getTags();
+            tags = tags.length > 0 ? tags : ["Miscellaneous"];
 
-                    this.infoPanel.innerHTML = "";
-                    r.populateInfoPanel(this.infoPanel);
+            // Set behaviour when thumb is clicked
+            const onclickFn = () => {
+                this.resourceToBeAdded = r;
 
-                    // Set the unit dropdown to contain the correct values
-                    populateUnitDropdown(this.unitDropdown, r.getUnitGroupName());
-                },
-            );
+                this.infoPanel.innerHTML = "";
+                r.populateInfoPanel(this.infoPanel);
 
-            this.thumbList.appendChild(thumb);
+                // Set the unit dropdown to contain the correct values
+                populateUnitDropdown(this.unitDropdown, r.getUnitGroupName());
+            };
+
+            this.addThumbToTagLists(tags, tagLists, {
+                name: r.getDisplayName(),
+                image: r.getDisplayImage(),
+                onclick: onclickFn,
+            });
+
+            // const thumb = SubmitMenu.createThumb(
+            //     r.getDisplayName(),
+            //     r.getDisplayImage(),
+            //     onclickFn,
+            // );
+            //this.thumbList.appendChild(thumb);
         }
+
+        // Now that all other tag lists are ordered alphabetically, place the misc
+        // tag at the end (but only if it has stuff in it)
+        if (miscTag.querySelector(".tag-list-content")!.children.length > 0)
+            this.thumbList.appendChild(miscTag);
     }
 
     public override close() {

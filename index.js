@@ -679,6 +679,44 @@
     }
   };
 
+  // scripts/resource.ts
+  var Resource = class _Resource {
+    static infoTemplate = document.querySelector(
+      "#resource-info-template"
+    );
+    displayName;
+    displayImage;
+    tags;
+    unitGroupName;
+    constructor(name, image, tags, unitGroup) {
+      this.displayName = name;
+      this.displayImage = image;
+      this.tags = tags;
+      this.unitGroupName = unitGroup;
+    }
+    getDisplayName() {
+      return this.displayName;
+    }
+    getDisplayImage() {
+      return this.displayImage;
+    }
+    getUnitGroupName() {
+      return this.unitGroupName;
+    }
+    getTags() {
+      return [...this.tags];
+    }
+    // (assumes an empty info panel element)
+    populateInfoPanel(panel) {
+      const el = _Resource.infoTemplate.content.cloneNode(true);
+      el.querySelector(".rc-info-header").innerText = this.getDisplayName();
+      el.querySelector(".rc-info-image").src = getSrc(
+        this.getDisplayImage()
+      );
+      panel.appendChild(el);
+    }
+  };
+
   // scripts/units.ts
   var unitGroups = /* @__PURE__ */ new Map();
   var defaultUnitGroup = "UNINITIALIZED";
@@ -724,39 +762,6 @@
     }
   }
 
-  // scripts/resource.ts
-  var Resource = class _Resource {
-    static infoTemplate = document.querySelector(
-      "#resource-info-template"
-    );
-    displayName;
-    displayImage;
-    unitGroupName;
-    constructor(data) {
-      this.displayName = data.displayName;
-      this.displayImage = data.displayImage;
-      this.unitGroupName = data.unitGroup ?? getDefaultUnitGroup();
-    }
-    getDisplayName() {
-      return this.displayName;
-    }
-    getDisplayImage() {
-      return this.displayImage;
-    }
-    getUnitGroupName() {
-      return this.unitGroupName;
-    }
-    // (assumes an empty info panel element)
-    populateInfoPanel(panel) {
-      const el = _Resource.infoTemplate.content.cloneNode(true);
-      el.querySelector(".rc-info-header").innerText = this.getDisplayName();
-      el.querySelector(".rc-info-image").src = getSrc(
-        this.getDisplayImage()
-      );
-      panel.appendChild(el);
-    }
-  };
-
   // scripts/data.ts
   var loadedResources = /* @__PURE__ */ new Map();
   var loadedConverterFactories = /* @__PURE__ */ new Map();
@@ -769,7 +774,12 @@
     if (!res.ok) throw new Error("Error during resource loading!");
     const json = await res.json();
     for (const data of json) {
-      const r = new Resource(data);
+      const r = new Resource(
+        data.displayName,
+        data.displayImage,
+        data.tags ?? [],
+        data.unitGroup ?? getDefaultUnitGroup()
+      );
       loadedResources.set(data.id, r);
     }
   }
@@ -1240,19 +1250,30 @@
       const formData = new FormData(this.filterForm);
       this.searchString = String(formData.get("search-string").valueOf());
       const resourceList = getResourcesWithFilter(this.searchString);
+      const tagLists = /* @__PURE__ */ new Map();
+      const miscTag = SubmitMenu.createTagListIfNotExists(
+        tagLists,
+        "Miscellaneous",
+        null
+      );
       for (const [, r] of resourceList) {
-        const thumb = SubmitMenu.createThumb(
-          r.getDisplayName(),
-          r.getDisplayImage(),
-          () => {
-            this.resourceToBeAdded = r;
-            this.infoPanel.innerHTML = "";
-            r.populateInfoPanel(this.infoPanel);
-            populateUnitDropdown(this.unitDropdown, r.getUnitGroupName());
-          }
-        );
-        this.thumbList.appendChild(thumb);
+        console.log(r.getDisplayName());
+        let tags = r.getTags();
+        tags = tags.length > 0 ? tags : ["Miscellaneous"];
+        const onclickFn = () => {
+          this.resourceToBeAdded = r;
+          this.infoPanel.innerHTML = "";
+          r.populateInfoPanel(this.infoPanel);
+          populateUnitDropdown(this.unitDropdown, r.getUnitGroupName());
+        };
+        this.addThumbToTagLists(tags, tagLists, {
+          name: r.getDisplayName(),
+          image: r.getDisplayImage(),
+          onclick: onclickFn
+        });
       }
+      if (miscTag.querySelector(".tag-list-content").children.length > 0)
+        this.thumbList.appendChild(miscTag);
     }
     close() {
       this.resourceToBeAdded = null;

@@ -12,6 +12,7 @@ import {
     IntermediateConverter,
 } from "./intermediateConverter";
 import { Resource, ResourceData } from "./resource";
+import { getDefaultUnitGroup } from "./units";
 
 // Note that resources are stored as the "proper" objects, since they don't have
 // settings. But converters need to be stored in an in-between state in order to
@@ -31,7 +32,12 @@ export async function loadAllResources() {
     const json: ResourceData[] = await res.json();
 
     for (const data of json) {
-        const r = new Resource(data);
+        const r = new Resource(
+            data.displayName,
+            data.displayImage,
+            data.tags ?? [],
+            data.unitGroup ?? getDefaultUnitGroup(),
+        );
         loadedResources.set(data.id, r);
     }
 }

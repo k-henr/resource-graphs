@@ -13,12 +13,15 @@ export class Resource {
     private displayName: string;
     private displayImage: string;
 
+    private tags: string[];
+
     private unitGroupName: string;
 
-    constructor(data: ResourceData) {
-        this.displayName = data.displayName;
-        this.displayImage = data.displayImage;
-        this.unitGroupName = data.unitGroup ?? getDefaultUnitGroup();
+    constructor(name: string, image: string, tags: string[], unitGroup: string) {
+        this.displayName = name;
+        this.displayImage = image;
+        this.tags = tags;
+        this.unitGroupName = unitGroup;
     }
 
     public getDisplayName() {
@@ -31,6 +34,10 @@ export class Resource {
 
     public getUnitGroupName() {
         return this.unitGroupName;
+    }
+
+    public getTags() {
+        return [...this.tags];
     }
 
     // (assumes an empty info panel element)
@@ -51,5 +58,6 @@ export type ResourceData = {
     id: string;
     displayName: string;
     displayImage: string;
+    tags: string[] | undefined;
     unitGroup: string | undefined;
 };
