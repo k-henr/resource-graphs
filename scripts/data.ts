@@ -83,6 +83,7 @@ export async function loadAllConverters() {
         loadedConverterFactories.set(data.id, {
             name: data.thumbName ?? data.displayName,
             image: data.displayImage,
+            tags: data.tags ?? [],
             possibleIngredients: possibleIngr,
             possibleProducts: possibleProd,
             factory: createFactory(data),

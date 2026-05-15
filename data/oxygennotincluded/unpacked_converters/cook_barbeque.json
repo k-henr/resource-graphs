@@ -1,4 +1,5 @@
 {
+    "tags": ["Recipe"],
     "displayImage": "images/converters/barbeque.png",
     "consumes": [{ "type": "RESOURCE", "id": "meat", "amount": 3200 }],
     "produces": [{ "type": "RESOURCE", "id": "food", "amount": 4000 }]

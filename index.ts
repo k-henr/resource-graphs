@@ -5,13 +5,13 @@
 import {
     loadAllResources,
     loadAllConverters,
-    getResource,
     getConverterFactory,
 } from "./scripts/data";
 import { ResourceGraph } from "./scripts/resourceGraph";
-import { ConverterMenu, ResourceMenu } from "./scripts/menus";
-import { Rational, RationalNumber } from "./scripts/rational";
+import { Rational } from "./scripts/rational";
 import { loadUnitGroups, UnitGroupData } from "./scripts/units";
+import { ConverterMenu } from "./scripts/converterMenu";
+import { ResourceMenu } from "./scripts/resourceMenu";
 
 (async () => {
     // Forcibly reload when the hash changes since the loading needs to reset
@@ -59,7 +59,7 @@ import { loadUnitGroups, UnitGroupData } from "./scripts/units";
     )!;
     const header =
         addRcMenuWrapper.querySelector<HTMLElement>("#add-rc-menu-header")!;
-    const thumbList = document.querySelector<HTMLElement>("#add-rc-thumb-list")!;
+    const thumbList = document.querySelector<HTMLElement>("#add-rc-tag-list")!;
     const infoPanel = document.querySelector<HTMLElement>("#rc-info-panel")!;
 
     const rUnitDropdown = document.querySelector<HTMLSelectElement>(

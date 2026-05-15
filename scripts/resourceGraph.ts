@@ -2,7 +2,7 @@
  * The class for handling a resource graph. Contains a number of conversions, as well as a resource delta
  */
 
-import { ConverterMenu } from "./menus";
+import { ConverterMenu } from "./converterMenu";
 import { Converter } from "./converter";
 import { getSrc } from "./data";
 import { Resource } from "./resource";

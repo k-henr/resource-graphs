@@ -59,8 +59,9 @@
                     <input type="text" name="search-string" autocomplete="off" />
                     <button type="submit">Apply</button>
                 </form>
-                <div id="add-rc-thumb-list">
+                <div id="add-rc-tag-list">
                     <!-- All resource/converter thumbs are loaded in here -->
+                    <div class="tag-list-content"></div>
                 </div>
                 <div id="add-rc-footer">
                     <div id="rc-info-panel" class="flex-2"></div>
@@ -166,6 +167,14 @@
                     <img src="icons/delete.svg" />
                 </button>
             </div>
+        </template>
+
+        <!-- TODO: Template for a tag folder used in rc menu -->
+        <template id="tag-list-template">
+            <section>
+                <div class="tag-list-name">TAG LIST:</div>
+                <div class="tag-list-content"></div>
+            </section>
         </template>
 
         <!-- Template for an item or converter thumb in the selection lists -->

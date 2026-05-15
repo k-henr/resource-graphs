@@ -1,4 +1,5 @@
 {
+    "tags": ["Power"],
     "id": "steam_turbine",
     "displayName": "Steam Turbine ({Steam temperature}°C)",
     "thumbName": "Steam Turbine",

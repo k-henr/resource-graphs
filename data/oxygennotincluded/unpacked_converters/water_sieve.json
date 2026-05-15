@@ -1,4 +1,5 @@
 {
+    "tags": ["Refinement"],
     "id": "water_sieve",
     "displayName": "Water Sieve",
     "consumes": [

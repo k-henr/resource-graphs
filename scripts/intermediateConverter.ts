@@ -1,9 +1,5 @@
 import { Converter, ConverterIngredient } from "./converter";
-import {
-    ConverterSettings,
-    Setting,
-    SettingsTreeNode,
-} from "./converterSettings";
+import { ConverterSettings, Setting, SettingsTreeNode } from "./converterSettings";
 import { getResource, getSrc } from "./data";
 import { Rational, RationalNumber } from "./rational";
 import { Resource } from "./resource";
@@ -35,10 +31,9 @@ export class IntermediateConverter {
         document.querySelector<HTMLTemplateElement>(
             "template#converter-select-template",
         )!;
-    private static converterOrTemplate =
-        document.querySelector<HTMLTemplateElement>(
-            "template#converter-or-template",
-        )!;
+    private static converterOrTemplate = document.querySelector<HTMLTemplateElement>(
+        "template#converter-or-template",
+    )!;
 
     private static infoPanel =
         document.querySelector<HTMLElement>("#rc-info-panel")!;
@@ -73,10 +68,7 @@ export class IntermediateConverter {
         // Get all the settings present in this converter
         this.settings = this.getAllConverterSettings(
             this.products,
-            this.getAllConverterSettings(
-                this.ingredients,
-                new ConverterSettings(),
-            ),
+            this.getAllConverterSettings(this.ingredients, new ConverterSettings()),
         );
 
         // Add all the settings to the settings form
@@ -116,12 +108,7 @@ export class IntermediateConverter {
             IntermediateConverter.settingsForm,
         );
 
-        return new Converter(
-            this.getDisplayName(),
-            this.displayImage,
-            ingr,
-            prod,
-        );
+        return new Converter(this.getDisplayName(), this.displayImage, ingr, prod);
     }
 
     // Populate an info panel with information regarding this converter
@@ -167,18 +154,14 @@ export class IntermediateConverter {
         const setting = this.settings.getSetting(settingName);
 
         if (!setting)
-            throw new Error(
-                `Formatting error: Setting "${settingName}" not found!`,
-            );
+            throw new Error(`Formatting error: Setting "${settingName}" not found!`);
 
         // Depending on the type of the setting, do different things
         switch (setting.type) {
             case "TOGGLE": {
                 // Depending on if the toggle is on or not, return the first or
                 // second alternative
-                return formData.get(settingName)
-                    ? (args[1] ?? "")
-                    : (args[2] ?? "");
+                return formData.get(settingName) ? (args[1] ?? "") : (args[2] ?? "");
             }
 
             case "NUMBER": {
@@ -198,10 +181,7 @@ export class IntermediateConverter {
         }
     }
 
-    private createSettingInput(
-        name: string,
-        setting: Setting,
-    ): DocumentFragment {
+    private createSettingInput(name: string, setting: Setting): DocumentFragment {
         switch (setting.type) {
             case "NUMBER": {
                 const [settingEl, , input] = this.createInputElement(name);
@@ -380,9 +360,8 @@ export class IntermediateConverter {
                         if (parentContext.parent.type === "MULTIPLIER") {
                             parentContext.parent.resource = res;
                         } else {
-                            parentContext.parent.resources[
-                                parentContext.index
-                            ] = res;
+                            parentContext.parent.resources[parentContext.index] =
+                                res;
                         }
                         selectEl.replaceWith(option);
 
@@ -416,10 +395,7 @@ export class IntermediateConverter {
                     ": ",
                     node.multiplier,
                 );
-                console.log(
-                    "New multiplier:",
-                    multiplier.getMixedFractionString(),
-                );
+                console.log("New multiplier:", multiplier.getMixedFractionString());
 
                 if (multiplier.equals(Rational.zero)) {
                     // TODO: Don't add anything, preferably without adding a dummy
@@ -485,12 +461,7 @@ export class IntermediateConverter {
                         new FormData(form),
                     ),
                 );
-                this.resourceTreeToList(
-                    node.resource,
-                    output,
-                    form,
-                    multiplier,
-                );
+                this.resourceTreeToList(node.resource, output, form, multiplier);
                 break;
             case "OR":
                 throw new Error(
@@ -548,11 +519,7 @@ export class IntermediateConverter {
                             ? selector === chosen
                             : selector.indexOf(chosen) !== -1;
                     if (selectorMatches)
-                        return this.evaluateSettingsTree(
-                            option,
-                            form,
-                            formData,
-                        );
+                        return this.evaluateSettingsTree(option, form, formData);
                 }
                 // Fallback in case of multiple toggles with the same name and
                 // different options
@@ -561,11 +528,7 @@ export class IntermediateConverter {
                 // that case, choose the default value instead
                 for (const [name, option] of treeNode.options) {
                     if (name === treeNode.default)
-                        return this.evaluateSettingsTree(
-                            option,
-                            form,
-                            formData,
-                        );
+                        return this.evaluateSettingsTree(option, form, formData);
                 }
                 // TODO: Error handling in case of graph error where the default
                 // option doesn't exist
@@ -584,11 +547,7 @@ export class IntermediateConverter {
                     form,
                     formData,
                 ).div(
-                    this.evaluateSettingsTree(
-                        treeNode.denominator,
-                        form,
-                        formData,
-                    ),
+                    this.evaluateSettingsTree(treeNode.denominator, form, formData),
                 );
 
             case "ADD":
@@ -598,11 +557,7 @@ export class IntermediateConverter {
                 return s;
 
             case "SUB":
-                return this.evaluateSettingsTree(
-                    treeNode.term1,
-                    form,
-                    formData,
-                ).sub(
+                return this.evaluateSettingsTree(treeNode.term1, form, formData).sub(
                     this.evaluateSettingsTree(treeNode.term2, form, formData),
                 );
 
@@ -622,6 +577,7 @@ export class IntermediateConverter {
 export type ConverterFactory = {
     name: string;
     image: string;
+    tags: string[];
     possibleIngredients: Resource[];
     possibleProducts: Resource[];
     // switch to using an interface to not mix paradigms?
@@ -632,6 +588,7 @@ export type ConverterFactory = {
 // the input/output, it assumes you need/get them all
 export type ConverterData = {
     id: string;
+    tags: string[] | undefined;
     displayName: string;
     thumbName: string | undefined;
     displayImage: string;

@@ -327,10 +327,7 @@
       _IntermediateConverter.settingsForm.innerHTML = "";
       this.settings = this.getAllConverterSettings(
         this.products,
-        this.getAllConverterSettings(
-          this.ingredients,
-          new ConverterSettings()
-        )
+        this.getAllConverterSettings(this.ingredients, new ConverterSettings())
       );
       for (const [name, setting] of this.settings.getAllSettings()) {
         const settingEl = this.createSettingInput(name, setting);
@@ -362,12 +359,7 @@
         [],
         _IntermediateConverter.settingsForm
       );
-      return new Converter(
-        this.getDisplayName(),
-        this.displayImage,
-        ingr,
-        prod
-      );
+      return new Converter(this.getDisplayName(), this.displayImage, ingr, prod);
     }
     // Populate an info panel with information regarding this converter
     // Assumes empty panel element!
@@ -401,9 +393,7 @@
       const settingName = args[0];
       const setting = this.settings.getSetting(settingName);
       if (!setting)
-        throw new Error(
-          `Formatting error: Setting "${settingName}" not found!`
-        );
+        throw new Error(`Formatting error: Setting "${settingName}" not found!`);
       switch (setting.type) {
         case "TOGGLE": {
           return formData.get(settingName) ? args[1] ?? "" : args[2] ?? "";
@@ -570,10 +560,7 @@
             ": ",
             node.multiplier
           );
-          console.log(
-            "New multiplier:",
-            multiplier.getMixedFractionString()
-          );
+          console.log("New multiplier:", multiplier.getMixedFractionString());
           if (multiplier.equals(Rational.zero)) {
           }
           return this.addResourceTreeToElement(
@@ -616,12 +603,7 @@
               new FormData(form)
             )
           );
-          this.resourceTreeToList(
-            node.resource,
-            output,
-            form,
-            multiplier
-          );
+          this.resourceTreeToList(node.resource, output, form, multiplier);
           break;
         case "OR":
           throw new Error(
@@ -661,19 +643,11 @@
           for (const [selector, option] of treeNode.options) {
             const selectorMatches = typeof selector === "string" ? selector === chosen : selector.indexOf(chosen) !== -1;
             if (selectorMatches)
-              return this.evaluateSettingsTree(
-                option,
-                form,
-                formData
-              );
+              return this.evaluateSettingsTree(option, form, formData);
           }
           for (const [name, option] of treeNode.options) {
             if (name === treeNode.default)
-              return this.evaluateSettingsTree(
-                option,
-                form,
-                formData
-              );
+              return this.evaluateSettingsTree(option, form, formData);
           }
           console.log("Couldn't find default value");
           return Rational.zero;
@@ -688,11 +662,7 @@
             form,
             formData
           ).div(
-            this.evaluateSettingsTree(
-              treeNode.denominator,
-              form,
-              formData
-            )
+            this.evaluateSettingsTree(treeNode.denominator, form, formData)
           );
         case "ADD":
           let s = Rational.zero;
@@ -700,11 +670,7 @@
             s = s.add(this.evaluateSettingsTree(child, form, formData));
           return s;
         case "SUB":
-          return this.evaluateSettingsTree(
-            treeNode.term1,
-            form,
-            formData
-          ).sub(
+          return this.evaluateSettingsTree(treeNode.term1, form, formData).sub(
             this.evaluateSettingsTree(treeNode.term2, form, formData)
           );
         case "POW":
@@ -840,6 +806,7 @@
       loadedConverterFactories.set(data.id, {
         name: data.thumbName ?? data.displayName,
         image: data.displayImage,
+        tags: data.tags ?? [],
         possibleIngredients: possibleIngr,
         possibleProducts: possibleProd,
         factory: createFactory(data)
@@ -1001,8 +968,9 @@
     graph.recalculateIfNeeded();
   }
 
-  // scripts/menus.ts
+  // scripts/submitMenu.ts
   var SubmitMenu = class {
+    static tagListTemplate = document.querySelector("#tag-list-template");
     static thumbTemplate = document.querySelector(
       "#item-converter-thumb"
     );
@@ -1047,6 +1015,8 @@
       this.infoPanel.innerHTML = "";
     }
   };
+
+  // scripts/converterMenu.ts
   var ConverterMenu = class _ConverterMenu extends SubmitMenu {
     amountInput;
     resourceBeingRequested = null;
@@ -1113,24 +1083,61 @@
       this.thumbList.innerHTML = "";
       const formData = new FormData(this.filterForm);
       this.searchString = String(formData.get("search-string").valueOf());
-      const list = getConverterFactoriesWithFilters(
+      const converterList = getConverterFactoriesWithFilters(
         this.searchString,
         this.resourceBeingRequested ? [this.resourceBeingRequested] : [],
         []
       );
-      for (const [_, cFact] of list) {
-        const thumb = _ConverterMenu.thumbTemplate.content.cloneNode(true).querySelector(".thumb");
-        thumb.querySelector(".thumb-name").innerText = cFact.name;
-        thumb.querySelector("img.thumb-image").src = getSrc(
-          cFact.image
-        );
-        thumb.onclick = () => {
-          this.infoPanel.innerHTML = "";
+      const tagLists = /* @__PURE__ */ new Map();
+      const miscTag = this.createTagListIfNotExists(
+        tagLists,
+        "Miscellaneous",
+        null
+      );
+      for (const [_, cFact] of converterList) {
+        const tags = cFact.tags.length > 0 ? cFact.tags : ["Miscellaneous"];
+        let onclickFn = () => {
           this.intermediateConverter = cFact.factory();
+          this.infoPanel.innerHTML = "";
           this.intermediateConverter.populateInfoPanel();
         };
-        this.thumbList.appendChild(thumb);
+        for (const tagName of tags) {
+          const tagList = this.createTagListIfNotExists(
+            tagLists,
+            tagName,
+            this.thumbList
+          );
+          const thumb = _ConverterMenu.thumbTemplate.content.cloneNode(true).querySelector(".thumb");
+          thumb.querySelector(".thumb-name").innerText = cFact.name;
+          thumb.querySelector("img.thumb-image").src = getSrc(cFact.image);
+          thumb.onclick = onclickFn;
+          tagList.querySelector(".tag-list-content").appendChild(thumb);
+        }
       }
+      this.thumbList.appendChild(miscTag);
+    }
+    createTagListIfNotExists(map, name, tagListContainer) {
+      if (map.has(name)) return map.get(name);
+      console.log(`Creating tag list: ${name}`);
+      const tagList = _ConverterMenu.tagListTemplate.content.cloneNode(true).firstElementChild;
+      tagList.querySelector(".tag-list-name").innerText = name;
+      if (tagListContainer) {
+        console.log("Inserting automatically");
+        const children = tagListContainer.children;
+        for (let i = 0; i < children.length + 1; i++) {
+          const c = children[i];
+          const insertHere = c ? name.localeCompare(
+            c.querySelector(".tag-list-name").innerText
+          ) : true;
+          if (insertHere) {
+            console.log("Inserting: " + name);
+            tagListContainer.insertBefore(tagList, c);
+            break;
+          }
+        }
+      }
+      map.set(name, tagList);
+      return tagList;
     }
     open() {
       super.open();
@@ -1153,6 +1160,8 @@
       this.applyCurrentFilters();
     }
   };
+
+  // scripts/resourceMenu.ts
   var ResourceMenu = class _ResourceMenu extends SubmitMenu {
     searchString = "";
     unitDropdown;
@@ -1266,7 +1275,7 @@
       "#add-rc-menu-wrapper"
     );
     const header = addRcMenuWrapper.querySelector("#add-rc-menu-header");
-    const thumbList = document.querySelector("#add-rc-thumb-list");
+    const thumbList = document.querySelector("#add-rc-tag-list");
     const infoPanel = document.querySelector("#rc-info-panel");
     const rUnitDropdown = document.querySelector(
       "select#resource-unit-select"

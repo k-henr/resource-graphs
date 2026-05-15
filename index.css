@@ -66,13 +66,24 @@ main {
     }
 }
 
+#add-rc-tag-list {
+    width: 100%;
+}
+
 #resources,
-#add-rc-thumb-list {
+.tag-list-content {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     justify-content: start;
     align-content: start;
     gap: 4px;
+}
+
+.tag-list-content {
+    width: 100%;
+    flex: 1;
+
+    overflow-y: auto;
 }
 
 /* TODO: Combine the three below classes using &, if .resource-name and
@@ -209,13 +220,6 @@ well? */
     display: flex;
     flex-direction: column;
     align-items: center;
-}
-
-#add-rc-thumb-list {
-    width: 100%;
-    flex: 1;
-
-    overflow-y: auto;
 }
 
 #add-rc-footer {
