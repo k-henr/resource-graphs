@@ -102,7 +102,11 @@ export abstract class SubmitMenu {
                 thumbData.image,
                 thumbData.onclick,
             );
-            tagList.querySelector(".tag-list-content")!.appendChild(thumb);
+            SubmitMenu.insertAlphabetical(
+                tagList.querySelector(".tag-list-content")!,
+                thumb,
+                ".thumb-name",
+            );
         }
     }
 
@@ -122,25 +126,33 @@ export abstract class SubmitMenu {
 
         // If the element should automatically be inserted, do that
         if (tagListContainer) {
-            const children = tagListContainer.children;
-            for (let i = 0; i <= children.length; i++) {
-                const c = children[i]; // is undefined if we're at the end
-                // Compare names (if c is undefined we're at the end and should
-                // always insert. Yucky, but ¯\_(ツ)_/¯)
-                const insertHere = c
-                    ? name <
-                      c.querySelector<HTMLElement>(".tag-list-name")!.innerText
-                    : true;
-                if (insertHere) {
-                    tagListContainer.insertBefore(tagList, c);
-                    break;
-                }
-            }
+            this.insertAlphabetical(tagListContainer, tagList, ".tag-list-name");
         }
 
         map.set(name, tagList);
 
         return tagList;
+    }
+
+    private static insertAlphabetical(
+        container: HTMLElement,
+        element: HTMLElement,
+        textSelector: string,
+    ) {
+        const name = element.querySelector<HTMLElement>(textSelector)!.innerText;
+        const children = container.children;
+        for (let i = 0; i <= children.length; i++) {
+            const c = children[i]; // is undefined if we're at the end
+            // Compare names (if c is undefined we're at the end and should
+            // always insert. Yucky, but ¯\_(ツ)_/¯)
+            const insertHere = c
+                ? name < c.querySelector<HTMLElement>(textSelector)!.innerText
+                : true;
+            if (insertHere) {
+                container.insertBefore(element, c);
+                break;
+            }
+        }
     }
 
     protected static createThumb(name: string, image: string, onclick: () => void) {

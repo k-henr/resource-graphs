@@ -1026,7 +1026,11 @@
           thumbData.image,
           thumbData.onclick
         );
-        tagList.querySelector(".tag-list-content").appendChild(thumb);
+        _SubmitMenu.insertAlphabetical(
+          tagList.querySelector(".tag-list-content"),
+          thumb,
+          ".thumb-name"
+        );
       }
     }
     static createTagListIfNotExists(map, name, tagListContainer) {
@@ -1035,18 +1039,22 @@
       tagList.querySelector(".tag-list-name").innerText = name;
       tagList.querySelector("button").onclick = () => tagList.querySelector(".tag-list-content").classList.toggle("hidden");
       if (tagListContainer) {
-        const children = tagListContainer.children;
-        for (let i = 0; i <= children.length; i++) {
-          const c = children[i];
-          const insertHere = c ? name < c.querySelector(".tag-list-name").innerText : true;
-          if (insertHere) {
-            tagListContainer.insertBefore(tagList, c);
-            break;
-          }
-        }
+        this.insertAlphabetical(tagListContainer, tagList, ".tag-list-name");
       }
       map.set(name, tagList);
       return tagList;
+    }
+    static insertAlphabetical(container, element, textSelector) {
+      const name = element.querySelector(textSelector).innerText;
+      const children = container.children;
+      for (let i = 0; i <= children.length; i++) {
+        const c = children[i];
+        const insertHere = c ? name < c.querySelector(textSelector).innerText : true;
+        if (insertHere) {
+          container.insertBefore(element, c);
+          break;
+        }
+      }
     }
     static createThumb(name, image, onclick) {
       const thumb = _SubmitMenu.thumbTemplate.content.cloneNode(true).querySelector(".thumb");
