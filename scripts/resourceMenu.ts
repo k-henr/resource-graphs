@@ -89,29 +89,22 @@ export class ResourceMenu extends SubmitMenu {
         const formData = new FormData(this.filterForm);
         this.searchString = String(formData.get("search-string")!.valueOf());
 
-        const list = getResourcesWithFilter(this.searchString);
+        const resourceList = getResourcesWithFilter(this.searchString);
 
-        for (const [, r] of list) {
-            const thumb = (<HTMLElement>(
-                ResourceMenu.thumbTemplate.content.cloneNode(true)
-            )).querySelector<HTMLElement>(".thumb")!;
-
-            thumb.querySelector<HTMLElement>(".thumb-name")!.innerText =
-                r.getDisplayName();
-            thumb.querySelector<HTMLImageElement>("img.thumb-image")!.src = getSrc(
+        for (const [, r] of resourceList) {
+            const thumb = SubmitMenu.createThumb(
+                r.getDisplayName(),
                 r.getDisplayImage(),
+                () => {
+                    this.resourceToBeAdded = r;
+
+                    this.infoPanel.innerHTML = "";
+                    r.populateInfoPanel(this.infoPanel);
+
+                    // Set the unit dropdown to contain the correct values
+                    populateUnitDropdown(this.unitDropdown, r.getUnitGroupName());
+                },
             );
-
-            // Add a listener for selecting the thumb
-            thumb.onclick = () => {
-                this.resourceToBeAdded = r;
-
-                this.infoPanel.innerHTML = "";
-                r.populateInfoPanel(this.infoPanel);
-
-                // Set the unit dropdown to contain the correct values
-                populateUnitDropdown(this.unitDropdown, r.getUnitGroupName());
-            };
 
             this.thumbList.appendChild(thumb);
         }

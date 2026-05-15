@@ -119,7 +119,7 @@ export class ConverterMenu extends SubmitMenu {
         // elements
         const tagLists = new Map<string, HTMLElement>();
         // The misc tag should be at the end, so it needs special handling here
-        const miscTag = this.createTagListIfNotExists(
+        const miscTag = SubmitMenu.createTagListIfNotExists(
             tagLists,
             "Miscellaneous",
             null,
@@ -136,75 +136,19 @@ export class ConverterMenu extends SubmitMenu {
                 this.intermediateConverter.populateInfoPanel();
             };
 
-            // For each tag, add this element as a child of its thumb list. If this
-            // is the first occurence of the tag, make a completely new element and
-            // add it to the map
-            for (const tagName of tags) {
-                // Get the tag list and create it if it doesn't exist yet
-                const tagList = this.createTagListIfNotExists(
-                    tagLists,
-                    tagName,
-                    this.thumbList,
-                );
-
-                // Add the thumb to the end of the tag list
-                // TODO: Alphabetical or user-defined order
-                const thumb = (<HTMLElement>(
-                    ConverterMenu.thumbTemplate.content.cloneNode(true)
-                )).querySelector<HTMLElement>(".thumb")!;
-                thumb.querySelector<HTMLElement>(".thumb-name")!.innerText =
-                    cFact.name;
-                thumb.querySelector<HTMLImageElement>("img.thumb-image")!.src =
-                    getSrc(cFact.image);
-                thumb.onclick = onclickFn;
-
-                tagList.querySelector(".tag-list-content")!.appendChild(thumb);
-            }
+            // Add this thumb to all tag lists where it should be
+            // (automatically adds new tag lists when it encounters a new one)
+            this.addThumbToTagLists(tags, tagLists, {
+                name: cFact.name,
+                image: cFact.image,
+                onclick: onclickFn,
+            });
         }
 
         // Now that all other tag lists are ordered alphabetically, place the misc
-        // tag at the end
-        this.thumbList.appendChild(miscTag);
-    }
-
-    private createTagListIfNotExists(
-        map: Map<string, HTMLElement>,
-        name: string,
-        tagListContainer: HTMLElement | null, // Set to null to not automatically add
-    ): HTMLElement {
-        if (map.has(name)) return map.get(name)!;
-
-        console.log(`Creating tag list: ${name}`);
-
-        const tagList = (<HTMLElement>(
-            ConverterMenu.tagListTemplate.content.cloneNode(true)
-        )).firstElementChild! as HTMLElement;
-        tagList.querySelector<HTMLElement>(".tag-list-name")!.innerText = name;
-
-        // If the element should automatically be inserted, do that
-        if (tagListContainer) {
-            console.log("Inserting automatically");
-            const children = tagListContainer.children;
-            for (let i = 0; i < children.length + 1; i++) {
-                const c = children[i]; // is undefined if we're at the end
-                // Compare names (if c is undefined we're at the end and should
-                // always insert. Yucky, but ¯\_(ツ)_/¯)
-                const insertHere = c
-                    ? name.localeCompare(
-                          c.querySelector<HTMLElement>(".tag-list-name")!.innerText,
-                      )
-                    : true;
-                if (insertHere) {
-                    console.log("Inserting: " + name);
-                    tagListContainer.insertBefore(tagList, c);
-                    break;
-                }
-            }
-        }
-
-        map.set(name, tagList);
-
-        return tagList;
+        // tag at the end (but only if it has stuff in it)
+        if (miscTag.querySelector(".tag-list-content")!.children.length > 0)
+            this.thumbList.appendChild(miscTag);
     }
 
     public override open() {

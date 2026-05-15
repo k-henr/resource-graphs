@@ -969,7 +969,7 @@
   }
 
   // scripts/submitMenu.ts
-  var SubmitMenu = class {
+  var SubmitMenu = class _SubmitMenu {
     static tagListTemplate = document.querySelector("#tag-list-template");
     static thumbTemplate = document.querySelector(
       "#item-converter-thumb"
@@ -1014,10 +1014,51 @@
       this.submissionForm.classList.add("hidden");
       this.infoPanel.innerHTML = "";
     }
+    addThumbToTagLists(tags, tagListMap, thumbData) {
+      for (const tagName of tags) {
+        const tagList = _SubmitMenu.createTagListIfNotExists(
+          tagListMap,
+          tagName,
+          this.thumbList
+        );
+        const thumb = _SubmitMenu.createThumb(
+          thumbData.name,
+          thumbData.image,
+          thumbData.onclick
+        );
+        tagList.querySelector(".tag-list-content").appendChild(thumb);
+      }
+    }
+    static createTagListIfNotExists(map, name, tagListContainer) {
+      if (map.has(name)) return map.get(name);
+      const tagList = _SubmitMenu.tagListTemplate.content.cloneNode(true).firstElementChild;
+      tagList.querySelector(".tag-list-name").innerText = name;
+      tagList.querySelector("button").onclick = () => tagList.querySelector(".tag-list-content").classList.toggle("hidden");
+      if (tagListContainer) {
+        const children = tagListContainer.children;
+        for (let i = 0; i <= children.length; i++) {
+          const c = children[i];
+          const insertHere = c ? name < c.querySelector(".tag-list-name").innerText : true;
+          if (insertHere) {
+            tagListContainer.insertBefore(tagList, c);
+            break;
+          }
+        }
+      }
+      map.set(name, tagList);
+      return tagList;
+    }
+    static createThumb(name, image, onclick) {
+      const thumb = _SubmitMenu.thumbTemplate.content.cloneNode(true).querySelector(".thumb");
+      thumb.querySelector(".thumb-name").innerText = name;
+      thumb.querySelector("img.thumb-image").src = getSrc(image);
+      thumb.onclick = onclick;
+      return thumb;
+    }
   };
 
   // scripts/converterMenu.ts
-  var ConverterMenu = class _ConverterMenu extends SubmitMenu {
+  var ConverterMenu = class extends SubmitMenu {
     amountInput;
     resourceBeingRequested = null;
     amountOfResourceBeingRequested = Rational.zero;
@@ -1089,7 +1130,7 @@
         []
       );
       const tagLists = /* @__PURE__ */ new Map();
-      const miscTag = this.createTagListIfNotExists(
+      const miscTag = SubmitMenu.createTagListIfNotExists(
         tagLists,
         "Miscellaneous",
         null
@@ -1101,43 +1142,14 @@
           this.infoPanel.innerHTML = "";
           this.intermediateConverter.populateInfoPanel();
         };
-        for (const tagName of tags) {
-          const tagList = this.createTagListIfNotExists(
-            tagLists,
-            tagName,
-            this.thumbList
-          );
-          const thumb = _ConverterMenu.thumbTemplate.content.cloneNode(true).querySelector(".thumb");
-          thumb.querySelector(".thumb-name").innerText = cFact.name;
-          thumb.querySelector("img.thumb-image").src = getSrc(cFact.image);
-          thumb.onclick = onclickFn;
-          tagList.querySelector(".tag-list-content").appendChild(thumb);
-        }
+        this.addThumbToTagLists(tags, tagLists, {
+          name: cFact.name,
+          image: cFact.image,
+          onclick: onclickFn
+        });
       }
-      this.thumbList.appendChild(miscTag);
-    }
-    createTagListIfNotExists(map, name, tagListContainer) {
-      if (map.has(name)) return map.get(name);
-      console.log(`Creating tag list: ${name}`);
-      const tagList = _ConverterMenu.tagListTemplate.content.cloneNode(true).firstElementChild;
-      tagList.querySelector(".tag-list-name").innerText = name;
-      if (tagListContainer) {
-        console.log("Inserting automatically");
-        const children = tagListContainer.children;
-        for (let i = 0; i < children.length + 1; i++) {
-          const c = children[i];
-          const insertHere = c ? name.localeCompare(
-            c.querySelector(".tag-list-name").innerText
-          ) : true;
-          if (insertHere) {
-            console.log("Inserting: " + name);
-            tagListContainer.insertBefore(tagList, c);
-            break;
-          }
-        }
-      }
-      map.set(name, tagList);
-      return tagList;
+      if (miscTag.querySelector(".tag-list-content").children.length > 0)
+        this.thumbList.appendChild(miscTag);
     }
     open() {
       super.open();
@@ -1162,7 +1174,7 @@
   };
 
   // scripts/resourceMenu.ts
-  var ResourceMenu = class _ResourceMenu extends SubmitMenu {
+  var ResourceMenu = class extends SubmitMenu {
     searchString = "";
     unitDropdown;
     constructor(graph, menuElement, headerElement, thumbList, filterForm, converterForm, unitDropdown, infoPanel, showOnOpen) {
@@ -1219,19 +1231,18 @@
       this.thumbList.innerHTML = "";
       const formData = new FormData(this.filterForm);
       this.searchString = String(formData.get("search-string").valueOf());
-      const list = getResourcesWithFilter(this.searchString);
-      for (const [, r] of list) {
-        const thumb = _ResourceMenu.thumbTemplate.content.cloneNode(true).querySelector(".thumb");
-        thumb.querySelector(".thumb-name").innerText = r.getDisplayName();
-        thumb.querySelector("img.thumb-image").src = getSrc(
-          r.getDisplayImage()
+      const resourceList = getResourcesWithFilter(this.searchString);
+      for (const [, r] of resourceList) {
+        const thumb = SubmitMenu.createThumb(
+          r.getDisplayName(),
+          r.getDisplayImage(),
+          () => {
+            this.resourceToBeAdded = r;
+            this.infoPanel.innerHTML = "";
+            r.populateInfoPanel(this.infoPanel);
+            populateUnitDropdown(this.unitDropdown, r.getUnitGroupName());
+          }
         );
-        thumb.onclick = () => {
-          this.resourceToBeAdded = r;
-          this.infoPanel.innerHTML = "";
-          r.populateInfoPanel(this.infoPanel);
-          populateUnitDropdown(this.unitDropdown, r.getUnitGroupName());
-        };
         this.thumbList.appendChild(thumb);
       }
     }

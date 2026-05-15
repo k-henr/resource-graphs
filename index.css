@@ -15,6 +15,7 @@
 }
 
 body {
+    height: 100%;
     margin: 0px;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     background-color: var(--background-color);
@@ -35,6 +36,7 @@ footer {
 main {
     display: flex;
     flex: 1;
+    height: 100%;
 
     & > div {
         padding: 16px;
@@ -68,6 +70,19 @@ main {
 
 #add-rc-tag-list {
     width: 100%;
+}
+
+.tag-list-header {
+    display: flex;
+    gap: 8px;
+    background-color: var(--muted-background);
+    margin: 8px 0px;
+    padding: 8px;
+}
+
+.tag-list-name {
+    font-size: larger;
+    font-weight: bold;
 }
 
 #resources,
@@ -192,21 +207,21 @@ well? */
     gap: 8px;
 }
 
-/* RC menu */
-
 #add-rc-menu-wrapper {
     position: absolute;
     top: 0px;
     left: 0px;
     width: 100vw;
-    min-height: 100vh;
+    height: 100vh;
+    overflow-y: auto;
+    overscroll-behavior-y: none;
 }
 
 #add-rc-menu {
     margin: 32px 128px;
     box-sizing: border-box;
 
-    background-color: darkgray;
+    background-color: var(--background-color);
     box-shadow: black 0px 0px 50px;
 
     padding: 32px;
