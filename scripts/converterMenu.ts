@@ -23,6 +23,7 @@ export class ConverterMenu extends SubmitMenu {
     constructor(
         graph: ResourceGraph,
         menuElement: HTMLElement,
+        detailPopup: HTMLElement,
         headerElement: HTMLElement,
         thumbList: HTMLElement,
         filterForm: HTMLFormElement,
@@ -35,6 +36,7 @@ export class ConverterMenu extends SubmitMenu {
         super(
             graph,
             menuElement,
+            detailPopup,
             headerElement,
             thumbList,
             filterForm,
@@ -131,9 +133,14 @@ export class ConverterMenu extends SubmitMenu {
 
             // Create an onclick function
             let onclickFn = () => {
+                console.log("Factorying for", cFact.name);
                 this.intermediateConverter = cFact.factory();
+                // TODO: Clear settings form
+
                 this.infoPanel.innerHTML = "";
-                this.intermediateConverter.populateInfoPanel();
+                this.intermediateConverter.populateSettingsForm(this.infoPanel);
+                this.intermediateConverter.populateInfoPanel(this.infoPanel);
+                this.openDetailPopup();
             };
 
             // Add this thumb to all tag lists where it should be
@@ -153,7 +160,6 @@ export class ConverterMenu extends SubmitMenu {
 
     public override open() {
         super.open();
-        this.headerElement.innerText = "Add new converter";
     }
 
     public override close() {
@@ -172,7 +178,6 @@ export class ConverterMenu extends SubmitMenu {
         this.amountInput.classList.add("hidden");
 
         this.open();
-        this.headerElement.innerText = `Choose a converter that produces ${resource.getDisplayName()}`;
         this.applyCurrentFilters();
     }
 }

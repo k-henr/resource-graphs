@@ -308,7 +308,7 @@
     static converterOrTemplate = document.querySelector(
       "template#converter-or-template"
     );
-    static infoPanel = document.querySelector("#rc-info-panel");
+    // TODO: Make non-static
     static settingsForm = document.querySelector(
       "#converter-settings-form"
     );
@@ -324,13 +324,15 @@
       this.displayImage = displayImage;
       this.ingredients = ingredients;
       this.products = products;
-      _IntermediateConverter.settingsForm.innerHTML = "";
       this.settings = this.getAllConverterSettings(
         this.products,
         this.getAllConverterSettings(this.ingredients, new ConverterSettings())
       );
+    }
+    populateSettingsForm(infoPanel) {
+      _IntermediateConverter.settingsForm.innerHTML = "";
       for (const [name, setting] of this.settings.getAllSettings()) {
-        const settingEl = this.createSettingInput(name, setting);
+        const settingEl = this.createSettingInput(name, setting, infoPanel);
         _IntermediateConverter.settingsForm.appendChild(settingEl);
       }
     }
@@ -363,7 +365,7 @@
     }
     // Populate an info panel with information regarding this converter
     // Assumes empty panel element!
-    populateInfoPanel() {
+    populateInfoPanel(infoPanel) {
       const el = _IntermediateConverter.infoTemplate.content.cloneNode(
         true
       );
@@ -371,7 +373,6 @@
       el.querySelector(".rc-info-image").src = getSrc(
         this.getDisplayImage()
       );
-      console.log("Repopulating info panel, ingredients:", this.ingredients);
       this.addResourceTreeToElement(
         this.ingredients,
         null,
@@ -384,11 +385,10 @@
         el.querySelector(".c-info-products"),
         _IntermediateConverter.settingsForm
       );
-      _IntermediateConverter.infoPanel.appendChild(el);
+      infoPanel.appendChild(el);
     }
     // Replace a given string with the text it represents, given settings data
     parseFormatting(toFormat, formData) {
-      console.log(toFormat);
       const args = toFormat.split("|");
       const settingName = args[0];
       const setting = this.settings.getSetting(settingName);
@@ -411,22 +411,31 @@
         }
       }
     }
-    createSettingInput(name, setting) {
+    createSettingInput(name, setting, infoPanel) {
       switch (setting.type) {
         case "NUMBER": {
-          const [settingEl, , input] = this.createInputElement(name);
+          const [settingEl, , input] = this.createInputElement(
+            name,
+            infoPanel
+          );
           input.type = "text";
           input.value = String(setting.default ?? 0);
           return settingEl;
         }
         case "TOGGLE": {
-          const [settingEl, , input] = this.createInputElement(name);
+          const [settingEl, , input] = this.createInputElement(
+            name,
+            infoPanel
+          );
           input.type = "checkbox";
           input.checked = setting.default ?? false;
           return settingEl;
         }
         case "ENUMERATE": {
-          const [settingEl, , select] = this.createSelectElement(name);
+          const [settingEl, , select] = this.createSelectElement(
+            name,
+            infoPanel
+          );
           for (const optionName of setting.options) {
             const optionEl = document.createElement("option");
             optionEl.value = optionName;
@@ -439,7 +448,7 @@
         }
       }
     }
-    createInputElement(name) {
+    createInputElement(name, infoPanel) {
       const settingEl = _IntermediateConverter.settingInputTemplate.content.cloneNode(
         true
       );
@@ -449,12 +458,12 @@
       label.innerText = name;
       input.name = name;
       input.onchange = () => {
-        _IntermediateConverter.infoPanel.innerHTML = "";
-        this.populateInfoPanel();
+        infoPanel.innerHTML = "";
+        this.populateInfoPanel(infoPanel);
       };
       return [settingEl, label, input];
     }
-    createSelectElement(name) {
+    createSelectElement(name, infoPanel) {
       const settingEl = _IntermediateConverter.settingSelectTemplate.content.cloneNode(
         true
       );
@@ -464,8 +473,8 @@
       label.innerText = name;
       input.name = name;
       input.onchange = () => {
-        _IntermediateConverter.infoPanel.innerHTML = "";
-        this.populateInfoPanel();
+        infoPanel.innerHTML = "";
+        this.populateInfoPanel(infoPanel);
       };
       return [settingEl, label, input];
     }
@@ -526,10 +535,6 @@
             option.onclick = () => {
               if (!parentContext)
                 throw new Error("An OR node can't be a root node!");
-              console.log(
-                "Replacing OR node in parent context:",
-                parentContext
-              );
               if (parentContext.parent.type === "MULTIPLIER") {
                 parentContext.parent.resource = res;
               } else {
@@ -554,13 +559,6 @@
               new FormData(settingsForm)
             )
           );
-          console.log(
-            "Parsed multiplier for",
-            node.resource,
-            ": ",
-            node.multiplier
-          );
-          console.log("New multiplier:", multiplier.getMixedFractionString());
           if (multiplier.equals(Rational.zero)) {
           }
           return this.addResourceTreeToElement(
@@ -595,7 +593,6 @@
             this.resourceTreeToList(child, output, form, multiplier);
           break;
         case "MULTIPLIER":
-          console.log("Encountered multiplier when converting to list");
           multiplier = multiplier.mul(
             this.evaluateSettingsTree(
               node.multiplier,
@@ -621,25 +618,25 @@
             `input[name="${treeNode.name}"]`
           );
           const num = Rational.fromInput(
-            String(formData.get(treeNode.name).valueOf()),
+            String(
+              formData.get(treeNode.name)?.valueOf() ?? treeNode.default
+            ),
             el
           );
-          if (!num) {
-            throw new Error("Bad formatting!");
-          }
+          if (!num) throw new Error("Bad formatting!");
           return num;
         case "TOGGLE":
           return this.evaluateSettingsTree(
             form.querySelector(
               `input[name="${treeNode.name}"]`
-            ).checked ? treeNode.true : treeNode.false,
+            )?.checked ?? treeNode.default ? treeNode.true : treeNode.false,
             form,
             formData
           );
         case "ENUMERATE":
           const chosen = form.querySelector(
             `select[name="${treeNode.name}"]`
-          ).value.valueOf();
+          )?.value.valueOf() ?? treeNode.default;
           for (const [selector, option] of treeNode.options) {
             const selectorMatches = typeof selector === "string" ? selector === chosen : selector.indexOf(chosen) !== -1;
             if (selectorMatches)
@@ -649,7 +646,6 @@
             if (name === treeNode.default)
               return this.evaluateSettingsTree(option, form, formData);
           }
-          console.log("Couldn't find default value");
           return Rational.zero;
         case "MUL":
           let p = Rational.one;
@@ -825,12 +821,20 @@
   }
   function createFactory(data) {
     return () => {
+      const ingr = {
+        type: "AND",
+        resources: [...data.consumes]
+      };
+      const prod = {
+        type: "AND",
+        resources: [...data.produces]
+      };
       return new IntermediateConverter(
         data.displayName,
         data.thumbName ?? data.displayName,
         data.displayImage,
-        { type: "AND", resources: [...data.consumes] },
-        { type: "AND", resources: [...data.produces] }
+        structuredClone(ingr),
+        structuredClone(prod)
       );
     };
   }
@@ -986,15 +990,17 @@
     );
     graph;
     menuElement;
+    detailPopup;
     headerElement;
     thumbList;
     filterForm;
     submissionForm;
     infoPanel;
     showOnOpen;
-    constructor(graph, menuElement, headerElement, thumbList, filterForm, submissionForm, infoPanel, showOnOpen) {
+    constructor(graph, menuElement, detailPopup, headerElement, thumbList, filterForm, submissionForm, infoPanel, showOnOpen) {
       this.graph = graph;
       this.menuElement = menuElement;
+      this.detailPopup = detailPopup;
       this.headerElement = headerElement;
       this.thumbList = thumbList;
       this.filterForm = filterForm;
@@ -1014,15 +1020,25 @@
     open() {
       this.applyCurrentFilters();
       this.menuElement.classList.remove("hidden");
+      this.headerElement.classList.remove("hidden");
       this.filterForm.classList.remove("hidden");
       this.submissionForm.classList.remove("hidden");
     }
     close() {
+      this.closeDetailPopup();
       this.clearFilters();
       this.menuElement.classList.add("hidden");
+      this.headerElement.classList.add("hidden");
+      console.log(this.headerElement);
       this.filterForm.classList.add("hidden");
       this.submissionForm.classList.add("hidden");
       this.infoPanel.innerHTML = "";
+    }
+    openDetailPopup() {
+      this.detailPopup.classList.remove("hidden");
+    }
+    closeDetailPopup() {
+      this.detailPopup.classList.add("hidden");
     }
     addThumbToTagLists(tags, tagListMap, thumbData) {
       for (const tagName of tags) {
@@ -1085,10 +1101,11 @@
     // intermediate converter storage is required
     intermediateConverter = null;
     converterSettingsForm;
-    constructor(graph, menuElement, headerElement, thumbList, filterForm, converterForm, converterSettingsForm, amountInput, infoPanel, showOnOpen) {
+    constructor(graph, menuElement, detailPopup, headerElement, thumbList, filterForm, converterForm, converterSettingsForm, amountInput, infoPanel, showOnOpen) {
       super(
         graph,
         menuElement,
+        detailPopup,
         headerElement,
         thumbList,
         filterForm,
@@ -1156,9 +1173,12 @@
       for (const [_, cFact] of converterList) {
         const tags = cFact.tags.length > 0 ? cFact.tags : ["Miscellaneous"];
         let onclickFn = () => {
+          console.log("Factorying for", cFact.name);
           this.intermediateConverter = cFact.factory();
           this.infoPanel.innerHTML = "";
-          this.intermediateConverter.populateInfoPanel();
+          this.intermediateConverter.populateSettingsForm(this.infoPanel);
+          this.intermediateConverter.populateInfoPanel(this.infoPanel);
+          this.openDetailPopup();
         };
         this.addThumbToTagLists(tags, tagLists, {
           name: cFact.name,
@@ -1171,7 +1191,6 @@
     }
     open() {
       super.open();
-      this.headerElement.innerText = "Add new converter";
     }
     close() {
       super.close();
@@ -1186,7 +1205,6 @@
       this.amountOfResourceBeingRequested = amount;
       this.amountInput.classList.add("hidden");
       this.open();
-      this.headerElement.innerText = `Choose a converter that produces ${resource.getDisplayName()}`;
       this.applyCurrentFilters();
     }
   };
@@ -1195,10 +1213,11 @@
   var ResourceMenu = class extends SubmitMenu {
     searchString = "";
     unitDropdown;
-    constructor(graph, menuElement, headerElement, thumbList, filterForm, converterForm, unitDropdown, infoPanel, showOnOpen) {
+    constructor(graph, menuElement, detailPopup, headerElement, thumbList, filterForm, converterForm, unitDropdown, infoPanel, showOnOpen) {
       super(
         graph,
         menuElement,
+        detailPopup,
         headerElement,
         thumbList,
         filterForm,
@@ -1257,7 +1276,6 @@
         null
       );
       for (const [, r] of resourceList) {
-        console.log(r.getDisplayName());
         let tags = r.getTags();
         tags = tags.length > 0 ? tags : ["Miscellaneous"];
         const onclickFn = () => {
@@ -1265,6 +1283,7 @@
           this.infoPanel.innerHTML = "";
           r.populateInfoPanel(this.infoPanel);
           populateUnitDropdown(this.unitDropdown, r.getUnitGroupName());
+          this.openDetailPopup();
         };
         this.addThumbToTagLists(tags, tagLists, {
           name: r.getDisplayName(),
@@ -1314,9 +1333,12 @@
     const addRcMenuWrapper = document.querySelector(
       "#add-rc-menu-wrapper"
     );
-    const header = addRcMenuWrapper.querySelector("#add-rc-menu-header");
+    const detailPopup = document.querySelector("#rc-detail-popup");
     const thumbList = document.querySelector("#add-rc-tag-list");
     const infoPanel = document.querySelector("#rc-info-panel");
+    const rHeader = addRcMenuWrapper.querySelector(
+      "#add-resource-header"
+    );
     const rUnitDropdown = document.querySelector(
       "select#resource-unit-select"
     );
@@ -1329,7 +1351,8 @@
     const resourceMenu = new ResourceMenu(
       graph,
       addRcMenuWrapper,
-      header,
+      detailPopup,
+      rHeader,
       thumbList,
       rFilter,
       rSubmit,
@@ -1340,7 +1363,11 @@
       // reason need to hide more, this is what to change
     );
     document.querySelector("#open-item-delta-menu-button").onclick = () => resourceMenu.open();
-    document.querySelector("#close-item-form-button").onclick = () => resourceMenu.close();
+    document.querySelector("#close-resource-menu-button").onclick = () => resourceMenu.close();
+    document.querySelector("#close-item-popup-button").onclick = () => resourceMenu.closeDetailPopup();
+    const cHeader = addRcMenuWrapper.querySelector(
+      "#add-converter-header"
+    );
     const cFilter = document.querySelector(
       "form#converter-filter-form"
     );
@@ -1359,7 +1386,8 @@
     const converterMenu = new ConverterMenu(
       graph,
       addRcMenuWrapper,
-      header,
+      detailPopup,
+      cHeader,
       thumbList,
       cFilter,
       cSubmit,
@@ -1369,7 +1397,8 @@
       cFormWrapper
     );
     document.querySelector("#open-converter-menu-button").onclick = () => converterMenu.open();
-    document.querySelector("#close-converter-form-button").onclick = () => converterMenu.close();
+    document.querySelector("#close-converter-menu-button").onclick = () => converterMenu.close();
+    document.querySelector("#close-converter-popup-button").onclick = () => converterMenu.closeDetailPopup();
     graph.setConverterRequestTarget(converterMenu);
     const dupe = getConverterFactory("duplicant").factory().finalize();
     const electrolyzer = getConverterFactory("electrolyzer").factory().finalize();

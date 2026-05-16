@@ -44,7 +44,14 @@
         <!-- Menu for adding resources or converters to the graph -->
         <div id="add-rc-menu-wrapper" class="hidden">
             <div id="add-rc-menu">
-                <h2 id="add-rc-menu-header"></h2>
+                <div id="add-resource-header" class="hidden">
+                    <h2 class="flex-1">Add Resource source/drain</h2>
+                    <button id="close-resource-menu-button">CLOSE</button>
+                </div>
+                <div id="add-converter-header" class="hidden">
+                    <h2 class="flex-1">Add Converter</h2>
+                    <button id="close-converter-menu-button">CLOSE</button>
+                </div>
                 <!-- Filter form for when adding resources. -->
                 <form id="resource-filter-form" class="hidden">
                     <label for="search-string">Search</label>
@@ -63,78 +70,73 @@
                     <!-- All resource/converter thumbs are loaded in here -->
                     <div class="tag-list-content"></div>
                 </div>
-                <div id="add-rc-footer">
-                    <div id="rc-info-panel" class="flex-2"></div>
-                    <div class="flex-1">
+                <!-- TODO: Break out footer to its own popup -->
+            </div>
+
+            <div id="rc-detail-popup" class="hidden">
+                <div id="rc-info-panel" class="flex-2"></div>
+                <div class="flex-1">
+                    <form id="resource-submission-form" class="popup-form hidden">
+                        <div class="rc-form-option">
+                            <label for="delta">Rate of change</label>
+                            <input
+                                type="text"
+                                name="delta"
+                                value="1"
+                                step="0.01"
+                                autocomplete="off"
+                            />
+                            <select id="resource-unit-select"></select>
+                        </div>
+                        <div>
+                            <button
+                                type="submit"
+                                class="primary-button rc-submit-button"
+                            >
+                                Add Resource
+                            </button>
+                            <button
+                                id="close-item-popup-button"
+                                class="rc-submit-button"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                    <div id="converter-specific-footer">
+                        <form id="converter-settings-form" class="popup-form"></form>
                         <form
-                            id="resource-submission-form"
+                            id="converter-submission-form"
                             class="popup-form hidden"
                         >
-                            <div class="rc-form-option">
-                                <label for="delta">Rate of change</label>
-                                <input
-                                    type="text"
-                                    name="delta"
-                                    value="1"
-                                    step="0.01"
-                                    autocomplete="off"
-                                />
-                                <select id="resource-unit-select"></select>
+                            <div id="converter-amount-input">
+                                <div class="rc-form-option">
+                                    <label for="amount">Number of converters</label>
+                                    <input
+                                        type="text"
+                                        name="amount"
+                                        value="1"
+                                        step="0.01"
+                                        autocomplete="off"
+                                    />
+                                </div>
                             </div>
                             <div>
                                 <button
                                     type="submit"
                                     class="primary-button rc-submit-button"
                                 >
-                                    Add Resource
+                                    Add Converter
                                 </button>
                                 <button
-                                    id="close-item-form-button"
+                                    type="button"
+                                    id="close-converter-popup-button"
                                     class="rc-submit-button"
                                 >
                                     Cancel
                                 </button>
                             </div>
                         </form>
-                        <div id="converter-specific-footer">
-                            <form
-                                id="converter-settings-form"
-                                class="popup-form"
-                            ></form>
-                            <form
-                                id="converter-submission-form"
-                                class="popup-form hidden"
-                            >
-                                <div id="converter-amount-input">
-                                    <div class="rc-form-option">
-                                        <label for="amount"
-                                            >Number of converters</label
-                                        >
-                                        <input
-                                            type="text"
-                                            name="amount"
-                                            value="1"
-                                            step="0.01"
-                                            autocomplete="off"
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <button
-                                        type="submit"
-                                        class="primary-button rc-submit-button"
-                                    >
-                                        Add Converter
-                                    </button>
-                                    <button
-                                        id="close-converter-form-button"
-                                        class="rc-submit-button"
-                                    >
-                                        Cancel
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
                     </div>
                 </div>
             </div>

@@ -35,9 +35,7 @@ export class IntermediateConverter {
         "template#converter-or-template",
     )!;
 
-    private static infoPanel =
-        document.querySelector<HTMLElement>("#rc-info-panel")!;
-
+    // TODO: Make non-static
     private static settingsForm = document.querySelector<HTMLFormElement>(
         "#converter-settings-form",
     )!;
@@ -63,17 +61,18 @@ export class IntermediateConverter {
         this.ingredients = ingredients;
         this.products = products;
 
-        IntermediateConverter.settingsForm.innerHTML = "";
-
         // Get all the settings present in this converter
         this.settings = this.getAllConverterSettings(
             this.products,
             this.getAllConverterSettings(this.ingredients, new ConverterSettings()),
         );
+    }
 
-        // Add all the settings to the settings form
+    public populateSettingsForm(infoPanel: HTMLElement) {
+        // Add settings to the settings form
+        IntermediateConverter.settingsForm.innerHTML = "";
         for (const [name, setting] of this.settings.getAllSettings()) {
-            const settingEl = this.createSettingInput(name, setting);
+            const settingEl = this.createSettingInput(name, setting, infoPanel);
 
             IntermediateConverter.settingsForm.appendChild(settingEl);
         }
@@ -113,7 +112,7 @@ export class IntermediateConverter {
 
     // Populate an info panel with information regarding this converter
     // Assumes empty panel element!
-    public populateInfoPanel() {
+    public populateInfoPanel(infoPanel: HTMLElement) {
         const el = IntermediateConverter.infoTemplate.content.cloneNode(
             true,
         ) as DocumentFragment;
@@ -124,8 +123,6 @@ export class IntermediateConverter {
         el.querySelector<HTMLImageElement>(".rc-info-image")!.src = getSrc(
             this.getDisplayImage(),
         );
-
-        console.log("Repopulating info panel, ingredients:", this.ingredients);
 
         // Populate the info panel recursively with ingredients and products
         this.addResourceTreeToElement(
@@ -141,12 +138,11 @@ export class IntermediateConverter {
             IntermediateConverter.settingsForm,
         );
 
-        IntermediateConverter.infoPanel.appendChild(el);
+        infoPanel.appendChild(el);
     }
 
     // Replace a given string with the text it represents, given settings data
     private parseFormatting(toFormat: string, formData: FormData): string {
-        console.log(toFormat);
         const args = toFormat.split("|");
 
         // The first argument is always the name of the setting
@@ -181,10 +177,17 @@ export class IntermediateConverter {
         }
     }
 
-    private createSettingInput(name: string, setting: Setting): DocumentFragment {
+    private createSettingInput(
+        name: string,
+        setting: Setting,
+        infoPanel: HTMLElement,
+    ): DocumentFragment {
         switch (setting.type) {
             case "NUMBER": {
-                const [settingEl, , input] = this.createInputElement(name);
+                const [settingEl, , input] = this.createInputElement(
+                    name,
+                    infoPanel,
+                );
                 // Add a text input (which will be parsed to a rational) with the
                 // correct name and label
                 input.type = "text";
@@ -193,7 +196,10 @@ export class IntermediateConverter {
             }
 
             case "TOGGLE": {
-                const [settingEl, , input] = this.createInputElement(name);
+                const [settingEl, , input] = this.createInputElement(
+                    name,
+                    infoPanel,
+                );
                 // Add a toggle box
                 input.type = "checkbox";
                 input.checked = setting.default ?? false;
@@ -201,7 +207,10 @@ export class IntermediateConverter {
             }
 
             case "ENUMERATE": {
-                const [settingEl, , select] = this.createSelectElement(name);
+                const [settingEl, , select] = this.createSelectElement(
+                    name,
+                    infoPanel,
+                );
                 // Add all the options
                 for (const optionName of setting.options) {
                     const optionEl = document.createElement("option");
@@ -220,6 +229,7 @@ export class IntermediateConverter {
 
     private createInputElement(
         name: string,
+        infoPanel: HTMLElement,
     ): [DocumentFragment, HTMLLabelElement, HTMLInputElement] {
         const settingEl =
             IntermediateConverter.settingInputTemplate.content.cloneNode(
@@ -234,8 +244,8 @@ export class IntermediateConverter {
 
         input.onchange = () => {
             // Clear info panel and show again
-            IntermediateConverter.infoPanel.innerHTML = "";
-            this.populateInfoPanel();
+            infoPanel.innerHTML = "";
+            this.populateInfoPanel(infoPanel);
         };
 
         return [settingEl, label, input];
@@ -243,6 +253,7 @@ export class IntermediateConverter {
 
     private createSelectElement(
         name: string,
+        infoPanel: HTMLElement,
     ): [DocumentFragment, HTMLLabelElement, HTMLSelectElement] {
         const settingEl =
             IntermediateConverter.settingSelectTemplate.content.cloneNode(
@@ -257,8 +268,8 @@ export class IntermediateConverter {
 
         input.onchange = () => {
             // Clear info panel and show again
-            IntermediateConverter.infoPanel.innerHTML = "";
-            this.populateInfoPanel();
+            infoPanel.innerHTML = "";
+            this.populateInfoPanel(infoPanel);
         };
 
         return [settingEl, label, input];
@@ -351,11 +362,6 @@ export class IntermediateConverter {
                         if (!parentContext)
                             throw new Error("An OR node can't be a root node!");
 
-                        console.log(
-                            "Replacing OR node in parent context:",
-                            parentContext,
-                        );
-
                         // Replace the OR node with the chosen option
                         if (parentContext.parent.type === "MULTIPLIER") {
                             parentContext.parent.resource = res;
@@ -389,13 +395,6 @@ export class IntermediateConverter {
                         new FormData(settingsForm),
                     ),
                 );
-                console.log(
-                    "Parsed multiplier for",
-                    node.resource,
-                    ": ",
-                    node.multiplier,
-                );
-                console.log("New multiplier:", multiplier.getMixedFractionString());
 
                 if (multiplier.equals(Rational.zero)) {
                     // TODO: Don't add anything, preferably without adding a dummy
@@ -437,7 +436,7 @@ export class IntermediateConverter {
     private resourceTreeToList(
         node: ConverterResourceTree,
         output: ConverterIngredient[],
-        form: HTMLFormElement,
+        form: HTMLFormElement, // If running "headless" with default settings, this is null
         multiplier: Rational = Rational.one,
     ) {
         switch (node.type) {
@@ -452,7 +451,6 @@ export class IntermediateConverter {
                     this.resourceTreeToList(child, output, form, multiplier);
                 break;
             case "MULTIPLIER":
-                console.log("Encountered multiplier when converting to list");
                 // Evaluate the settings tree
                 multiplier = multiplier.mul(
                     this.evaluateSettingsTree(
@@ -485,22 +483,21 @@ export class IntermediateConverter {
                 // Get the setting from the form data
                 const el = form.querySelector<HTMLInputElement>(
                     `input[name="${treeNode.name}"]`,
-                )!;
+                );
                 const num = Rational.fromInput(
-                    String(formData.get(treeNode.name)!.valueOf()),
+                    String(
+                        formData.get(treeNode.name)?.valueOf() ?? treeNode.default,
+                    ),
                     el,
                 );
-                if (!num) {
-                    // TODO: popup
-                    throw new Error("Bad formatting!");
-                }
+                if (!num) throw new Error("Bad formatting!");
                 return num;
 
             case "TOGGLE":
                 return this.evaluateSettingsTree(
-                    form.querySelector<HTMLInputElement>(
+                    (form.querySelector<HTMLInputElement>(
                         `input[name="${treeNode.name}"]`,
-                    )!.checked
+                    )?.checked ?? treeNode.default)
                         ? treeNode.true
                         : treeNode.false,
                     form,
@@ -508,11 +505,12 @@ export class IntermediateConverter {
                 );
 
             case "ENUMERATE":
-                const chosen = form
-                    .querySelector<HTMLInputElement>(
-                        `select[name="${treeNode.name}"]`,
-                    )!
-                    .value.valueOf();
+                const chosen =
+                    form
+                        .querySelector<HTMLInputElement>(
+                            `select[name="${treeNode.name}"]`,
+                        )
+                        ?.value.valueOf() ?? treeNode.default;
                 for (const [selector, option] of treeNode.options) {
                     const selectorMatches =
                         typeof selector === "string"
@@ -532,7 +530,6 @@ export class IntermediateConverter {
                 }
                 // TODO: Error handling in case of graph error where the default
                 // option doesn't exist
-                console.log("Couldn't find default value");
                 return Rational.zero;
 
             case "MUL":
@@ -608,7 +605,7 @@ type ConverterResourceTreeLeaf = {
     id: string;
     amount: RationalNumber;
 };
-type ResourceTreeBooleanNode = {
+export type ResourceTreeBooleanNode = {
     type: "AND" | "OR";
     resources: ConverterResourceTree[];
 };

@@ -61,11 +61,13 @@ import { ResourceMenu } from "./scripts/resourceMenu";
     const addRcMenuWrapper = document.querySelector<HTMLElement>(
         "#add-rc-menu-wrapper",
     )!;
-    const header =
-        addRcMenuWrapper.querySelector<HTMLElement>("#add-rc-menu-header")!;
+    const detailPopup = document.querySelector<HTMLElement>("#rc-detail-popup")!;
     const thumbList = document.querySelector<HTMLElement>("#add-rc-tag-list")!;
     const infoPanel = document.querySelector<HTMLElement>("#rc-info-panel")!;
 
+    const rHeader = addRcMenuWrapper.querySelector<HTMLElement>(
+        "#add-resource-header",
+    )!;
     const rUnitDropdown = document.querySelector<HTMLSelectElement>(
         "select#resource-unit-select",
     )!;
@@ -79,7 +81,8 @@ import { ResourceMenu } from "./scripts/resourceMenu";
     const resourceMenu = new ResourceMenu(
         graph,
         addRcMenuWrapper,
-        header,
+        detailPopup,
+        rHeader,
         thumbList,
         rFilter,
         rSubmit,
@@ -89,12 +92,18 @@ import { ResourceMenu } from "./scripts/resourceMenu";
         // reason need to hide more, this is what to change
     );
 
-    // Add listeners for opening/closing the resource menu
+    // Add listeners for opening/closing the rc menu
+    // TODO: Move these into submitMenu
     document.querySelector<HTMLElement>("#open-item-delta-menu-button")!.onclick =
         () => resourceMenu.open();
-    document.querySelector<HTMLElement>("#close-item-form-button")!.onclick = () =>
-        resourceMenu.close();
+    document.querySelector<HTMLElement>("#close-resource-menu-button")!.onclick =
+        () => resourceMenu.close();
+    document.querySelector<HTMLElement>("#close-item-popup-button")!.onclick = () =>
+        resourceMenu.closeDetailPopup();
 
+    const cHeader = addRcMenuWrapper.querySelector<HTMLElement>(
+        "#add-converter-header",
+    )!;
     const cFilter = document.querySelector<HTMLFormElement>(
         "form#converter-filter-form",
     )!;
@@ -114,7 +123,8 @@ import { ResourceMenu } from "./scripts/resourceMenu";
     const converterMenu = new ConverterMenu(
         graph,
         addRcMenuWrapper,
-        header,
+        detailPopup,
+        cHeader,
         thumbList,
         cFilter,
         cSubmit,
@@ -125,10 +135,13 @@ import { ResourceMenu } from "./scripts/resourceMenu";
     );
 
     // Open/close converter menu too
+    // TODO: Move these into submitMenu
     document.querySelector<HTMLElement>("#open-converter-menu-button")!.onclick =
         () => converterMenu.open();
-    document.querySelector<HTMLElement>("#close-converter-form-button")!.onclick =
+    document.querySelector<HTMLElement>("#close-converter-menu-button")!.onclick =
         () => converterMenu.close();
+    document.querySelector<HTMLElement>("#close-converter-popup-button")!.onclick =
+        () => converterMenu.closeDetailPopup();
 
     // Set the graph's request target to the converter menu
     graph.setConverterRequestTarget(converterMenu);

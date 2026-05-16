@@ -10,6 +10,7 @@ import {
     ConverterResourceTree,
     ConverterFactory,
     IntermediateConverter,
+    ResourceTreeBooleanNode,
 } from "./intermediateConverter";
 import { Resource, ResourceData } from "./resource";
 import { getDefaultUnitGroup } from "./units";
@@ -99,12 +100,21 @@ export async function loadAllConverters() {
 
 function createFactory(data: ConverterData) {
     return () => {
+        const ingr: ResourceTreeBooleanNode = {
+            type: "AND",
+            resources: [...data.consumes],
+        };
+        const prod: ResourceTreeBooleanNode = {
+            type: "AND",
+            resources: [...data.produces],
+        };
+
         return new IntermediateConverter(
             data.displayName,
             data.thumbName ?? data.displayName,
             data.displayImage,
-            { type: "AND", resources: [...data.consumes] },
-            { type: "AND", resources: [...data.produces] },
+            structuredClone(ingr),
+            structuredClone(prod),
         );
     };
 }

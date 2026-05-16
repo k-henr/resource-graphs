@@ -13,6 +13,7 @@ export class ResourceMenu extends SubmitMenu {
     constructor(
         graph: ResourceGraph,
         menuElement: HTMLElement,
+        detailPopup: HTMLElement,
         headerElement: HTMLElement,
         thumbList: HTMLElement,
         filterForm: HTMLFormElement,
@@ -24,6 +25,7 @@ export class ResourceMenu extends SubmitMenu {
         super(
             graph,
             menuElement,
+            detailPopup,
             headerElement,
             thumbList,
             filterForm,
@@ -100,7 +102,6 @@ export class ResourceMenu extends SubmitMenu {
         );
 
         for (const [, r] of resourceList) {
-            console.log(r.getDisplayName());
             // Get tags
             let tags = r.getTags();
             tags = tags.length > 0 ? tags : ["Miscellaneous"];
@@ -111,9 +112,9 @@ export class ResourceMenu extends SubmitMenu {
 
                 this.infoPanel.innerHTML = "";
                 r.populateInfoPanel(this.infoPanel);
-
                 // Set the unit dropdown to contain the correct values
                 populateUnitDropdown(this.unitDropdown, r.getUnitGroupName());
+                this.openDetailPopup();
             };
 
             this.addThumbToTagLists(tags, tagLists, {
@@ -121,13 +122,6 @@ export class ResourceMenu extends SubmitMenu {
                 image: r.getDisplayImage(),
                 onclick: onclickFn,
             });
-
-            // const thumb = SubmitMenu.createThumb(
-            //     r.getDisplayName(),
-            //     r.getDisplayImage(),
-            //     onclickFn,
-            // );
-            //this.thumbList.appendChild(thumb);
         }
 
         // Now that all other tag lists are ordered alphabetically, place the misc

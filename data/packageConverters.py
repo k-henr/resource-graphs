@@ -18,7 +18,7 @@ projPath = os.path.join(os.getcwd(), "data", projName)
 unpackedPath = os.path.join(projPath, unpackedDir)
 for filename in os.listdir(unpackedPath):
     print(f"Found converter: {filename}")
-    with open(os.path.join(unpackedPath, filename)) as file:
+    with open(os.path.join(unpackedPath, filename), encoding="utf-8") as file:
         # Parse file
         converter = json.loads(file.read())
 
@@ -36,7 +36,6 @@ for filename in os.listdir(unpackedPath):
             converter["displayImage"] = f"{defaultImgPath}/{converter["id"]}.{defaultImgExt}"
 
         # If other fields are missing, add a warning to be printed out
-        print("TODO: Warn when other fields are missing")
         if(not ("consumes" in converter and "produces" in converter)):
             warnings.append(f"{filename} is missing a production or consumption list!")
 
@@ -53,7 +52,7 @@ if(len(warnings) != 0):
 # If no warnings were encountered, stringify the json and output to file
 else:
     print("Parsing successful, writing output...")
-    outputText = json.dumps(allConverters, separators=[",",":"])
-    with open(os.path.join(projPath, output), "w") as outputFile:
+    outputText = json.dumps(allConverters, separators=[",",":"], ensure_ascii=False)
+    with open(os.path.join(projPath, output), "w", encoding="utf-8") as outputFile:
         outputFile.write(outputText)
     print("Script finished successfully.")

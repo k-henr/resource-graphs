@@ -14,6 +14,7 @@ export abstract class SubmitMenu {
 
     protected graph: ResourceGraph;
     protected menuElement: HTMLElement;
+    protected detailPopup: HTMLElement;
     protected headerElement: HTMLElement;
     protected thumbList: HTMLElement;
     protected filterForm: HTMLFormElement;
@@ -24,6 +25,7 @@ export abstract class SubmitMenu {
     constructor(
         graph: ResourceGraph,
         menuElement: HTMLElement,
+        detailPopup: HTMLElement,
         headerElement: HTMLElement,
         thumbList: HTMLElement,
         filterForm: HTMLFormElement,
@@ -33,6 +35,7 @@ export abstract class SubmitMenu {
     ) {
         this.graph = graph;
         this.menuElement = menuElement;
+        this.detailPopup = detailPopup;
         this.headerElement = headerElement;
         this.thumbList = thumbList;
         this.filterForm = filterForm;
@@ -67,16 +70,28 @@ export abstract class SubmitMenu {
     public open() {
         this.applyCurrentFilters();
         this.menuElement.classList.remove("hidden");
+        this.headerElement.classList.remove("hidden");
         this.filterForm.classList.remove("hidden");
         this.submissionForm.classList.remove("hidden");
     }
 
     public close() {
+        this.closeDetailPopup();
         this.clearFilters();
         this.menuElement.classList.add("hidden");
+        this.headerElement.classList.add("hidden");
+        console.log(this.headerElement);
         this.filterForm.classList.add("hidden");
         this.submissionForm.classList.add("hidden");
         this.infoPanel.innerHTML = "";
+    }
+
+    public openDetailPopup() {
+        this.detailPopup.classList.remove("hidden");
+    }
+
+    public closeDetailPopup() {
+        this.detailPopup.classList.add("hidden");
     }
 
     protected addThumbToTagLists(
