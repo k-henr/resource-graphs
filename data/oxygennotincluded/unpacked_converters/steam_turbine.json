@@ -14,7 +14,8 @@
             "multiplier": {
                 "type": "NUMBER",
                 "name": "Flow rate",
-                "default": 2
+                "default": 2,
+                "unit": "kg/s"
             }
         }
     ],

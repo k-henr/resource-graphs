@@ -104,9 +104,12 @@ export class ConverterSettings {
     private makeNewSettingObject(node: SettingsTreeInputNode): Setting {
         switch (node.type) {
             case "NUMBER":
+                console.log(node);
+                console.log(node.unit);
                 return {
                     type: "NUMBER",
                     default: node.default,
+                    unit: node.unit ?? null,
                 };
 
             case "TOGGLE":
@@ -136,6 +139,7 @@ export type Setting = NumberSetting | ToggleSetting | EnumerateSetting;
 type NumberSetting = {
     type: "NUMBER";
     default: RationalNumber;
+    unit: string | null; // content is written after the input element
 };
 type ToggleSetting = {
     type: "TOGGLE";
@@ -164,6 +168,7 @@ type SettingsTreeNumberInput = {
     type: "NUMBER";
     name: string;
     default: RationalNumber;
+    unit: string | undefined;
 };
 type SettingsTreeToggleInput = {
     type: "TOGGLE";

@@ -261,9 +261,12 @@
     makeNewSettingObject(node) {
       switch (node.type) {
         case "NUMBER":
+          console.log(node);
+          console.log(node.unit);
           return {
             type: "NUMBER",
-            default: node.default
+            default: node.default,
+            unit: node.unit ?? null
           };
         case "TOGGLE":
           return {
@@ -461,7 +464,8 @@
         case "NUMBER": {
           const [settingEl, , input] = this.createInputElement(
             name,
-            infoPanel
+            infoPanel,
+            setting.unit ?? ""
           );
           input.type = "text";
           input.value = String(setting.default ?? 0);
@@ -470,7 +474,8 @@
         case "TOGGLE": {
           const [settingEl, , input] = this.createInputElement(
             name,
-            infoPanel
+            infoPanel,
+            ""
           );
           input.type = "checkbox";
           input.checked = setting.default ?? false;
@@ -493,15 +498,17 @@
         }
       }
     }
-    createInputElement(name, infoPanel) {
+    createInputElement(name, infoPanel, postText) {
       const settingEl = _IntermediateConverter.settingInputTemplate.content.cloneNode(
         true
       );
       const label = settingEl.querySelector("label");
       const input = settingEl.querySelector("input");
+      const post = settingEl.querySelector("span");
       label.htmlFor = name;
       label.innerText = name;
       input.name = name;
+      post.innerText = postText;
       input.onchange = () => {
         infoPanel.innerHTML = "";
         this.populateInfoPanel(infoPanel);

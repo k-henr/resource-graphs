@@ -188,6 +188,7 @@ export class IntermediateConverter {
                 const [settingEl, , input] = this.createInputElement(
                     name,
                     infoPanel,
+                    setting.unit ?? "",
                 );
                 // Add a text input (which will be parsed to a rational) with the
                 // correct name and label
@@ -200,6 +201,7 @@ export class IntermediateConverter {
                 const [settingEl, , input] = this.createInputElement(
                     name,
                     infoPanel,
+                    "",
                 );
                 // Add a toggle box
                 input.type = "checkbox";
@@ -231,6 +233,7 @@ export class IntermediateConverter {
     private createInputElement(
         name: string,
         infoPanel: HTMLElement,
+        postText: string,
     ): [DocumentFragment, HTMLLabelElement, HTMLInputElement] {
         const settingEl =
             IntermediateConverter.settingInputTemplate.content.cloneNode(
@@ -238,10 +241,12 @@ export class IntermediateConverter {
             ) as DocumentFragment;
         const label = settingEl.querySelector<HTMLLabelElement>("label")!;
         const input = settingEl.querySelector<HTMLInputElement>("input")!;
+        const post = settingEl.querySelector<HTMLElement>("span")!;
 
         label.htmlFor = name;
         label.innerText = name;
         input.name = name;
+        post.innerText = postText;
 
         input.onchange = () => {
             // Clear info panel and show again
