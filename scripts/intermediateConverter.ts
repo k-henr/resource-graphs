@@ -3,6 +3,7 @@ import { ConverterSettings, Setting, SettingsTreeNode } from "./converterSetting
 import { getResource, getSrc } from "./data";
 import { Rational, RationalNumber } from "./rational";
 import { Resource } from "./resource";
+import { getUnits } from "./units";
 
 /**
  * A class for holding a converter currently being constructed, with ORs and settings
@@ -424,8 +425,10 @@ export class IntermediateConverter {
 
         const res = getResource(ingr.id);
 
+        const unit = getResource(ingr.id).getUnitGroupName();
+
         el.querySelector<HTMLElement>(".converter-ingredient-name")!.innerText =
-            `${res.getDisplayName()} ⨉ ${Rational.fromData(ingr.amount).mul(multiplier).getDecimalString()}`;
+            `${res.getDisplayName()} ⨉ ${Rational.fromData(ingr.amount).mul(multiplier).getDecimalString()} ${getUnits(unit)[1]}`;
         el.querySelector<HTMLImageElement>(".converter-ingredient-image")!.src =
             getSrc(res.getDisplayImage());
 

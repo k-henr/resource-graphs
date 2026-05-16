@@ -285,6 +285,51 @@
     }
   };
 
+  // scripts/units.ts
+  var unitGroups = /* @__PURE__ */ new Map();
+  var defaultUnitGroup = "UNINITIALIZED";
+  function getDefaultUnitGroup() {
+    return defaultUnitGroup;
+  }
+  function loadUnitGroups(groups, defaultGroup) {
+    defaultUnitGroup = defaultGroup;
+    for (const [name, group] of groups) {
+      unitGroups.set(name, {
+        default: group.default,
+        conversions: group.conversions.map(([name2, r]) => [
+          name2,
+          Rational.fromData(r)
+        ])
+      });
+    }
+  }
+  function convertUnit(groupName, amount, unit) {
+    const group = unitGroups.get(groupName);
+    if (!group) throw new Error(`Unit group ${groupName} not found!`);
+    if (group.default === unit) return amount;
+    const conv = group.conversions.find(([name]) => name === unit);
+    if (!conv)
+      throw new Error(`Unit ${unit} can't be found in unit group ${groupName}!`);
+    return amount.mul(conv[1]);
+  }
+  function getUnits(groupName) {
+    const group = unitGroups.get(groupName);
+    if (!group) throw new Error(`Group ${groupName} not found!`);
+    const output = group.conversions.map((el) => el[0]);
+    output.push(group.default);
+    return [output, group.default];
+  }
+  function populateUnitDropdown(selectEl, groupName) {
+    selectEl.innerHTML = "";
+    const [units, defaultUnit] = getUnits(groupName);
+    for (const unit of units) {
+      const optionEl = document.createElement("option");
+      optionEl.innerText = unit;
+      selectEl.appendChild(optionEl);
+      if (unit === defaultUnit) optionEl.selected = true;
+    }
+  }
+
   // scripts/intermediateConverter.ts
   var IntermediateConverter = class _IntermediateConverter {
     displayName;
@@ -575,7 +620,8 @@
         true
       ).firstElementChild;
       const res = getResource(ingr.id);
-      el.querySelector(".converter-ingredient-name").innerText = `${res.getDisplayName()} \u2A09 ${Rational.fromData(ingr.amount).mul(multiplier).getDecimalString()}`;
+      const unit = getResource(ingr.id).getUnitGroupName();
+      el.querySelector(".converter-ingredient-name").innerText = `${res.getDisplayName()} \u2A09 ${Rational.fromData(ingr.amount).mul(multiplier).getDecimalString()} ${getUnits(unit)[1]}`;
       el.querySelector(".converter-ingredient-image").src = getSrc(res.getDisplayImage());
       return el;
     }
@@ -712,51 +758,6 @@
       panel.appendChild(el);
     }
   };
-
-  // scripts/units.ts
-  var unitGroups = /* @__PURE__ */ new Map();
-  var defaultUnitGroup = "UNINITIALIZED";
-  function getDefaultUnitGroup() {
-    return defaultUnitGroup;
-  }
-  function loadUnitGroups(groups, defaultGroup) {
-    defaultUnitGroup = defaultGroup;
-    for (const [name, group] of groups) {
-      unitGroups.set(name, {
-        default: group.default,
-        conversions: group.conversions.map(([name2, r]) => [
-          name2,
-          Rational.fromData(r)
-        ])
-      });
-    }
-  }
-  function convertUnit(groupName, amount, unit) {
-    const group = unitGroups.get(groupName);
-    if (!group) throw new Error(`Unit group ${groupName} not found!`);
-    if (group.default === unit) return amount;
-    const conv = group.conversions.find(([name]) => name === unit);
-    if (!conv)
-      throw new Error(`Unit ${unit} can't be found in unit group ${groupName}!`);
-    return amount.mul(conv[1]);
-  }
-  function getUnits(groupName) {
-    const group = unitGroups.get(groupName);
-    if (!group) throw new Error(`Group ${groupName} not found!`);
-    const output = group.conversions.map((el) => el[0]);
-    output.push(group.default);
-    return [output, group.default];
-  }
-  function populateUnitDropdown(selectEl, groupName) {
-    selectEl.innerHTML = "";
-    const [units, defaultUnit] = getUnits(groupName);
-    for (const unit of units) {
-      const optionEl = document.createElement("option");
-      optionEl.innerText = unit;
-      selectEl.appendChild(optionEl);
-      if (unit === defaultUnit) optionEl.selected = true;
-    }
-  }
 
   // scripts/data.ts
   var loadedResources = /* @__PURE__ */ new Map();
