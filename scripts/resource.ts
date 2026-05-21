@@ -53,11 +53,3 @@ export class Resource {
         panel.appendChild(el);
     }
 }
-
-export type ResourceData = {
-    id: string;
-    displayName: string;
-    displayImage: string;
-    tags: string[] | undefined;
-    unitGroup: string | undefined;
-};

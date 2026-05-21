@@ -1,4 +1,4 @@
-import { RationalNumber } from "./rational";
+import { Setting, SettingsTreeInputNode, SettingsTreeNode } from "./types";
 
 export class ConverterSettings {
     private settingsLookup = new Map<string, Setting>();
@@ -133,83 +133,3 @@ export class ConverterSettings {
         }
     }
 }
-
-// Represents the settings after parsing, outside of the AST
-export type Setting = NumberSetting | ToggleSetting | EnumerateSetting;
-type NumberSetting = {
-    type: "NUMBER";
-    default: RationalNumber;
-    unit: string | null; // content is written after the input element
-};
-type ToggleSetting = {
-    type: "TOGGLE";
-    default: boolean;
-};
-type EnumerateSetting = {
-    type: "ENUMERATE";
-    options: string[];
-    default: string;
-};
-
-// Types for specifying an AST tree describing the efficiency of a process as the
-// result of a number of settings
-export type SettingsTreeNode =
-    | SettingsTreeNumberNode
-    | SettingsTreeInputNode
-    | SettingsTreeMathNode;
-
-type SettingsTreeNumberNode = RationalNumber;
-
-export type SettingsTreeInputNode =
-    | SettingsTreeNumberInput
-    | SettingsTreeToggleInput
-    | SettingsTreeEnumerateInput;
-type SettingsTreeNumberInput = {
-    type: "NUMBER";
-    name: string;
-    default: RationalNumber;
-    unit: string | undefined;
-};
-type SettingsTreeToggleInput = {
-    type: "TOGGLE";
-    name: string;
-    true: SettingsTreeNode;
-    false: SettingsTreeNode;
-    default: boolean;
-};
-type SettingsTreeEnumerateInput = {
-    type: "ENUMERATE";
-    name: string;
-    options: [string | string[], SettingsTreeNode][];
-    default: string;
-};
-
-type SettingsTreeMathNode =
-    | SettingsTreeMulNode
-    | SettingsTreeDivNode
-    | SettingsTreeAddNode
-    | SettingsTreeSubNode
-    | SettingsTreePowNode;
-type SettingsTreeMulNode = {
-    type: "MUL";
-    factors: SettingsTreeNode[];
-};
-type SettingsTreeDivNode = {
-    type: "DIV";
-    numerator: SettingsTreeNode;
-    denominator: SettingsTreeNode;
-};
-type SettingsTreeAddNode = {
-    type: "ADD";
-    terms: SettingsTreeNode[];
-};
-type SettingsTreeSubNode = {
-    type: "SUB";
-    term1: SettingsTreeNode;
-    term2: SettingsTreeNode;
-};
-type SettingsTreePowNode = {
-    type: "POW";
-    base: SettingsTreeNode;
-    exponent: SettingsTreeNode;
-};

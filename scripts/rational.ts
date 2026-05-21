@@ -2,6 +2,8 @@
  * A class for representing rational numbers
  */
 
+import { RationalNumber } from "./types";
+
 export class Rational {
     // These are just normal numbers atm, do I need bigint?
     public readonly numerator: number;
@@ -155,6 +157,3 @@ export class Rational {
         return `${isNeg ? "-" : ""}${whole !== 0 ? whole : ""}${whole !== 0 && rest !== 0 ? " " : ""}${rest !== 0 ? `${rest}/${den}` : ""}`;
     }
 }
-
-// Type, for JSON stuff
-export type RationalNumber = number | [number, number];

@@ -152,13 +152,3 @@ import { ResourceMenu } from "./scripts/resourceMenu";
     graph.addConverter(dupe, new Rational(3));
     graph.addConverter(electrolyzer, new Rational(3 / 5));
 })();
-
-type Config = {
-    // A system-specific disclaimer to put in the footer
-    legalDisclaimer: string;
-
-    // All unit groups present, like "mass", "power", "food" etc
-    unitGroups: [string, UnitGroupData][];
-    // The unit group used when no override is specified
-    defaultUnitGroup: string;
-};

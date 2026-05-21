@@ -806,7 +806,8 @@
     const res = await fetch(`data/${graphName}/converters.json`);
     if (!res.ok) throw new Error("Error during resource loading!");
     const json = await res.json();
-    for (const data of json) {
+    for (const unprocessedData of json) {
+      const data = preprocessConverterData(unprocessedData);
       const possibleIngr = [];
       parseIngredientListToAllPossible(possibleIngr, {
         type: "AND",
@@ -826,6 +827,9 @@
         factory: createFactory(data)
       });
     }
+  }
+  function preprocessConverterData(data) {
+    return data;
   }
   function createFactory(data) {
     return () => {

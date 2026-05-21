@@ -5,14 +5,15 @@
  * (which I probably will, or at least add a flag for it)
  */
 
+import { IntermediateConverter } from "./intermediateConverter";
+import { Resource } from "./resource";
 import {
     ConverterData,
-    ConverterResourceTree,
     ConverterFactory,
-    IntermediateConverter,
+    ResourceData,
+    ResourceTree,
     ResourceTreeBooleanNode,
-} from "./intermediateConverter";
-import { Resource, ResourceData } from "./resource";
+} from "./types";
 import { getDefaultUnitGroup } from "./units";
 
 // Note that resources are stored as the "proper" objects, since they don't have
@@ -71,9 +72,11 @@ export function getResourcesWithFilter(searchString: string = "") {
 export async function loadAllConverters() {
     const res = await fetch(`data/${graphName}/converters.json`);
     if (!res.ok) throw new Error("Error during resource loading!");
-    const json: ConverterData[] = await res.json();
+    const json: ConverterData<false>[] = await res.json();
 
-    for (const data of json) {
+    for (const unprocessedData of json) {
+        const data = preprocessConverterData(unprocessedData);
+
         // Construct lists of all possible ingredients and products from this converter
         const possibleIngr: Resource[] = [];
         parseIngredientListToAllPossible(possibleIngr, {
@@ -98,13 +101,20 @@ export async function loadAllConverters() {
     }
 }
 
-function createFactory(data: ConverterData) {
+function preprocessConverterData(data: ConverterData<false>): ConverterData<true> {
+    // TODO: Process converter ingredients and products, flattening ORs into ORs,
+    // TAGs into ORs and ANDs into ANDs. Also adding ORs over TAGs if they aren't
+    // present there already
+    return data as unknown as ConverterData<true>;
+}
+
+function createFactory(data: ConverterData<true>) {
     return () => {
-        const ingr: ResourceTreeBooleanNode = {
+        const ingr: ResourceTreeBooleanNode<true> = {
             type: "AND",
             resources: [...data.consumes],
         };
-        const prod: ResourceTreeBooleanNode = {
+        const prod: ResourceTreeBooleanNode<true> = {
             type: "AND",
             resources: [...data.produces],
         };
@@ -123,7 +133,7 @@ function createFactory(data: ConverterData) {
 // in the same way as an AND!
 function parseIngredientListToAllPossible(
     output: Resource[],
-    node: ConverterResourceTree,
+    node: ResourceTree<true>,
 ) {
     switch (node.type) {
         case "RESOURCE":

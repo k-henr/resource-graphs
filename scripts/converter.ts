@@ -5,11 +5,7 @@
 import { Rational } from "./rational";
 import { Resource } from "./resource";
 import { NumberedSet } from "./resourceGraph";
-
-export type ConverterIngredient = {
-    resource: Resource;
-    amount: Rational;
-};
+import { ConverterIngredient } from "./types";
 
 export class Converter {
     // All the inputs and outputs of this conversion

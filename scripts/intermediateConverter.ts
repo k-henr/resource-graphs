@@ -1,8 +1,16 @@
-import { Converter, ConverterIngredient } from "./converter";
-import { ConverterSettings, Setting, SettingsTreeNode } from "./converterSettings";
+import { Converter } from "./converter";
+import { ConverterSettings } from "./converterSettings";
 import { getResource, getSrc } from "./data";
-import { Rational, RationalNumber } from "./rational";
-import { Resource } from "./resource";
+import { Rational } from "./rational";
+import {
+    ConverterIngredient,
+    ResourceTree,
+    ResourceTreeLeaf,
+    ResourceTreeNode,
+    ResourceTreeBooleanNode,
+    Setting,
+    SettingsTreeNode,
+} from "./types";
 import { getUnits } from "./units";
 
 /**
@@ -18,8 +26,8 @@ export class IntermediateConverter {
 
     // Ingredients and products are always wrapped in an AND node. Split AND and OR
     // into two types to enforce this further?
-    private ingredients: ResourceTreeBooleanNode;
-    private products: ResourceTreeBooleanNode;
+    private ingredients: ResourceTree<true>;
+    private products: ResourceTree<true>;
 
     private static infoTemplate = document.querySelector<HTMLTemplateElement>(
         "#converter-info-template",
@@ -53,8 +61,8 @@ export class IntermediateConverter {
         displayName: string,
         thumbName: string,
         displayImage: string,
-        ingredients: ResourceTreeBooleanNode,
-        products: ResourceTreeBooleanNode,
+        ingredients: ResourceTree<true>, // needs processed resource trees!
+        products: ResourceTree<true>,
     ) {
         this.displayName = displayName;
         this.thumbName = thumbName;
@@ -283,7 +291,7 @@ export class IntermediateConverter {
 
     // Register all converter settings present in the given tree
     private getAllConverterSettings(
-        node: ConverterResourceTree,
+        node: ResourceTree<true>,
         settings: ConverterSettings,
     ) {
         switch (node.type) {
@@ -304,9 +312,9 @@ export class IntermediateConverter {
 
     // (returns the newly created element)
     private addResourceTreeToElement(
-        node: ConverterResourceTree,
+        node: ResourceTree<true>,
         parentContext: {
-            parent: ConverterResourceTreeNode;
+            parent: ResourceTreeNode<true>;
             index: number;
         } | null,
         el: Element,
@@ -365,6 +373,8 @@ export class IntermediateConverter {
 
                     // Add a listener for selecting an option
                     option.onclick = () => {
+                        // (since I wrap everything in an AND node, this shouldn't
+                        // happen so it's fine that I don't support it)
                         if (!parentContext)
                             throw new Error("An OR node can't be a root node!");
 
@@ -407,7 +417,7 @@ export class IntermediateConverter {
                     // element
                 }
 
-                // For now, just ignore it, but add some kind of listener later
+                // Add the resource multiplied by the multiplier
                 return this.addResourceTreeToElement(
                     node.resource,
                     { parent: node, index: 0 },
@@ -418,10 +428,7 @@ export class IntermediateConverter {
         }
     }
 
-    private createIngredientElement(
-        ingr: ConverterResourceTreeLeaf,
-        multiplier: Rational,
-    ) {
+    private createIngredientElement(ingr: ResourceTreeLeaf, multiplier: Rational) {
         const el = (
             IntermediateConverter.converterIngredientTemplate.content.cloneNode(
                 true,
@@ -442,7 +449,7 @@ export class IntermediateConverter {
 
     // Parse the given resource tree and store it in the output list
     private resourceTreeToList(
-        node: ConverterResourceTree,
+        node: ResourceTree<true>,
         output: ConverterIngredient[],
         form: HTMLFormElement, // If running "headless" with default settings, this is null
         multiplier: Rational = Rational.one,
@@ -576,49 +583,3 @@ export class IntermediateConverter {
         }
     }
 }
-
-// A type for a factory of a converter, before any settings or ingredient trees are
-// resolved. Stores some basic information for display and filtering
-export type ConverterFactory = {
-    name: string;
-    image: string;
-    tags: string[];
-    possibleIngredients: Resource[];
-    possibleProducts: Resource[];
-    // switch to using an interface to not mix paradigms?
-    factory: () => IntermediateConverter;
-};
-
-// The resource list is wrapped in implicit ANDs; if there are multiple entries in
-// the input/output, it assumes you need/get them all
-export type ConverterData = {
-    id: string;
-    tags: string[] | undefined;
-    displayName: string;
-    thumbName: string | undefined;
-    displayImage: string;
-    consumes: ConverterResourceTree[];
-    produces: ConverterResourceTree[];
-};
-
-// Types for representing an input tree that has not yet been resolved into a list
-export type ConverterResourceTree =
-    | ConverterResourceTreeLeaf
-    | ConverterResourceTreeNode;
-type ConverterResourceTreeNode =
-    | ResourceTreeBooleanNode
-    | ResourceTreeMultiplierNode;
-type ConverterResourceTreeLeaf = {
-    type: "RESOURCE";
-    id: string;
-    amount: RationalNumber;
-};
-export type ResourceTreeBooleanNode = {
-    type: "AND" | "OR";
-    resources: ConverterResourceTree[];
-};
-type ResourceTreeMultiplierNode = {
-    type: "MULTIPLIER";
-    multiplier: SettingsTreeNode;
-    resource: ConverterResourceTree;
-};

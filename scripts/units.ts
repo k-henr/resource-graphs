@@ -2,7 +2,8 @@
  * Handles unit conversions
  */
 
-import { Rational, RationalNumber } from "./rational";
+import { Rational } from "./rational";
+import { UnitGroup, UnitGroupData } from "./types";
 
 const unitGroups = new Map<string, UnitGroup>();
 let defaultUnitGroup: string = "UNINITIALIZED";
@@ -78,16 +79,3 @@ export function populateUnitDropdown(
         if (unit === defaultUnit) optionEl.selected = true;
     }
 }
-
-export type UnitGroupData = {
-    // The "base unit" of this unit group
-    default: string;
-    // Does not contain the default unit, just the other units and their conversion
-    // ratios!
-    conversions: [string, RationalNumber][];
-};
-
-type UnitGroup = {
-    default: string;
-    conversions: [string, Rational][];
-};
