@@ -23,23 +23,13 @@
                 "type": "OR",
                 "resources": [
                     {
+                        "type": "TAG",
+                        "tagName": "Raw Mineral",
+                        "amount": 140
+                    },
+                    {
                         "type": "RESOURCE",
                         "id": "dirt",
-                        "amount": 140
-                    },
-                    {
-                        "type": "RESOURCE",
-                        "id": "sandstone",
-                        "amount": 140
-                    },
-                    {
-                        "type": "RESOURCE",
-                        "id": "sedimentary_rock",
-                        "amount": 140
-                    },
-                    {
-                        "type": "RESOURCE",
-                        "id": "shale",
                         "amount": 140
                     },
                     {

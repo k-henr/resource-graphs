@@ -1,8 +1,5 @@
 /**
- * File for handling loading and conversion of external resources. Just in case I want a
- * preloading system later
- *
- * (which I probably will, or at least add a flag for it)
+ * File for handling loading and conversion of external resources
  */
 
 import { IntermediateConverter } from "./intermediateConverter";
@@ -13,6 +10,8 @@ import {
     ResourceData,
     ResourceTree,
     ResourceTreeBooleanNode,
+    ResourceTreeMultiplierNode,
+    ResourceTreeType,
 } from "./types";
 import { getDefaultUnitGroup } from "./units";
 
@@ -50,6 +49,15 @@ export function getResource(id: string): Resource {
     return r;
 }
 
+export function getResourcesWithTag(tag: string) {
+    const list = loadedResources.entries();
+    const output: [string, Resource][] = [];
+    for (const [id, r] of list) {
+        if (r.getTags().indexOf(tag) !== -1) output.push([id, r]);
+    }
+    return output;
+}
+
 export function getResourcesWithFilter(searchString: string = "") {
     const list = loadedResources.entries();
     const output: [string, Resource][] = [];
@@ -75,23 +83,18 @@ export async function loadAllConverters() {
     const json: ConverterData<false>[] = await res.json();
 
     for (const unprocessedData of json) {
+        // Preprocess the converter data
         const data = preprocessConverterData(unprocessedData);
 
         // Construct lists of all possible ingredients and products from this converter
         const possibleIngr: Resource[] = [];
-        parseIngredientListToAllPossible(possibleIngr, {
-            type: "AND",
-            resources: data.consumes,
-        });
+        parseIngredientListToAllPossible(possibleIngr, data.consumes);
         const possibleProd: Resource[] = [];
-        parseIngredientListToAllPossible(possibleProd, {
-            type: "AND",
-            resources: data.produces,
-        });
+        parseIngredientListToAllPossible(possibleProd, data.produces);
 
         // Create a new converter factory object
         loadedConverterFactories.set(data.id, {
-            name: data.thumbName ?? data.displayName,
+            name: data.thumbName ?? data.displayName, // TODO: Deal with thumb names and display names in preprocessing; currently I do this in multiple places!
             image: data.displayImage,
             tags: data.tags ?? [],
             possibleIngredients: possibleIngr,
@@ -102,29 +105,128 @@ export async function loadAllConverters() {
 }
 
 function preprocessConverterData(data: ConverterData<false>): ConverterData<true> {
+    // Process the resource trees and wrap them in ANDs
+    const processedConsumes: ResourceTree<true>[] = [];
+    for (const c of data.consumes)
+        preprocessResourceTree({ childList: processedConsumes, type: "AND" }, c);
+    const processedProduces: ResourceTree<true>[] = [];
+    for (const c of data.produces)
+        preprocessResourceTree({ childList: processedProduces, type: "AND" }, c);
+
+    // Create the processed data object and return it
+    const processedData: ConverterData<true> = {
+        ...data,
+        consumes: { type: "AND", resources: processedConsumes },
+        produces: { type: "AND", resources: processedProduces },
+    };
+    return processedData;
+}
+
+function preprocessResourceTree(
+    parentContext: {
+        childList: ResourceTree<true>[];
+        type: ResourceTreeType<true>;
+    },
+    node: ResourceTree<false>,
+) {
+    switch (node.type) {
+        case "RESOURCE": {
+            parentContext.childList.push(node);
+            return;
+        }
+
+        case "AND": {
+            // If parent node is also an AND node, flatten this into that
+            if (parentContext.type === "AND") {
+                for (const c of node.resources)
+                    preprocessResourceTree(parentContext, c);
+            } else {
+                const processedNode: ResourceTree<true> = {
+                    ...node,
+                    resources: [],
+                };
+                const ctx = {
+                    type: processedNode.type,
+                    childList: processedNode.resources,
+                };
+                parentContext.childList.push(processedNode);
+                for (const c of node.resources) preprocessResourceTree(ctx, c);
+            }
+            return;
+        }
+
+        case "OR": {
+            // If parent node is OR, flatten this into that
+            if (parentContext.type === "OR") {
+                for (const c of node.resources)
+                    preprocessResourceTree(parentContext, c);
+            } else {
+                const processedNode: ResourceTree<true> = {
+                    ...node,
+                    resources: [],
+                };
+                const ctx = {
+                    type: processedNode.type,
+                    childList: processedNode.resources,
+                };
+                parentContext.childList.push(processedNode);
+                for (const c of node.resources) preprocessResourceTree(ctx, c);
+            }
+            return;
+        }
+
+        case "MULTIPLIER": {
+            // yucky workaround
+            const childList: ResourceTree<true>[] = [];
+            preprocessResourceTree({ type: "MULTIPLIER", childList }, node.resource);
+            const processedNode: ResourceTree<true> = {
+                ...node,
+                resource: childList[0],
+            };
+            parentContext.childList.push(processedNode);
+            return;
+        }
+
+        case "TAG": {
+            // Get all resources with the given tag
+            const resources = getResourcesWithTag(node.tagName);
+
+            if (parentContext.type === "OR") {
+                // If parent is an OR, push all children onto that
+                // (treat them as if they were resource nodes)
+                for (const [id] of resources) {
+                    preprocessResourceTree(parentContext, {
+                        type: "RESOURCE",
+                        id,
+                        amount: node.amount,
+                    });
+                }
+            } else {
+                // If parent is not an OR, make an extra OR and push onto that instead
+                // (using another function call for simplicity)
+                const orNode: ResourceTree<true> = { type: "OR", resources: [] };
+                parentContext.childList.push(orNode);
+                preprocessResourceTree(
+                    { childList: orNode.resources, type: "OR" },
+                    node,
+                );
+            }
+            return;
+        }
+    }
     // TODO: Process converter ingredients and products, flattening ORs into ORs,
     // TAGs into ORs and ANDs into ANDs. Also adding ORs over TAGs if they aren't
     // present there already
-    return data as unknown as ConverterData<true>;
 }
 
 function createFactory(data: ConverterData<true>) {
     return () => {
-        const ingr: ResourceTreeBooleanNode<true> = {
-            type: "AND",
-            resources: [...data.consumes],
-        };
-        const prod: ResourceTreeBooleanNode<true> = {
-            type: "AND",
-            resources: [...data.produces],
-        };
-
         return new IntermediateConverter(
             data.displayName,
             data.thumbName ?? data.displayName,
             data.displayImage,
-            structuredClone(ingr),
-            structuredClone(prod),
+            structuredClone(data.consumes),
+            structuredClone(data.produces),
         );
     };
 }

@@ -9,19 +9,9 @@
             "amount": 3000
         },
         {
-            "type": "OR",
-            "resources": [
-                {
-                    "type": "RESOURCE",
-                    "id": "regolith",
-                    "amount": 600
-                },
-                {
-                    "type": "RESOURCE",
-                    "id": "sand",
-                    "amount": 600
-                }
-            ]
+            "type": "TAG",
+            "tagName": "Filtration medium",
+            "amount": 600
         }
     ],
     "produces": [

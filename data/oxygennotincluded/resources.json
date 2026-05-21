@@ -27,19 +27,19 @@
     },
     {
         "id": "sandstone",
-        "tags": ["Mineral"],
+        "tags": ["Raw Mineral"],
         "displayName": "Sandstone",
         "displayImage": "images/resources/sandstone.png"
     },
     {
         "id": "sedimentary_rock",
-        "tags": ["Mineral"],
+        "tags": ["Raw Mineral"],
         "displayName": "Sedimentary Rock",
         "displayImage": "images/resources/sedimentary_rock.png"
     },
     {
         "id": "shale",
-        "tags": ["Mineral"],
+        "tags": ["Raw Mineral"],
         "displayName": "Shale",
         "displayImage": "images/resources/shale.png"
     },

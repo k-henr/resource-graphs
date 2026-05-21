@@ -53,8 +53,10 @@ export type ConverterData<Processed extends boolean> = {
     displayName: string;
     thumbName: string | undefined;
     displayImage: string;
-    consumes: ResourceTree<Processed>[];
-    produces: ResourceTree<Processed>[];
+    // The trees are wrapped in implicit ANDs in the data, but this gets resolved
+    // during processing. Yucky, should make better later I think
+    consumes: Processed extends true ? ResourceTree<true> : ResourceTree<false>[];
+    produces: Processed extends true ? ResourceTree<true> : ResourceTree<false>[];
 };
 
 // A type for a factory of a converter, before any settings or ingredient trees are
@@ -86,6 +88,10 @@ export type ResourceTreeNode<Processed extends boolean> =
     | ResourceTreeBooleanNode<Processed>
     | ResourceTreeMultiplierNode<Processed>
     | (Processed extends false ? ResourceTreeTagNode : never); // Don't allow TAGs in processed trees, should either be replaced by an OR or fill a parent OR's child nodes with stuff
+
+// If I need to reference all types somewhere
+export type ResourceTreeType<Processed extends boolean> =
+    ResourceTree<Processed>["type"];
 
 // A leaf node, representing a single resource with a base amount to be used/produced
 export type ResourceTreeLeaf = {

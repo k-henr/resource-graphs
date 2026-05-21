@@ -9,9 +9,10 @@ import {
 } from "./scripts/data";
 import { ResourceGraph } from "./scripts/resourceGraph";
 import { Rational } from "./scripts/rational";
-import { loadUnitGroups, UnitGroupData } from "./scripts/units";
+import { loadUnitGroups } from "./scripts/units";
 import { ConverterMenu } from "./scripts/converterMenu";
 import { ResourceMenu } from "./scripts/resourceMenu";
+import { Config } from "./scripts/types";
 
 (async () => {
     // Forcibly reload when the hash changes since the loading needs to reset

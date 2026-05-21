@@ -792,6 +792,14 @@
     if (!r) throw new Error(`Couldn't find resoure "${id}"!`);
     return r;
   }
+  function getResourcesWithTag(tag) {
+    const list = loadedResources.entries();
+    const output = [];
+    for (const [id, r] of list) {
+      if (r.getTags().indexOf(tag) !== -1) output.push([id, r]);
+    }
+    return output;
+  }
   function getResourcesWithFilter(searchString = "") {
     const list = loadedResources.entries();
     const output = [];
@@ -809,17 +817,12 @@
     for (const unprocessedData of json) {
       const data = preprocessConverterData(unprocessedData);
       const possibleIngr = [];
-      parseIngredientListToAllPossible(possibleIngr, {
-        type: "AND",
-        resources: data.consumes
-      });
+      parseIngredientListToAllPossible(possibleIngr, data.consumes);
       const possibleProd = [];
-      parseIngredientListToAllPossible(possibleProd, {
-        type: "AND",
-        resources: data.produces
-      });
+      parseIngredientListToAllPossible(possibleProd, data.produces);
       loadedConverterFactories.set(data.id, {
         name: data.thumbName ?? data.displayName,
+        // TODO: Deal with thumb names and display names in preprocessing; currently I do this in multiple places!
         image: data.displayImage,
         tags: data.tags ?? [],
         possibleIngredients: possibleIngr,
@@ -829,24 +832,101 @@
     }
   }
   function preprocessConverterData(data) {
-    return data;
+    const processedConsumes = [];
+    for (const c of data.consumes)
+      preprocessResourceTree({ childList: processedConsumes, type: "AND" }, c);
+    const processedProduces = [];
+    for (const c of data.produces)
+      preprocessResourceTree({ childList: processedProduces, type: "AND" }, c);
+    const processedData = {
+      ...data,
+      consumes: { type: "AND", resources: processedConsumes },
+      produces: { type: "AND", resources: processedProduces }
+    };
+    return processedData;
+  }
+  function preprocessResourceTree(parentContext, node) {
+    switch (node.type) {
+      case "RESOURCE": {
+        parentContext.childList.push(node);
+        return;
+      }
+      case "AND": {
+        if (parentContext.type === "AND") {
+          for (const c of node.resources)
+            preprocessResourceTree(parentContext, c);
+        } else {
+          const processedNode = {
+            ...node,
+            resources: []
+          };
+          const ctx = {
+            type: processedNode.type,
+            childList: processedNode.resources
+          };
+          parentContext.childList.push(processedNode);
+          for (const c of node.resources) preprocessResourceTree(ctx, c);
+        }
+        return;
+      }
+      case "OR": {
+        if (parentContext.type === "OR") {
+          for (const c of node.resources)
+            preprocessResourceTree(parentContext, c);
+        } else {
+          const processedNode = {
+            ...node,
+            resources: []
+          };
+          const ctx = {
+            type: processedNode.type,
+            childList: processedNode.resources
+          };
+          parentContext.childList.push(processedNode);
+          for (const c of node.resources) preprocessResourceTree(ctx, c);
+        }
+        return;
+      }
+      case "MULTIPLIER": {
+        const childList = [];
+        preprocessResourceTree({ type: "MULTIPLIER", childList }, node.resource);
+        const processedNode = {
+          ...node,
+          resource: childList[0]
+        };
+        parentContext.childList.push(processedNode);
+        return;
+      }
+      case "TAG": {
+        const resources = getResourcesWithTag(node.tagName);
+        if (parentContext.type === "OR") {
+          for (const [id] of resources) {
+            preprocessResourceTree(parentContext, {
+              type: "RESOURCE",
+              id,
+              amount: node.amount
+            });
+          }
+        } else {
+          const orNode = { type: "OR", resources: [] };
+          parentContext.childList.push(orNode);
+          preprocessResourceTree(
+            { childList: orNode.resources, type: "OR" },
+            node
+          );
+        }
+        return;
+      }
+    }
   }
   function createFactory(data) {
     return () => {
-      const ingr = {
-        type: "AND",
-        resources: [...data.consumes]
-      };
-      const prod = {
-        type: "AND",
-        resources: [...data.produces]
-      };
       return new IntermediateConverter(
         data.displayName,
         data.thumbName ?? data.displayName,
         data.displayImage,
-        structuredClone(ingr),
-        structuredClone(prod)
+        structuredClone(data.consumes),
+        structuredClone(data.produces)
       );
     };
   }
