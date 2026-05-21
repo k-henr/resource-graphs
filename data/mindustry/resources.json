@@ -82,21 +82,25 @@
     {
         "id": "water",
         "displayName": "Water",
-        "displayImage": "images/resources/water.png"
+        "displayImage": "images/resources/water.png",
+        "unitGroup": "liquid/time"
     },
     {
         "id": "oil",
         "displayName": "Oil",
-        "displayImage": "images/resources/oil.png"
+        "displayImage": "images/resources/oil.png",
+        "unitGroup": "liquid/time"
     },
     {
         "id": "slag",
         "displayName": "Slag",
-        "displayImage": "images/resources/slag.png"
+        "displayImage": "images/resources/slag.png",
+        "unitGroup": "liquid/time"
     },
     {
         "id": "cryofluid",
         "displayName": "Cryofluid",
-        "displayImage": "images/resources/cryofluid.png"
+        "displayImage": "images/resources/cryofluid.png",
+        "unitGroup": "liquid/time"
     }
 ]
