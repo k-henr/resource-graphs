@@ -111,11 +111,17 @@ export class ConverterMenu extends SubmitMenu {
         const formData = new FormData(this.filterForm);
         this.searchString = String(formData.get("search-string")!.valueOf());
 
+        console.log("Applying search string: " + this.searchString);
         const converterList = getConverterFactoriesWithFilters(
             this.searchString,
             this.resourceBeingRequested ? [this.resourceBeingRequested] : [],
             [],
         );
+
+        // If there were no results, write "no results" in the element
+        if (converterList.length === 0) {
+            this.thumbList.innerText = "No Results";
+        }
 
         // Keep track on all previously encountered tags and their respective
         // elements

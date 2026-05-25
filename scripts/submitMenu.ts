@@ -55,6 +55,14 @@ export abstract class SubmitMenu {
             this.applyCurrentFilters();
         };
 
+        // Submit filter form on any change in input elements
+        for (const el of filterForm.getElementsByTagName("input")) {
+            el.oninput = () => {
+                console.log(filterForm);
+                filterForm.requestSubmit();
+            };
+        }
+
         this.clearFilters();
     }
 
@@ -69,6 +77,7 @@ export abstract class SubmitMenu {
 
     public open() {
         this.applyCurrentFilters();
+        this.filterForm.reset();
         this.menuElement.classList.remove("hidden");
         this.headerElement.classList.remove("hidden");
         this.filterForm.classList.remove("hidden");
@@ -87,6 +96,7 @@ export abstract class SubmitMenu {
     }
 
     public openDetailPopup() {
+        this.submissionForm.reset();
         this.detailPopup.classList.remove("hidden");
     }
 

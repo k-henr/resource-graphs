@@ -547,6 +547,7 @@
     }
     // (returns the newly created element)
     addResourceTreeToElement(node, parentContext, el, settingsForm, multiplier = Rational.one) {
+      if (multiplier.equals(Rational.zero)) return document.createElement("div");
       switch (node.type) {
         case "RESOURCE":
           const resEl = this.createIngredientElement(node, multiplier);
@@ -611,8 +612,6 @@
               new FormData(settingsForm)
             )
           );
-          if (multiplier.equals(Rational.zero)) {
-          }
           return this.addResourceTreeToElement(
             node.resource,
             { parent: node, index: 0 },
@@ -1107,10 +1106,17 @@
         e.preventDefault();
         this.applyCurrentFilters();
       };
+      for (const el of filterForm.getElementsByTagName("input")) {
+        el.oninput = () => {
+          console.log(filterForm);
+          filterForm.requestSubmit();
+        };
+      }
       this.clearFilters();
     }
     open() {
       this.applyCurrentFilters();
+      this.filterForm.reset();
       this.menuElement.classList.remove("hidden");
       this.headerElement.classList.remove("hidden");
       this.filterForm.classList.remove("hidden");
@@ -1127,6 +1133,7 @@
       this.infoPanel.innerHTML = "";
     }
     openDetailPopup() {
+      this.submissionForm.reset();
       this.detailPopup.classList.remove("hidden");
     }
     closeDetailPopup() {
@@ -1251,11 +1258,15 @@
       this.thumbList.innerHTML = "";
       const formData = new FormData(this.filterForm);
       this.searchString = String(formData.get("search-string").valueOf());
+      console.log("Applying search string: " + this.searchString);
       const converterList = getConverterFactoriesWithFilters(
         this.searchString,
         this.resourceBeingRequested ? [this.resourceBeingRequested] : [],
         []
       );
+      if (converterList.length === 0) {
+        this.thumbList.innerText = "No Results";
+      }
       const tagLists = /* @__PURE__ */ new Map();
       const miscTag = SubmitMenu.createTagListIfNotExists(
         tagLists,

@@ -70,6 +70,7 @@ main {
 
 #add-rc-tag-list {
     width: 100%;
+    text-align: center;
 }
 
 .tag-list-header {

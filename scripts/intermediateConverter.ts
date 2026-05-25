@@ -321,6 +321,10 @@ export class IntermediateConverter {
         settingsForm: HTMLFormElement,
         multiplier: Rational = Rational.one,
     ): HTMLElement {
+        // If the multiplier is zero, don't add this branch to the tree since it'll
+        // all just be zero
+        if (multiplier.equals(Rational.zero)) return document.createElement("div");
+
         switch (node.type) {
             case "RESOURCE":
                 // Just add the resource to the element
@@ -411,11 +415,6 @@ export class IntermediateConverter {
                         new FormData(settingsForm),
                     ),
                 );
-
-                if (multiplier.equals(Rational.zero)) {
-                    // TODO: Don't add anything, preferably without adding a dummy
-                    // element
-                }
 
                 // Add the resource multiplied by the multiplier
                 return this.addResourceTreeToElement(
