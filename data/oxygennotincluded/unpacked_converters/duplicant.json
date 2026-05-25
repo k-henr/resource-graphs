@@ -20,18 +20,141 @@
         {
             "type": "MULTIPLIER",
             "multiplier": {
-                "type": "TOGGLE",
-                "name": "Mouth breather",
-                "default": false,
-                "true": 1.5,
-                "false": 1
+                "type": "ADD",
+                "terms": [
+                    60,
+                    {
+                        "type": "TOGGLE",
+                        "name": "Mouth breather",
+                        "default": false,
+                        "true": 60,
+                        "false": 0
+                    },
+                    {
+                        "type": "TOGGLE",
+                        "name": "Diver's Lungs",
+                        "default": false,
+                        "true": -15,
+                        "false": 0
+                    },
+                    {
+                        "type": "TOGGLE",
+                        "name": "Deep Diver's Lungs",
+                        "default": false,
+                        "true": -30,
+                        "false": 0
+                    }
+                ]
             },
             "resource": {
                 "type": "RESOURCE",
                 "id": "oxygen",
-                "amount": 60
+                "amount": 1
+            }
+        },
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "ENUMERATE",
+                "name": "Waste expelled by",
+                "default": "Lavatory",
+                "options": [
+                    ["Lavatory", 5],
+                    [["Outhouse", "Accident"], 0]
+                ]
+            },
+            "resource": {
+                "type": "RESOURCE",
+                "id": "water",
+                "amount": 1
+            }
+        },
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "ENUMERATE",
+                "name": "Waste expelled by",
+                "options": [
+                    ["Outhouse", 1],
+                    [["Lavatory", "Accident"], 0]
+                ]
+            },
+            "resource": {
+                "type": "RESOURCE",
+                "id": "dirt",
+                "amount": 13
             }
         }
     ],
-    "produces": []
+    "produces": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "ADD",
+                "terms": [
+                    1.2,
+                    {
+                        "type": "TOGGLE",
+                        "name": "Mouth breather",
+                        "default": false,
+                        "true": 1.2,
+                        "false": 0
+                    },
+                    {
+                        "type": "TOGGLE",
+                        "name": "Diver's Lungs",
+                        "default": false,
+                        "true": -0.3,
+                        "false": 0
+                    },
+                    {
+                        "type": "TOGGLE",
+                        "name": "Deep Diver's Lungs",
+                        "default": false,
+                        "true": -0.6,
+                        "false": 0
+                    }
+                ]
+            },
+            "resource": {
+                "type": "RESOURCE",
+                "id": "carbon_dioxide",
+                "amount": 1
+            }
+        },
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "ENUMERATE",
+                "name": "Waste expelled by",
+                "default": "Lavatory",
+                "options": [
+                    ["Lavatory", 11.7],
+                    ["Outhouse", 0],
+                    ["Accident", 6.7]
+                ]
+            },
+            "resource": {
+                "type": "RESOURCE",
+                "id": "polluted_water",
+                "amount": 1
+            }
+        },
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "ENUMERATE",
+                "name": "Waste expelled by",
+                "options": [
+                    ["Outhouse", 1],
+                    [["Lavatory", "Accident"], 0]
+                ]
+            },
+            "resource": {
+                "type": "RESOURCE",
+                "id": "polluted_dirt",
+                "amount": 19.7
+            }
+        }
+    ]
 }

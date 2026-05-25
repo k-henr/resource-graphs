@@ -82,5 +82,26 @@
         "displayName": "Meat",
         "displayImage": "images/resources/meat.png",
         "unitGroup": "food/time"
+    },
+    {
+        "id": "wood",
+        "displayName": "Wood",
+        "displayImage": "images/resources/wood.png"
+    },
+    {
+        "id": "carbon_dioxide",
+        "displayName": "Carbon Dioxide",
+        "displayImage": "images/resources/carbon_dioxide.png"
+    },
+    {
+        "id": "ethanol",
+        "tags": ["Combustible Liquid"],
+        "displayName": "Ethanol",
+        "displayImage": "images/resources/ethanol.png"
+    },
+    {
+        "id": "polluted_dirt",
+        "displayName": "Polluted Dirt",
+        "displayImage": "images/resources/polluted_dirt.png"
     }
 ]

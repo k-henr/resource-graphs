@@ -1,34 +1,32 @@
 {
     "tags": ["Refinement"],
-    "id": "water_sieve",
-    "displayName": "Water Sieve",
     "consumes": [
         {
             "type": "RESOURCE",
             "id": "power",
-            "amount": 120
+            "amount": 240
         },
         {
             "type": "RESOURCE",
-            "id": "polluted_water",
-            "amount": 3000
-        },
-        {
-            "type": "TAG",
-            "tagName": "Filtration medium",
+            "id": "wood",
             "amount": 600
         }
     ],
     "produces": [
         {
             "type": "RESOURCE",
-            "id": "water",
-            "amount": 3000
+            "id": "ethanol",
+            "amount": 300
         },
         {
             "type": "RESOURCE",
             "id": "polluted_dirt",
-            "amount": 120
+            "amount": 200
+        },
+        {
+            "type": "RESOURCE",
+            "id": "carbon_dioxide",
+            "amount": 100
         }
     ]
 }

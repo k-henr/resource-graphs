@@ -1,0 +1,9 @@
+{
+    "tags": ["Oxygen"],
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": 120 },
+        { "type": "RESOURCE", "id": "carbon_dioxide", "amount": 180 },
+        { "type": "RESOURCE", "id": "water", "amount": 600 }
+    ],
+    "produces": [{ "type": "RESOURCE", "id": "polluted_water", "amount": 600 }]
+}

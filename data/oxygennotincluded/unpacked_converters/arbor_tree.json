@@ -1,0 +1,52 @@
+{
+    "tags": ["Plants"],
+    "consumes": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "TOGGLE",
+                "name": "Wild",
+                "default": false,
+                "true": 0,
+                "false": 1
+            },
+            "resource": {
+                "type": "AND",
+                "resources": [
+                    { "type": "RESOURCE", "id": "polluted_water", "amount": 70 },
+                    { "type": "RESOURCE", "id": "dirt", "amount": 10 }
+                ]
+            }
+        }
+    ],
+    "produces": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "MUL",
+                "factors": [
+                    {
+                        "type": "ENUMERATE",
+                        "name": "Number of branches",
+                        "default": "5",
+                        "options": [
+                            ["0", 0],
+                            ["1", 1],
+                            ["2", 2],
+                            ["3", 3],
+                            ["4", 4],
+                            ["5", 5]
+                        ]
+                    },
+                    {
+                        "type": "TOGGLE",
+                        "name": "Wild",
+                        "true": [1, 18],
+                        "false": [1, 4.5]
+                    }
+                ]
+            },
+            "resource": { "type": "RESOURCE", "id": "wood", "amount": 300 }
+        }
+    ]
+}
