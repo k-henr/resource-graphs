@@ -2,7 +2,6 @@
  * Takes care of listeners and things related to the "Add Resource"/"Add Converter" menu(s)
  */
 
-import { getSrc } from "./data";
 import { ResourceGraph } from "./resourceGraph";
 
 export abstract class SubmitMenu {
@@ -185,8 +184,7 @@ export abstract class SubmitMenu {
             SubmitMenu.thumbTemplate.content.cloneNode(true)
         )).querySelector<HTMLElement>(".thumb")!;
         thumb.querySelector<HTMLElement>(".thumb-name")!.innerText = name;
-        thumb.querySelector<HTMLImageElement>("img.thumb-image")!.src =
-            getSrc(image);
+        thumb.querySelector<HTMLImageElement>("img.thumb-image")!.src = image;
         thumb.onclick = onclick;
         return thumb;
     }

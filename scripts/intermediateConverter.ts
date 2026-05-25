@@ -1,6 +1,6 @@
 import { Converter } from "./converter";
 import { ConverterSettings } from "./converterSettings";
-import { getResource, getSrc } from "./data";
+import { getResource } from "./data";
 import { Rational } from "./rational";
 import {
     ConverterIngredient,
@@ -129,9 +129,8 @@ export class IntermediateConverter {
         // Set name and image
         el.querySelector<HTMLElement>(".rc-info-header")!.innerText =
             this.getDisplayName();
-        el.querySelector<HTMLImageElement>(".rc-info-image")!.src = getSrc(
-            this.getDisplayImage(),
-        );
+        el.querySelector<HTMLImageElement>(".rc-info-image")!.src =
+            this.getDisplayImage();
 
         // Populate the info panel recursively with ingredients and products
         this.addResourceTreeToElement(
@@ -441,7 +440,7 @@ export class IntermediateConverter {
         el.querySelector<HTMLElement>(".converter-ingredient-name")!.innerText =
             `${res.getDisplayName()} ⨉ ${Rational.fromData(ingr.amount).mul(multiplier).getDecimalString()} ${getUnits(unit)[1]}`;
         el.querySelector<HTMLImageElement>(".converter-ingredient-image")!.src =
-            getSrc(res.getDisplayImage());
+            res.getDisplayImage();
 
         return el;
     }

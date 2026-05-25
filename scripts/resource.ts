@@ -2,9 +2,6 @@
  * A class representing a resource
  */
 
-import { getSrc } from "./data";
-import { getDefaultUnitGroup } from "./units";
-
 export class Resource {
     private static infoTemplate = document.querySelector<HTMLTemplateElement>(
         "#resource-info-template",
@@ -46,9 +43,8 @@ export class Resource {
 
         el.querySelector<HTMLElement>(".rc-info-header")!.innerText =
             this.getDisplayName();
-        el.querySelector<HTMLImageElement>(".rc-info-image")!.src = getSrc(
-            this.getDisplayImage(),
-        );
+        el.querySelector<HTMLImageElement>(".rc-info-image")!.src =
+            this.getDisplayImage();
 
         panel.appendChild(el);
     }

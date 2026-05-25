@@ -4,7 +4,6 @@
 
 import { ConverterMenu } from "./converterMenu";
 import { Converter } from "./converter";
-import { getSrc } from "./data";
 import { Resource } from "./resource";
 import { Rational } from "./rational";
 import { getUnits } from "./units";
@@ -95,9 +94,8 @@ export class ResourceGraph {
 
             el.querySelector<HTMLElement>(".resource-name")!.innerText =
                 resource.getDisplayName();
-            el.querySelector<HTMLImageElement>(".resource-image")!.src = getSrc(
-                resource.getDisplayImage(),
-            );
+            el.querySelector<HTMLImageElement>(".resource-image")!.src =
+                resource.getDisplayImage();
             el.querySelector<HTMLElement>(".resource-amount")!.innerText =
                 (amount.greaterThan(Rational.zero) ? "+" : "") +
                 amount.getDecimalString(); // todo: option to switch between decimal and mixed?
@@ -125,10 +123,8 @@ export class ResourceGraph {
 
             el.querySelector<HTMLElement>(".converter-name")!.innerText =
                 converter.getDisplayName();
-
-            el.querySelector<HTMLImageElement>(".converter-image")!.src = getSrc(
-                converter.getDisplayImage(),
-            );
+            el.querySelector<HTMLImageElement>(".converter-image")!.src =
+                converter.getDisplayImage();
 
             const amountEl =
                 el.querySelector<HTMLInputElement>(".converter-amount")!;

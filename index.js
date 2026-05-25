@@ -418,9 +418,7 @@
         true
       );
       el.querySelector(".rc-info-header").innerText = this.getDisplayName();
-      el.querySelector(".rc-info-image").src = getSrc(
-        this.getDisplayImage()
-      );
+      el.querySelector(".rc-info-image").src = this.getDisplayImage();
       this.addResourceTreeToElement(
         this.ingredients,
         null,
@@ -628,7 +626,7 @@
       const res = getResource(ingr.id);
       const unit = getResource(ingr.id).getUnitGroupName();
       el.querySelector(".converter-ingredient-name").innerText = `${res.getDisplayName()} \u2A09 ${Rational.fromData(ingr.amount).mul(multiplier).getDecimalString()} ${getUnits(unit)[1]}`;
-      el.querySelector(".converter-ingredient-image").src = getSrc(res.getDisplayImage());
+      el.querySelector(".converter-ingredient-image").src = res.getDisplayImage();
       return el;
     }
     // Parse the given resource tree and store it in the output list
@@ -758,9 +756,7 @@
     populateInfoPanel(panel) {
       const el = _Resource.infoTemplate.content.cloneNode(true);
       el.querySelector(".rc-info-header").innerText = this.getDisplayName();
-      el.querySelector(".rc-info-image").src = getSrc(
-        this.getDisplayImage()
-      );
+      el.querySelector(".rc-info-image").src = this.getDisplayImage();
       panel.appendChild(el);
     }
   };
@@ -779,7 +775,7 @@
     for (const data of json) {
       const r = new Resource(
         data.displayName,
-        data.displayImage,
+        getSrc(data.displayImage),
         data.tags ?? [],
         data.unitGroup ?? getDefaultUnitGroup()
       );
@@ -822,7 +818,7 @@
       loadedConverterFactories.set(data.id, {
         name: data.thumbName ?? data.displayName,
         // TODO: Deal with thumb names and display names in preprocessing; currently I do this in multiple places!
-        image: data.displayImage,
+        image: getSrc(data.displayImage),
         tags: data.tags ?? [],
         possibleIngredients: possibleIngr,
         possibleProducts: possibleProd,
@@ -923,7 +919,7 @@
       return new IntermediateConverter(
         data.displayName,
         data.thumbName ?? data.displayName,
-        data.displayImage,
+        getSrc(data.displayImage),
         structuredClone(data.consumes),
         structuredClone(data.produces)
       );
@@ -1024,9 +1020,7 @@
       for (const [resource, amount] of resourceDeltas.getEntries()) {
         const el = this.resourceDeltaTemplate.content.cloneNode(true).firstElementChild;
         el.querySelector(".resource-name").innerText = resource.getDisplayName();
-        el.querySelector(".resource-image").src = getSrc(
-          resource.getDisplayImage()
-        );
+        el.querySelector(".resource-image").src = resource.getDisplayImage();
         el.querySelector(".resource-amount").innerText = (amount.greaterThan(Rational.zero) ? "+" : "") + amount.getDecimalString();
         el.querySelector(".resource-delta-unit").innerText = getUnits(resource.getUnitGroupName())[1];
         if (amount.lessThan(Rational.zero)) {
@@ -1041,9 +1035,7 @@
       for (const [converter, number] of this.converters.getEntries()) {
         const el = this.converterTemplate.content.cloneNode(true).firstElementChild;
         el.querySelector(".converter-name").innerText = converter.getDisplayName();
-        el.querySelector(".converter-image").src = getSrc(
-          converter.getDisplayImage()
-        );
+        el.querySelector(".converter-image").src = converter.getDisplayImage();
         const amountEl = el.querySelector(".converter-amount");
         amountEl.value = number.getMixedFractionString();
         amountEl.onchange = (e) => {
@@ -1184,7 +1176,7 @@
     static createThumb(name, image, onclick) {
       const thumb = _SubmitMenu.thumbTemplate.content.cloneNode(true).querySelector(".thumb");
       thumb.querySelector(".thumb-name").innerText = name;
-      thumb.querySelector("img.thumb-image").src = getSrc(image);
+      thumb.querySelector("img.thumb-image").src = image;
       thumb.onclick = onclick;
       return thumb;
     }

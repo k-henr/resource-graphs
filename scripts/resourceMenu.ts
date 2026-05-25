@@ -1,5 +1,5 @@
 import { Converter } from "./converter";
-import { getResourcesWithFilter, getSrc } from "./data";
+import { getResourcesWithFilter } from "./data";
 import { Rational } from "./rational";
 import { Resource } from "./resource";
 import { ResourceGraph } from "./resourceGraph";

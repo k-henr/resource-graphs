@@ -23,7 +23,7 @@ const loadedConverterFactories: Map<string, ConverterFactory> = new Map();
 
 const graphName: string = window.location.hash.replace(/^#/, "");
 
-export function getSrc(src: string) {
+function getSrc(src: string) {
     return `data/${graphName}/${src}`;
 }
 
@@ -35,7 +35,7 @@ export async function loadAllResources() {
     for (const data of json) {
         const r = new Resource(
             data.displayName,
-            data.displayImage,
+            getSrc(data.displayImage),
             data.tags ?? [],
             data.unitGroup ?? getDefaultUnitGroup(),
         );
@@ -95,7 +95,7 @@ export async function loadAllConverters() {
         // Create a new converter factory object
         loadedConverterFactories.set(data.id, {
             name: data.thumbName ?? data.displayName, // TODO: Deal with thumb names and display names in preprocessing; currently I do this in multiple places!
-            image: data.displayImage,
+            image: getSrc(data.displayImage),
             tags: data.tags ?? [],
             possibleIngredients: possibleIngr,
             possibleProducts: possibleProd,
@@ -224,7 +224,7 @@ function createFactory(data: ConverterData<true>) {
         return new IntermediateConverter(
             data.displayName,
             data.thumbName ?? data.displayName,
-            data.displayImage,
+            getSrc(data.displayImage),
             structuredClone(data.consumes),
             structuredClone(data.produces),
         );

@@ -1,5 +1,5 @@
 import { Converter } from "./converter";
-import { getConverterFactoriesWithFilters, getSrc } from "./data";
+import { getConverterFactoriesWithFilters } from "./data";
 import { IntermediateConverter } from "./intermediateConverter";
 import { Rational } from "./rational";
 import { Resource } from "./resource";
