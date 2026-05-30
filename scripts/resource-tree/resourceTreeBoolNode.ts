@@ -1,4 +1,5 @@
 import { ConverterSettings } from "../converterSettings";
+import { ProgramError } from "../errors";
 import { Resource } from "../resource";
 import { ResourceTree } from "./resourceTree";
 import { ResourceTreeNode } from "./resourceTreeNode";
@@ -9,11 +10,6 @@ export abstract class ResourceTreeBoolNode extends ResourceTreeNode {
     public constructor(children: ResourceTree[]) {
         super();
         this.children = children;
-    }
-
-    public override getAllPossibleResources(output: Resource[]): Resource[] {
-        this.children.map((el) => el.getAllPossibleResources(output));
-        return output;
     }
 
     public override registerSettings(settings: ConverterSettings) {
@@ -31,6 +27,8 @@ export abstract class ResourceTreeBoolNode extends ResourceTreeNode {
                 return;
             }
         }
-        throw new Error("Element not found in boolean node!");
+        throw new ProgramError(
+            "Child not found in boolean node when trying to replace it!",
+        );
     }
 }

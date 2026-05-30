@@ -7,6 +7,7 @@ import { Converter } from "./converter";
 import { Resource } from "./resource";
 import { Rational } from "./rational";
 import { getUnits } from "./units";
+import { displayErr } from "./errors";
 
 export class NumberedSet<T> {
     private numberMap = new Map<T, Rational>();
@@ -165,5 +166,10 @@ export class ResourceGraph {
 // Keep asking the graph to recalculate if it has to
 function requestGraphUpdate(graph: ResourceGraph) {
     requestAnimationFrame(() => requestGraphUpdate(graph));
-    graph.recalculateIfNeeded();
+    try {
+        graph.recalculateIfNeeded();
+    } catch (e: any) {
+        displayErr(e);
+        throw e;
+    }
 }

@@ -2,6 +2,7 @@
  * Handles unit conversions
  */
 
+import { GraphError } from "./errors";
 import { Rational } from "./rational";
 import { UnitGroup, UnitGroupData } from "./types";
 
@@ -34,13 +35,15 @@ export function convertUnit(
     unit: string,
 ): Rational {
     const group = unitGroups.get(groupName);
-    if (!group) throw new Error(`Unit group ${groupName} not found!`);
+    if (!group) throw new GraphError(`Unit group ${groupName} not found!`);
 
     if (group.default === unit) return amount;
 
     const conv = group.conversions.find(([name]) => name === unit);
     if (!conv)
-        throw new Error(`Unit ${unit} can't be found in unit group ${groupName}!`);
+        throw new GraphError(
+            `Unit ${unit} can't be found in unit group ${groupName}!`,
+        );
 
     return amount.mul(conv[1]);
 }
@@ -53,7 +56,7 @@ export function convertUnit(
  */
 export function getUnits(groupName: string): [string[], string] {
     const group = unitGroups.get(groupName);
-    if (!group) throw new Error(`Group ${groupName} not found!`);
+    if (!group) throw new GraphError(`Unit group ${groupName} not found!`);
     const output = group.conversions.map((el) => el[0]);
     output.push(group.default);
     return [output, group.default];

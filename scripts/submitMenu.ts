@@ -2,6 +2,7 @@
  * Takes care of listeners and things related to the "Add Resource"/"Add Converter" menu(s)
  */
 
+import { displayErr } from "./errors";
 import { ResourceGraph } from "./resourceGraph";
 
 export abstract class SubmitMenu {
@@ -45,7 +46,12 @@ export abstract class SubmitMenu {
         // Listener for submitting
         submissionForm.onsubmit = async (e) => {
             e.preventDefault();
-            this.onSubmit();
+            try {
+                this.onSubmit();
+            } catch (e: any) {
+                displayErr(e);
+                throw e;
+            }
         };
 
         // Listener for applying filters

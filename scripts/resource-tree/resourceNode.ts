@@ -47,11 +47,6 @@ export class ResourceNode extends ResourceTree {
         return output;
     }
 
-    public override getAllPossibleResources(output: Resource[]): Resource[] {
-        output.push(getResource(this.id));
-        return output;
-    }
-
     public override registerSettings(s: ConverterSettings) {
         return s;
     }
@@ -64,8 +59,7 @@ export class ResourceNode extends ResourceTree {
         ).firstElementChild! as HTMLElement;
 
         const res = getResource(this.id);
-
-        const unit = getResource(this.id).getUnitGroupName();
+        const unit = res.getUnitGroupName();
 
         el.querySelector<HTMLElement>(".converter-ingredient-name")!.innerText =
             `${res.getDisplayName()} ⨉ ${this.amount.mul(multiplier).getDecimalString()} ${getUnits(unit)[1]}`;

@@ -1,7 +1,6 @@
 import { ConverterSettings } from "../converterSettings";
 import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
-import { Resource } from "../resource";
 import { ConverterIngredient } from "../types";
 import { ResourceTree } from "./resourceTree";
 import { ResourceTreeNode } from "./resourceTreeNode";
@@ -39,10 +38,6 @@ export class NothingNode extends ResourceTree {
         output: ConverterIngredient[],
         _: HTMLFormElement | null,
     ) {
-        return output;
-    }
-
-    public override getAllPossibleResources(output: Resource[]): Resource[] {
         return output;
     }
 

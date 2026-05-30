@@ -1,7 +1,7 @@
 import { ConverterSettings } from "../converterSettings";
+import { GraphError, ProgramError, UserError } from "../errors";
 import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
-import { Resource } from "../resource";
 import { ConverterIngredient, SettingsTreeNode } from "../types";
 import { ResourceTree } from "./resourceTree";
 import { ResourceTreeNode } from "./resourceTreeNode";
@@ -63,10 +63,6 @@ export class MultiplierNode extends ResourceTreeNode {
         return output;
     }
 
-    public override getAllPossibleResources(output: Resource[]): Resource[] {
-        return this.resource.getAllPossibleResources(output);
-    }
-
     public override registerSettings(settings: ConverterSettings) {
         settings.registerSettingsFromAst(this.multiplierAst); // todo: place here instead?
         return settings;
@@ -77,7 +73,7 @@ export class MultiplierNode extends ResourceTreeNode {
         newChild: ResourceTree,
     ): void {
         if (this.resource !== oldChild)
-            throw new Error(
+            throw new ProgramError(
                 "Tried to replace a resource on a MULTIPLIER that wasn't present on the node!",
             );
         this.resource = newChild;
@@ -106,7 +102,10 @@ export class MultiplierNode extends ResourceTreeNode {
                     ),
                     el,
                 );
-                if (!num) throw new Error("Bad formatting!");
+                if (!num)
+                    throw new UserError(
+                        "Bad formatting, all number settings have to contain a rational or decimal number!",
+                    );
                 return num;
 
             case "TOGGLE":
@@ -144,9 +143,11 @@ export class MultiplierNode extends ResourceTreeNode {
                     if (name === treeNode.default)
                         return this.evaluateSettingsTree(option, form, formData);
                 }
-                // TODO: Error handling in case of graph error where the default
-                // option doesn't exist
-                return Rational.zero;
+                // Couldn't find the setting on the node, complain
+                console.log(treeNode);
+                throw new GraphError(
+                    `Default setting "${treeNode.default}" for setting "${treeNode.name}" does not exist as an option!`,
+                );
 
             case "MUL":
                 let p = Rational.one;
@@ -176,11 +177,7 @@ export class MultiplierNode extends ResourceTreeNode {
 
             case "POW":
                 // Hmmmmmm... need to think how to do this
-                throw new Error("Powers aren't supported yet!");
-            // return Math.pow(
-            //     this.evaluateSettingsTree(treeNode.base, form),
-            //     this.evaluateSettingsTree(treeNode.exponent, form),
-            // );
+                throw new ProgramError("Powers aren't supported yet!");
         }
     }
 }

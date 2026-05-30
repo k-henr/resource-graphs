@@ -2,6 +2,7 @@
  * File for handling loading and conversion of external resources
  */
 
+import { displayErr, GraphError } from "./errors";
 import { IntermediateConverter } from "./intermediateConverter";
 import { Rational } from "./rational";
 import { Resource } from "./resource";
@@ -11,15 +12,11 @@ import { MultiplierNode } from "./resource-tree/multiplierNode";
 import { OrNode } from "./resource-tree/orNode";
 import { ResourceNode } from "./resource-tree/resourceNode";
 import { ResourceTree } from "./resource-tree/resourceTree";
-import { ResourceTreeNode } from "./resource-tree/resourceTreeNode";
 import {
     ConverterData,
     ConverterFactory,
     ResourceData,
-    ResourceTreeData as ResourceTreeData,
-    ResourceTreeDataBooleanNode,
-    ResourceTreeDataMultiplierNode,
-    ResourceTreeDataType as ResourceTreeDataType,
+    ResourceTreeData,
     RationalNumber,
 } from "./types";
 import { getDefaultUnitGroup } from "./units";
@@ -38,7 +35,10 @@ function getSrc(src: string) {
 
 export async function loadAllResources() {
     const res = await fetch(`data/${graphName}/resources.json`);
-    if (!res.ok) throw new Error("Error during resource loading!");
+    if (!res.ok)
+        throw new GraphError(
+            "Error during resource loading, resources.json doesn't exist!",
+        );
     const json: ResourceData[] = await res.json();
 
     for (const data of json) {
@@ -54,7 +54,7 @@ export async function loadAllResources() {
 
 export function getResource(id: string): Resource {
     const r = loadedResources.get(id);
-    if (!r) throw new Error(`Couldn't find resoure "${id}"!`);
+    if (!r) throw new GraphError(`Couldn't find resoure "${id}"!`);
     return r;
 }
 
@@ -88,7 +88,10 @@ export function getResourcesWithFilter(searchString: string = "") {
 
 export async function loadAllConverters() {
     const res = await fetch(`data/${graphName}/converters.json`);
-    if (!res.ok) throw new Error("Error during resource loading!");
+    if (!res.ok)
+        throw new GraphError(
+            "Error during resource loading, converter.json doesn't exist!",
+        );
     const json: ConverterData[] = await res.json();
 
     for (const data of json) {
@@ -104,13 +107,18 @@ export async function loadAllConverters() {
             possibleIngredients: possibleIngr,
             possibleProducts: possibleProd,
             factory: () => {
-                return new IntermediateConverter(
-                    data.displayName,
-                    data.thumbName ?? data.displayName,
-                    getSrc(data.displayImage),
-                    resourceTreeDataToClass(andWrap(data.consumes)),
-                    resourceTreeDataToClass(andWrap(data.produces)),
-                );
+                try {
+                    return new IntermediateConverter(
+                        data.displayName,
+                        data.thumbName ?? data.displayName,
+                        getSrc(data.displayImage),
+                        resourceTreeDataToClass(andWrap(data.consumes)),
+                        resourceTreeDataToClass(andWrap(data.produces)),
+                    );
+                } catch (e: any) {
+                    displayErr(e);
+                    throw e;
+                }
             },
         });
     }

@@ -74,6 +74,7 @@
             "multiplier": {
                 "type": "ENUMERATE",
                 "name": "Waste expelled by",
+                "default": "Lavatory",
                 "options": [
                     ["Outhouse", 1],
                     [["Lavatory", "Accident"], 0]
@@ -145,6 +146,7 @@
             "multiplier": {
                 "type": "ENUMERATE",
                 "name": "Waste expelled by",
+                "default": "Lavatory",
                 "options": [
                     ["Outhouse", 1],
                     [["Lavatory", "Accident"], 0]

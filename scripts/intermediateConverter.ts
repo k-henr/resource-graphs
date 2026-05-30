@@ -1,5 +1,6 @@
 import { Converter } from "./converter";
 import { ConverterSettings } from "./converterSettings";
+import { displayErr as displayErr, GraphError, ProgramError } from "./errors";
 import { Rational } from "./rational";
 import { EntangledOrNode } from "./resource-tree/entangledOr";
 import { ResourceTree } from "./resource-tree/resourceTree";
@@ -85,7 +86,6 @@ export class IntermediateConverter {
 
     // Returns a finalized converter, provided that all ambiguities are resolved
     public finalize(): Converter {
-        console.log(this.ingredientTree);
         const ingr = this.ingredientTree.addResourcesToList(
             [],
             IntermediateConverter.settingsForm,
@@ -144,8 +144,7 @@ export class IntermediateConverter {
         const settingName = args[0];
         const setting = this.settings.getSetting(settingName);
 
-        if (!setting)
-            throw new Error(`Formatting error: Setting "${settingName}" not found!`);
+        if (!setting) throw new GraphError(`Setting "${settingName}" not found!`);
 
         // Depending on the type of the setting, do different things
         switch (setting.type) {
@@ -244,8 +243,13 @@ export class IntermediateConverter {
 
         input.onchange = () => {
             // Clear info panel and show again
-            infoPanel.innerHTML = "";
-            this.populateInfoPanel(infoPanel);
+            try {
+                infoPanel.innerHTML = "";
+                this.populateInfoPanel(infoPanel);
+            } catch (e: any) {
+                displayErr(e);
+                throw e;
+            }
         };
 
         return [settingEl, label, input];
@@ -268,8 +272,13 @@ export class IntermediateConverter {
 
         input.onchange = () => {
             // Clear info panel and show again
-            infoPanel.innerHTML = "";
-            this.populateInfoPanel(infoPanel);
+            try {
+                infoPanel.innerHTML = "";
+                this.populateInfoPanel(infoPanel);
+            } catch (e: any) {
+                displayErr(e);
+                throw e;
+            }
         };
 
         return [settingEl, label, input];

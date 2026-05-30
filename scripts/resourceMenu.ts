@@ -1,5 +1,6 @@
 import { Converter } from "./converter";
 import { getResourcesWithFilter } from "./data";
+import { displayErr, UserError } from "./errors";
 import { Rational } from "./rational";
 import { Resource } from "./resource";
 import { ResourceGraph } from "./resourceGraph";
@@ -48,13 +49,16 @@ export class ResourceMenu extends SubmitMenu {
             this.submissionForm.querySelector<HTMLInputElement>(
                 "input[name=delta]",
             )!;
+
         const delta = convertUnit(
             resource.getUnitGroupName(),
             Rational.fromInput(el.value, el) ?? Rational.zero,
             this.unitDropdown.selectedOptions[0].innerText,
         );
         if (!delta) {
-            throw new Error("Bad formatting");
+            throw new UserError(
+                "Bad formatting, the amount needs to be a rational number!",
+            );
         }
 
         // Only add the item delta if it'll actually add or remove resources

@@ -1,4 +1,24 @@
 (() => {
+  // scripts/errors.ts
+  var UserError = class extends Error {
+  };
+  var GraphError = class extends Error {
+  };
+  var ProgramError = class extends Error {
+  };
+  function displayErr(e) {
+    if (e instanceof UserError) {
+      alert(`${e.message}`);
+    } else if (e instanceof GraphError) {
+      alert(`Configuration error: ${e.message}`);
+    } else if (e instanceof ProgramError) {
+      alert(`INTERNAL ERROR: ${e.message}
+
+Please report this as a bug!`);
+    }
+    throw e;
+  }
+
   // scripts/rational.ts
   var Rational = class _Rational {
     // These are just normal numbers atm, do I need bigint?
@@ -227,8 +247,8 @@
       if (this.settingsLookup.has(node.name)) {
         const prev = this.settingsLookup.get(node.name);
         if (node.type !== prev.type)
-          throw new Error(
-            `Mismatched type for converter setting ${node.name}`
+          throw new GraphError(
+            `Mismatched type for converter setting ${node.name}!`
           );
         if (node.type === "ENUMERATE") {
           if (prev.type !== "ENUMERATE") return;
@@ -345,7 +365,6 @@
     }
     // Returns a finalized converter, provided that all ambiguities are resolved
     finalize() {
-      console.log(this.ingredientTree);
       const ingr = this.ingredientTree.addResourcesToList(
         [],
         _IntermediateConverter.settingsForm,
@@ -390,8 +409,7 @@
       const args = toFormat.split("|");
       const settingName = args[0];
       const setting = this.settings.getSetting(settingName);
-      if (!setting)
-        throw new Error(`Formatting error: Setting "${settingName}" not found!`);
+      if (!setting) throw new GraphError(`Setting "${settingName}" not found!`);
       switch (setting.type) {
         case "TOGGLE": {
           return formData.get(settingName) ? args[1] ?? "" : args[2] ?? "";
@@ -460,8 +478,13 @@
       input.name = name;
       post.innerText = postText;
       input.onchange = () => {
-        infoPanel.innerHTML = "";
-        this.populateInfoPanel(infoPanel);
+        try {
+          infoPanel.innerHTML = "";
+          this.populateInfoPanel(infoPanel);
+        } catch (e) {
+          displayErr(e);
+          throw e;
+        }
       };
       return [settingEl, label, input];
     }
@@ -475,8 +498,13 @@
       label.innerText = name;
       input.name = name;
       input.onchange = () => {
-        infoPanel.innerHTML = "";
-        this.populateInfoPanel(infoPanel);
+        try {
+          infoPanel.innerHTML = "";
+          this.populateInfoPanel(infoPanel);
+        } catch (e) {
+          displayErr(e);
+          throw e;
+        }
       };
       return [settingEl, label, input];
     }
@@ -559,10 +587,6 @@
       super();
       this.children = children;
     }
-    getAllPossibleResources(output) {
-      this.children.map((el) => el.getAllPossibleResources(output));
-      return output;
-    }
     registerSettings(settings) {
       this.children.map((c) => c.registerSettings(settings));
       return settings;
@@ -574,7 +598,9 @@
           return;
         }
       }
-      throw new Error("Element not found in boolean node!");
+      throw new ProgramError(
+        "Child not found in boolean node when trying to replace it!"
+      );
     }
   };
 
@@ -623,9 +649,6 @@
     addResourcesToList(output, _) {
       return output;
     }
-    getAllPossibleResources(output) {
-      return output;
-    }
     registerSettings(s) {
       return s;
     }
@@ -645,7 +668,7 @@
       "template#converter-or-template"
     );
     getElement(parent, settingsForm, multiplier, requestingConverter) {
-      if (!parent) throw new Error("An OR node can't be a root node!");
+      if (!parent) throw new GraphError("An OR node can't be a root node!");
       const selectEl = _OrNode.converterSelectTemplate.content.cloneNode(true).firstElementChild;
       selectEl.querySelector(".converter-select-count").innerText = String(this.children.length);
       const selectList = selectEl.querySelector(
@@ -714,13 +737,18 @@
     }
     getOnClickForOption(parent, option, selectEl, optionEl, requestingConverter) {
       return () => {
-        this.collapseNode(
-          parent,
-          option,
-          selectEl,
-          optionEl,
-          requestingConverter
-        );
+        try {
+          this.collapseNode(
+            parent,
+            option,
+            selectEl,
+            optionEl,
+            requestingConverter
+          );
+        } catch (e) {
+          displayErr(e);
+          throw e;
+        }
       };
     }
     // Collapse this node with the given option
@@ -730,7 +758,9 @@
       optionEl.onclick = null;
     }
     addResourcesToList(_, __, ___ = Rational.one) {
-      throw new Error("All OR nodes aren't resolved, please choose an option!");
+      throw new UserError(
+        "All OR nodes aren't resolved, please choose an option!"
+      );
     }
   };
 
@@ -761,13 +791,18 @@
     // When creating the onclick, also store it in a dictionary here
     getOnClickForOption(parent, option, selectEl, optionEl, requestingConverter) {
       const onclickNoEntTrigger = () => {
-        super.collapseNode(
-          parent,
-          option,
-          selectEl,
-          optionEl,
-          requestingConverter
-        );
+        try {
+          super.collapseNode(
+            parent,
+            option,
+            selectEl,
+            optionEl,
+            requestingConverter
+          );
+        } catch (e) {
+          displayErr(e);
+          throw e;
+        }
       };
       const id = this.optionIds[this.children.indexOf(option)];
       this.onclicks.set(id, onclickNoEntTrigger);
@@ -784,7 +819,7 @@
       const onclick = this.onclicks.get(id);
       console.log(onclick);
       if (!onclick)
-        throw new Error(
+        throw new GraphError(
           `Option with id ${id} not present on this entangled OR!`
         );
       onclick();
@@ -792,7 +827,6 @@
     // Override the collapseNode function so that when this node collapses, it also
     // collapses the others
     collapseNode(orParent, option, selectEl, optionEl, requestingConverter) {
-      console.log("Collapsing entOr");
       const optionId = this.optionIds[this.children.indexOf(option)];
       super.collapseNode(
         orParent,
@@ -843,16 +877,13 @@
       this.resource.addResourcesToList(output, settingsForm, multiplier);
       return output;
     }
-    getAllPossibleResources(output) {
-      return this.resource.getAllPossibleResources(output);
-    }
     registerSettings(settings) {
       settings.registerSettingsFromAst(this.multiplierAst);
       return settings;
     }
     replaceChild(oldChild, newChild) {
       if (this.resource !== oldChild)
-        throw new Error(
+        throw new ProgramError(
           "Tried to replace a resource on a MULTIPLIER that wasn't present on the node!"
         );
       this.resource = newChild;
@@ -874,7 +905,10 @@
             ),
             el
           );
-          if (!num) throw new Error("Bad formatting!");
+          if (!num)
+            throw new UserError(
+              "Bad formatting, all number settings have to contain a rational or decimal number!"
+            );
           return num;
         case "TOGGLE":
           return this.evaluateSettingsTree(
@@ -897,7 +931,10 @@
             if (name === treeNode.default)
               return this.evaluateSettingsTree(option, form, formData);
           }
-          return Rational.zero;
+          console.log(treeNode);
+          throw new GraphError(
+            `Default setting "${treeNode.default}" for setting "${treeNode.name}" does not exist as an option!`
+          );
         case "MUL":
           let p = Rational.one;
           for (const child of treeNode.values)
@@ -921,7 +958,7 @@
             formData
           ).sub(this.evaluateSettingsTree(treeNode.value2, form, formData));
         case "POW":
-          throw new Error("Powers aren't supported yet!");
+          throw new ProgramError("Powers aren't supported yet!");
       }
     }
   };
@@ -946,16 +983,18 @@
   }
   function convertUnit(groupName, amount, unit) {
     const group = unitGroups.get(groupName);
-    if (!group) throw new Error(`Unit group ${groupName} not found!`);
+    if (!group) throw new GraphError(`Unit group ${groupName} not found!`);
     if (group.default === unit) return amount;
     const conv = group.conversions.find(([name]) => name === unit);
     if (!conv)
-      throw new Error(`Unit ${unit} can't be found in unit group ${groupName}!`);
+      throw new GraphError(
+        `Unit ${unit} can't be found in unit group ${groupName}!`
+      );
     return amount.mul(conv[1]);
   }
   function getUnits(groupName) {
     const group = unitGroups.get(groupName);
-    if (!group) throw new Error(`Group ${groupName} not found!`);
+    if (!group) throw new GraphError(`Unit group ${groupName} not found!`);
     const output = group.conversions.map((el) => el[0]);
     output.push(group.default);
     return [output, group.default];
@@ -995,10 +1034,6 @@
       });
       return output;
     }
-    getAllPossibleResources(output) {
-      output.push(getResource(this.id));
-      return output;
-    }
     registerSettings(s) {
       return s;
     }
@@ -1007,7 +1042,7 @@
         true
       ).firstElementChild;
       const res = getResource(this.id);
-      const unit = getResource(this.id).getUnitGroupName();
+      const unit = res.getUnitGroupName();
       el.querySelector(".converter-ingredient-name").innerText = `${res.getDisplayName()} \u2A09 ${this.amount.mul(multiplier).getDecimalString()} ${getUnits(unit)[1]}`;
       el.querySelector(".converter-ingredient-image").src = res.getDisplayImage();
       return el;
@@ -1023,7 +1058,10 @@
   }
   async function loadAllResources() {
     const res = await fetch(`data/${graphName}/resources.json`);
-    if (!res.ok) throw new Error("Error during resource loading!");
+    if (!res.ok)
+      throw new GraphError(
+        "Error during resource loading, resources.json doesn't exist!"
+      );
     const json = await res.json();
     for (const data of json) {
       const r = new Resource(
@@ -1037,7 +1075,7 @@
   }
   function getResource(id) {
     const r = loadedResources.get(id);
-    if (!r) throw new Error(`Couldn't find resoure "${id}"!`);
+    if (!r) throw new GraphError(`Couldn't find resoure "${id}"!`);
     return r;
   }
   function getResourcesWithTag(tag) {
@@ -1060,7 +1098,10 @@
   }
   async function loadAllConverters() {
     const res = await fetch(`data/${graphName}/converters.json`);
-    if (!res.ok) throw new Error("Error during resource loading!");
+    if (!res.ok)
+      throw new GraphError(
+        "Error during resource loading, converter.json doesn't exist!"
+      );
     const json = await res.json();
     for (const data of json) {
       const possibleIngr = getAllPossibleResources(andWrap(data.consumes), []);
@@ -1072,13 +1113,18 @@
         possibleIngredients: possibleIngr,
         possibleProducts: possibleProd,
         factory: () => {
-          return new IntermediateConverter(
-            data.displayName,
-            data.thumbName ?? data.displayName,
-            getSrc(data.displayImage),
-            resourceTreeDataToClass(andWrap(data.consumes)),
-            resourceTreeDataToClass(andWrap(data.produces))
-          );
+          try {
+            return new IntermediateConverter(
+              data.displayName,
+              data.thumbName ?? data.displayName,
+              getSrc(data.displayImage),
+              resourceTreeDataToClass(andWrap(data.consumes)),
+              resourceTreeDataToClass(andWrap(data.produces))
+            );
+          } catch (e) {
+            displayErr(e);
+            throw e;
+          }
         }
       });
     }
@@ -1283,7 +1329,12 @@
   };
   function requestGraphUpdate(graph) {
     requestAnimationFrame(() => requestGraphUpdate(graph));
-    graph.recalculateIfNeeded();
+    try {
+      graph.recalculateIfNeeded();
+    } catch (e) {
+      displayErr(e);
+      throw e;
+    }
   }
 
   // scripts/submitMenu.ts
@@ -1313,7 +1364,12 @@
       this.showOnOpen = showOnOpen;
       submissionForm.onsubmit = async (e) => {
         e.preventDefault();
-        this.onSubmit();
+        try {
+          this.onSubmit();
+        } catch (e2) {
+          displayErr(e2);
+          throw e2;
+        }
       };
       filterForm.onsubmit = (e) => {
         e.preventDefault();
@@ -1430,18 +1486,24 @@
     }
     onSubmit() {
       if (!this.intermediateConverter) return;
-      const converter = this.intermediateConverter.finalize();
-      const amount = this.getAmountToProduce(
-        converter,
-        this.submissionForm.querySelector(
-          "input[name=amount]"
-        )
-      );
-      if (!amount) {
-        throw new Error("Bad formatting!");
-      }
-      if (!amount.equals(Rational.zero)) {
-        this.graph.addConverter(converter, amount);
+      try {
+        const converter = this.intermediateConverter.finalize();
+        const amount = this.getAmountToProduce(
+          converter,
+          this.submissionForm.querySelector(
+            "input[name=amount]"
+          )
+        );
+        if (!amount) {
+          throw new UserError(
+            "Entered an invalid number! Please write a rational or floating-point number"
+          );
+        }
+        if (!amount.equals(Rational.zero)) {
+          this.graph.addConverter(converter, amount);
+        }
+      } catch (e) {
+        displayErr(e);
       }
       this.close();
     }
@@ -1489,12 +1551,16 @@
       for (const [_, cFact] of converterList) {
         const tags = cFact.tags.length > 0 ? cFact.tags : ["Miscellaneous"];
         let onclickFn = () => {
-          console.log("Factorying for", cFact.name);
-          this.intermediateConverter = cFact.factory();
-          this.infoPanel.innerHTML = "";
-          this.intermediateConverter.populateSettingsForm(this.infoPanel);
-          this.intermediateConverter.populateInfoPanel(this.infoPanel);
-          this.openDetailPopup();
+          try {
+            this.intermediateConverter = cFact.factory();
+            this.infoPanel.innerHTML = "";
+            this.intermediateConverter.populateSettingsForm(this.infoPanel);
+            this.intermediateConverter.populateInfoPanel(this.infoPanel);
+            this.openDetailPopup();
+          } catch (e) {
+            displayErr(e);
+            throw e;
+          }
         };
         this.addThumbToTagLists(tags, tagLists, {
           name: cFact.name,
@@ -1558,7 +1624,9 @@
         this.unitDropdown.selectedOptions[0].innerText
       );
       if (!delta) {
-        throw new Error("Bad formatting");
+        throw new UserError(
+          "Bad formatting, the amount needs to be a rational number!"
+        );
       }
       if (!delta?.equals(Rational.zero)) {
         const itemList = [{ resource, amount: Rational.one }];
@@ -1621,104 +1689,118 @@
     window.onhashchange = () => {
       window.location.reload();
     };
-    const resourceDeltaList = document.querySelector("#resources");
-    const converterList = document.querySelector("#converters");
-    const resourceDeltaTemplate = document.querySelector(
-      "template#resource-delta-template"
-    );
-    const converterTemplate = document.querySelector(
-      "template#converter-template"
-    );
-    const confRes = await fetch(
-      `/data/${window.location.hash.replace(/^#/, "")}/config.json`
-    );
-    if (!confRes.ok) {
-      throw new Error("Config not found!");
+    try {
+      const resourceDeltaList = document.querySelector(
+        "#resources"
+      );
+      const converterList = document.querySelector("#converters");
+      const resourceDeltaTemplate = document.querySelector(
+        "template#resource-delta-template"
+      );
+      const converterTemplate = document.querySelector(
+        "template#converter-template"
+      );
+      const confRes = await fetch(
+        `/data/${window.location.hash.replace(/^#/, "")}/config.json`
+      );
+      if (!confRes.ok) {
+        throw new GraphError("Config not found!");
+      }
+      const config = await confRes.json();
+      document.querySelector(
+        "#personal-legal-disclaimer"
+      ).innerText = config.legalDisclaimer;
+      loadUnitGroups(config.unitGroups, config.defaultUnitGroup);
+      await loadAllResources();
+      await loadAllConverters();
+      const graph = new ResourceGraph(
+        resourceDeltaList,
+        converterList,
+        resourceDeltaTemplate,
+        converterTemplate
+      );
+      const addRcMenuWrapper = document.querySelector(
+        "#add-rc-menu-wrapper"
+      );
+      const detailPopup = document.querySelector("#rc-detail-popup");
+      const thumbList = document.querySelector("#add-rc-tag-list");
+      const infoPanel = document.querySelector("#rc-info-panel");
+      const rHeader = addRcMenuWrapper.querySelector(
+        "#add-resource-header"
+      );
+      const rUnitDropdown = document.querySelector(
+        "select#resource-unit-select"
+      );
+      const rFilter = document.querySelector(
+        "form#resource-filter-form"
+      );
+      const rSubmit = document.querySelector(
+        "form#resource-submission-form"
+      );
+      const resourceMenu = new ResourceMenu(
+        graph,
+        addRcMenuWrapper,
+        detailPopup,
+        rHeader,
+        thumbList,
+        rFilter,
+        rSubmit,
+        rUnitDropdown,
+        infoPanel,
+        rSubmit
+        // For now, this only hides the submission form. If I for some
+        // reason need to hide more, this is what to change
+      );
+      document.querySelector(
+        "#open-item-delta-menu-button"
+      ).onclick = () => resourceMenu.open();
+      document.querySelector("#close-resource-menu-button").onclick = () => resourceMenu.close();
+      document.querySelector("#close-item-popup-button").onclick = () => resourceMenu.closeDetailPopup();
+      const cHeader = addRcMenuWrapper.querySelector(
+        "#add-converter-header"
+      );
+      const cFilter = document.querySelector(
+        "form#converter-filter-form"
+      );
+      const cSettings = document.querySelector(
+        "#converter-settings-form"
+      );
+      const cSubmit = document.querySelector(
+        "form#converter-submission-form"
+      );
+      const cSubmitAmount = document.querySelector(
+        "#converter-amount-input"
+      );
+      const cFormWrapper = document.querySelector(
+        "#converter-specific-footer"
+      );
+      const converterMenu = new ConverterMenu(
+        graph,
+        addRcMenuWrapper,
+        detailPopup,
+        cHeader,
+        thumbList,
+        cFilter,
+        cSubmit,
+        cSettings,
+        cSubmitAmount,
+        infoPanel,
+        cFormWrapper
+      );
+      document.querySelector("#open-converter-menu-button").onclick = () => converterMenu.open();
+      document.querySelector(
+        "#close-converter-menu-button"
+      ).onclick = () => converterMenu.close();
+      document.querySelector(
+        "#close-converter-popup-button"
+      ).onclick = () => converterMenu.closeDetailPopup();
+      graph.setConverterRequestTarget(converterMenu);
+      const dupe = getConverterFactory("duplicant").factory().finalize();
+      const electrolyzer = getConverterFactory("electrolyzer").factory().finalize();
+      graph.addConverter(dupe, new Rational(3));
+      graph.addConverter(electrolyzer, new Rational(3 / 5));
+    } catch (e) {
+      displayErr(e);
     }
-    const config = await confRes.json();
-    document.querySelector("#personal-legal-disclaimer").innerText = config.legalDisclaimer;
-    loadUnitGroups(config.unitGroups, config.defaultUnitGroup);
-    await loadAllResources();
-    await loadAllConverters();
-    const graph = new ResourceGraph(
-      resourceDeltaList,
-      converterList,
-      resourceDeltaTemplate,
-      converterTemplate
-    );
-    const addRcMenuWrapper = document.querySelector(
-      "#add-rc-menu-wrapper"
-    );
-    const detailPopup = document.querySelector("#rc-detail-popup");
-    const thumbList = document.querySelector("#add-rc-tag-list");
-    const infoPanel = document.querySelector("#rc-info-panel");
-    const rHeader = addRcMenuWrapper.querySelector(
-      "#add-resource-header"
-    );
-    const rUnitDropdown = document.querySelector(
-      "select#resource-unit-select"
-    );
-    const rFilter = document.querySelector(
-      "form#resource-filter-form"
-    );
-    const rSubmit = document.querySelector(
-      "form#resource-submission-form"
-    );
-    const resourceMenu = new ResourceMenu(
-      graph,
-      addRcMenuWrapper,
-      detailPopup,
-      rHeader,
-      thumbList,
-      rFilter,
-      rSubmit,
-      rUnitDropdown,
-      infoPanel,
-      rSubmit
-      // For now, this only hides the submission form. If I for some
-      // reason need to hide more, this is what to change
-    );
-    document.querySelector("#open-item-delta-menu-button").onclick = () => resourceMenu.open();
-    document.querySelector("#close-resource-menu-button").onclick = () => resourceMenu.close();
-    document.querySelector("#close-item-popup-button").onclick = () => resourceMenu.closeDetailPopup();
-    const cHeader = addRcMenuWrapper.querySelector(
-      "#add-converter-header"
-    );
-    const cFilter = document.querySelector(
-      "form#converter-filter-form"
-    );
-    const cSettings = document.querySelector(
-      "#converter-settings-form"
-    );
-    const cSubmit = document.querySelector(
-      "form#converter-submission-form"
-    );
-    const cSubmitAmount = document.querySelector(
-      "#converter-amount-input"
-    );
-    const cFormWrapper = document.querySelector(
-      "#converter-specific-footer"
-    );
-    const converterMenu = new ConverterMenu(
-      graph,
-      addRcMenuWrapper,
-      detailPopup,
-      cHeader,
-      thumbList,
-      cFilter,
-      cSubmit,
-      cSettings,
-      cSubmitAmount,
-      infoPanel,
-      cFormWrapper
-    );
-    document.querySelector("#open-converter-menu-button").onclick = () => converterMenu.open();
-    document.querySelector("#close-converter-menu-button").onclick = () => converterMenu.close();
-    document.querySelector("#close-converter-popup-button").onclick = () => converterMenu.closeDetailPopup();
-    graph.setConverterRequestTarget(converterMenu);
-    const dupe = getConverterFactory("duplicant").factory().finalize();
-    const electrolyzer = getConverterFactory("electrolyzer").factory().finalize();
-    graph.addConverter(dupe, new Rational(3));
-    graph.addConverter(electrolyzer, new Rational(3 / 5));
   })();
 })();

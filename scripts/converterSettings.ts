@@ -1,3 +1,4 @@
+import { GraphError } from "./errors";
 import { Setting, SettingsTreeInputNode, SettingsTreeNode } from "./types";
 
 export class ConverterSettings {
@@ -60,8 +61,8 @@ export class ConverterSettings {
 
             // If the types don't match, throw an error
             if (node.type !== prev.type)
-                throw new Error(
-                    `Mismatched type for converter setting ${node.name}`,
+                throw new GraphError(
+                    `Mismatched type for converter setting ${node.name}!`,
                 );
 
             // If the setting is an enumerate setting, any additional options present

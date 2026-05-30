@@ -1,5 +1,6 @@
 import { Converter } from "./converter";
 import { getConverterFactoriesWithFilters } from "./data";
+import { displayErr, UserError } from "./errors";
 import { IntermediateConverter } from "./intermediateConverter";
 import { Rational } from "./rational";
 import { Resource } from "./resource";
@@ -53,23 +54,28 @@ export class ConverterMenu extends SubmitMenu {
         // If no converter is "loaded", ignore
         if (!this.intermediateConverter) return;
 
-        const converter = this.intermediateConverter.finalize();
+        try {
+            const converter = this.intermediateConverter.finalize();
 
-        // If being requested by item, get the amount automatically from the converter
-        const amount = this.getAmountToProduce(
-            converter,
-            this.submissionForm.querySelector<HTMLInputElement>(
-                "input[name=amount]",
-            )!,
-        );
+            // If being requested by item, get the amount automatically from the converter
+            const amount = this.getAmountToProduce(
+                converter,
+                this.submissionForm.querySelector<HTMLInputElement>(
+                    "input[name=amount]",
+                )!,
+            );
 
-        if (!amount) {
-            // TODO: Proper error feedback that an input was badly formatted
-            throw new Error("Bad formatting!");
-        }
+            if (!amount) {
+                throw new UserError(
+                    "Entered an invalid number! Please write a rational or floating-point number",
+                );
+            }
 
-        if (!amount.equals(Rational.zero)) {
-            this.graph.addConverter(converter, amount);
+            if (!amount.equals(Rational.zero)) {
+                this.graph.addConverter(converter, amount);
+            }
+        } catch (e: any) {
+            displayErr(e);
         }
 
         this.close();
@@ -139,14 +145,18 @@ export class ConverterMenu extends SubmitMenu {
 
             // Create an onclick function
             let onclickFn = () => {
-                console.log("Factorying for", cFact.name);
-                this.intermediateConverter = cFact.factory();
-                // TODO: Clear settings form
+                try {
+                    this.intermediateConverter = cFact.factory();
+                    // TODO: Clear settings form
 
-                this.infoPanel.innerHTML = "";
-                this.intermediateConverter.populateSettingsForm(this.infoPanel);
-                this.intermediateConverter.populateInfoPanel(this.infoPanel);
-                this.openDetailPopup();
+                    this.infoPanel.innerHTML = "";
+                    this.intermediateConverter.populateSettingsForm(this.infoPanel);
+                    this.intermediateConverter.populateInfoPanel(this.infoPanel);
+                    this.openDetailPopup();
+                } catch (e: any) {
+                    displayErr(e);
+                    throw e;
+                }
             };
 
             // Add this thumb to all tag lists where it should be

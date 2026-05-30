@@ -1,3 +1,4 @@
+import { displayErr, GraphError } from "../errors";
 import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
 import { OrNode } from "./orNode";
@@ -49,13 +50,18 @@ export class EntangledOrNode extends OrNode {
         requestingConverter: IntermediateConverter,
     ): () => void {
         const onclickNoEntTrigger = () => {
-            super.collapseNode(
-                parent,
-                option,
-                selectEl,
-                optionEl,
-                requestingConverter,
-            );
+            try {
+                super.collapseNode(
+                    parent,
+                    option,
+                    selectEl,
+                    optionEl,
+                    requestingConverter,
+                );
+            } catch (e: any) {
+                displayErr(e);
+                throw e;
+            }
         };
 
         const id = this.optionIds[this.children.indexOf(option)];
@@ -76,7 +82,7 @@ export class EntangledOrNode extends OrNode {
         console.log(onclick);
 
         if (!onclick)
-            throw new Error(
+            throw new GraphError(
                 `Option with id ${id} not present on this entangled OR!`,
             );
 
@@ -92,7 +98,6 @@ export class EntangledOrNode extends OrNode {
         optionEl: HTMLElement,
         requestingConverter: IntermediateConverter,
     ): void {
-        console.log("Collapsing entOr");
         // Get the ID of the chosen option
         const optionId = this.optionIds[this.children.indexOf(option)];
 

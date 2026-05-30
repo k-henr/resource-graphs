@@ -1,3 +1,4 @@
+import { displayErr, GraphError, UserError } from "../errors";
 import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
 import { ConverterIngredient } from "../types";
@@ -30,7 +31,7 @@ export class OrNode extends ResourceTreeBoolNode {
     ): HTMLElement | null {
         // (since I wrap everything in an AND node, this shouldn't happen so it's
         // fine that I don't support it)
-        if (!parent) throw new Error("An OR node can't be a root node!");
+        if (!parent) throw new GraphError("An OR node can't be a root node!");
 
         // Create a new OR element, add all the child nodes as children to it. Then
         // add a listener which modifies this part of the tree to replace the OR node
@@ -134,13 +135,18 @@ export class OrNode extends ResourceTreeBoolNode {
         requestingConverter: IntermediateConverter,
     ) {
         return () => {
-            this.collapseNode(
-                parent,
-                option,
-                selectEl,
-                optionEl,
-                requestingConverter,
-            );
+            try {
+                this.collapseNode(
+                    parent,
+                    option,
+                    selectEl,
+                    optionEl,
+                    requestingConverter,
+                );
+            } catch (e: any) {
+                displayErr(e);
+                throw e;
+            }
         };
     }
 
@@ -162,6 +168,8 @@ export class OrNode extends ResourceTreeBoolNode {
         __: HTMLFormElement | null,
         ___: Rational = Rational.one,
     ): ConverterIngredient[] {
-        throw new Error("All OR nodes aren't resolved, please choose an option!");
+        throw new UserError(
+            "All OR nodes aren't resolved, please choose an option!",
+        );
     }
 }
