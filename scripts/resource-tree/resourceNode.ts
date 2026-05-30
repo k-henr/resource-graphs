@@ -35,16 +35,24 @@ export class ResourceNode extends ResourceTree {
 
     public override addResourcesToList(
         output: ConverterIngredient[],
-        settingsForm: HTMLFormElement | null,
+        _: HTMLFormElement | null,
         multiplier: Rational = Rational.one,
-    ): void {
+    ) {
         output.push({
             resource: getResource(this.id),
             amount: this.amount.mul(multiplier),
         });
+        return output;
     }
 
-    public override registerSettings(_: ConverterSettings): void {}
+    public override getAllPossibleResources(output: Resource[]): Resource[] {
+        output.push(getResource(this.id));
+        return output;
+    }
+
+    public override registerSettings(s: ConverterSettings) {
+        return s;
+    }
 
     private createIngredientElement(multiplier: Rational) {
         const el = (

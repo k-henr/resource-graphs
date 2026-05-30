@@ -47,7 +47,7 @@ export type UnitGroup = {
 // TODO: Speed up loading by adding a needsPreprocessing field here and skipping the
 // ones that don't need it? I should be able to automatically generate that in the
 // python
-export type ConverterData<Processed extends boolean> = {
+export type ConverterData = {
     id: string;
     tags: string[] | undefined;
     displayName: string;
@@ -55,8 +55,8 @@ export type ConverterData<Processed extends boolean> = {
     displayImage: string;
     // The trees are wrapped in implicit ANDs in the data, but this gets resolved
     // during processing. Yucky, should make better later I think
-    consumes: Processed extends true ? ResourceTree<true> : ResourceTree<false>[];
-    produces: Processed extends true ? ResourceTree<true> : ResourceTree<false>[];
+    consumes: ResourceTreeData[];
+    produces: ResourceTreeData[];
 };
 
 // A type for a factory of a converter, before any settings or ingredient trees are
@@ -81,17 +81,14 @@ export type ConverterIngredient = {
 
 // Types for representing a resource tree on a converter (either an ingredient tree
 // or a product tree)
-export type ResourceTree<Processed extends boolean> =
-    | ResourceTreeLeaf
-    | ResourceTreeNode<Processed>;
-export type ResourceTreeNode<Processed extends boolean> =
-    | ResourceTreeBooleanNode<Processed>
-    | ResourceTreeMultiplierNode<Processed>
-    | (Processed extends false ? ResourceTreeTagNode : never); // Don't allow TAGs in processed trees, should either be replaced by an OR or fill a parent OR's child nodes with stuff
+export type ResourceTreeData = ResourceTreeLeaf | ResourceTreeNode;
+export type ResourceTreeNode =
+    | ResourceTreeBooleanNode
+    | ResourceTreeMultiplierNode
+    | ResourceTreeTagNode;
 
 // If I need to reference all types somewhere
-export type ResourceTreeType<Processed extends boolean> =
-    ResourceTree<Processed>["type"];
+export type ResourceTreeDataType = ResourceTreeData["type"];
 
 // A leaf node, representing a single resource with a base amount to be used/produced
 export type ResourceTreeLeaf = {
@@ -100,9 +97,9 @@ export type ResourceTreeLeaf = {
     amount: RationalNumber;
 };
 // Combine resources either using AND or OR
-export type ResourceTreeBooleanNode<Processed extends boolean> = {
+export type ResourceTreeBooleanNode = {
     type: "AND" | "OR";
-    resources: ResourceTree<Processed>[];
+    resources: ResourceTreeData[];
 };
 // Represents all resources with the given tag. If it sits in an OR, the TAG will
 // automatically add all the resources to that OR. Otherwise, it'll create its own OR
@@ -113,10 +110,10 @@ export type ResourceTreeTagNode = {
 };
 // Represents a multiplier applied to the child tree, depending on the value that the
 // settings AST takes on. See below.
-export type ResourceTreeMultiplierNode<Processed extends boolean> = {
+export type ResourceTreeMultiplierNode = {
     type: "MULTIPLIER";
     multiplier: SettingsTreeNode;
-    resource: ResourceTree<Processed>;
+    resource: ResourceTreeData;
 };
 
 // -------- Setting nodes --------

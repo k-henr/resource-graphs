@@ -16,7 +16,7 @@ export class MultiplierNode extends ResourceTreeNode {
     }
 
     public override getElement(
-        parent: ResourceTreeNode | null,
+        _: ResourceTreeNode | null,
         settingsForm: HTMLFormElement,
         multiplier: Rational,
     ): HTMLElement | null {
@@ -30,14 +30,14 @@ export class MultiplierNode extends ResourceTreeNode {
         );
 
         // Add the resource multiplied by the new multiplier
-        return this.resource.getElement(parent, settingsForm, multiplier);
+        return this.resource.getElement(this, settingsForm, multiplier);
     }
 
     public override addResourcesToList(
         output: ConverterIngredient[],
         settingsForm: HTMLFormElement | null,
         multiplier: Rational,
-    ): void {
+    ) {
         // Evaluate the settings tree
         multiplier = multiplier.mul(
             this.evaluateSettingsTree(
@@ -47,10 +47,16 @@ export class MultiplierNode extends ResourceTreeNode {
             ),
         );
         this.resource.addResourcesToList(output, settingsForm, multiplier);
+        return output;
     }
 
-    public override registerSettings(settings: ConverterSettings): void {
+    public override getAllPossibleResources(output: Resource[]): Resource[] {
+        return this.resource.getAllPossibleResources(output);
+    }
+
+    public override registerSettings(settings: ConverterSettings) {
         settings.registerSettingsFromAst(this.multiplierAst); // todo: place here instead?
+        return settings;
     }
 
     public override replaceChild(

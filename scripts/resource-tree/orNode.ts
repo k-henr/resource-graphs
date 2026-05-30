@@ -1,16 +1,12 @@
-import { ConverterSettings } from "../converterSettings";
 import { Rational } from "../rational";
-import { Resource } from "../resource";
 import { ConverterIngredient } from "../types";
 import { ResourceTree } from "./resourceTree";
+import { ResourceTreeBoolNode } from "./resourceTreeBoolNode";
 import { ResourceTreeNode } from "./resourceTreeNode";
 
-export class OrNode extends ResourceTreeNode {
-    private children;
-
+export class OrNode extends ResourceTreeBoolNode {
     constructor(options: ResourceTree[]) {
-        super();
-        this.children = options;
+        super(options);
     }
 
     // Element representing an option
@@ -80,24 +76,7 @@ export class OrNode extends ResourceTreeNode {
         _: ConverterIngredient[],
         __: HTMLFormElement | null,
         ___: Rational = Rational.one,
-    ): void {
+    ): ConverterIngredient[] {
         throw new Error("All OR nodes aren't resolved, please choose an option!");
-    }
-
-    public override registerSettings(settings: ConverterSettings): void {
-        this.children.map((c) => c.registerSettings(settings));
-    }
-
-    public override replaceChild(
-        oldChild: ResourceTree,
-        newChild: ResourceTree,
-    ): void {
-        for (const i in this.children) {
-            if (this.children[i] === oldChild) {
-                this.children[i] = newChild;
-                return;
-            }
-        }
-        throw new Error("Element not found in OR node!");
     }
 }

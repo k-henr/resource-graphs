@@ -288,51 +288,6 @@
     }
   };
 
-  // scripts/units.ts
-  var unitGroups = /* @__PURE__ */ new Map();
-  var defaultUnitGroup = "UNINITIALIZED";
-  function getDefaultUnitGroup() {
-    return defaultUnitGroup;
-  }
-  function loadUnitGroups(groups, defaultGroup) {
-    defaultUnitGroup = defaultGroup;
-    for (const [name, group] of groups) {
-      unitGroups.set(name, {
-        default: group.default,
-        conversions: group.conversions.map(([name2, r]) => [
-          name2,
-          Rational.fromData(r)
-        ])
-      });
-    }
-  }
-  function convertUnit(groupName, amount, unit) {
-    const group = unitGroups.get(groupName);
-    if (!group) throw new Error(`Unit group ${groupName} not found!`);
-    if (group.default === unit) return amount;
-    const conv = group.conversions.find(([name]) => name === unit);
-    if (!conv)
-      throw new Error(`Unit ${unit} can't be found in unit group ${groupName}!`);
-    return amount.mul(conv[1]);
-  }
-  function getUnits(groupName) {
-    const group = unitGroups.get(groupName);
-    if (!group) throw new Error(`Group ${groupName} not found!`);
-    const output = group.conversions.map((el) => el[0]);
-    output.push(group.default);
-    return [output, group.default];
-  }
-  function populateUnitDropdown(selectEl, groupName) {
-    selectEl.innerHTML = "";
-    const [units, defaultUnit] = getUnits(groupName);
-    for (const unit of units) {
-      const optionEl = document.createElement("option");
-      optionEl.innerText = unit;
-      selectEl.appendChild(optionEl);
-      if (unit === defaultUnit) optionEl.selected = true;
-    }
-  }
-
   // scripts/intermediateConverter.ts
   var IntermediateConverter = class _IntermediateConverter {
     displayName;
@@ -340,21 +295,11 @@
     thumbName;
     displayImage;
     settings;
-    // Ingredients and products are always wrapped in an AND node. Split AND and OR
-    // into two types to enforce this further?
-    ingredients;
-    products;
+    // Ingredients and products
+    ingredientTree;
+    productTree;
     static infoTemplate = document.querySelector(
       "#converter-info-template"
-    );
-    static converterIngredientTemplate = document.querySelector(
-      "template#converter-ingredient-template"
-    );
-    static converterSelectTemplate = document.querySelector(
-      "template#converter-select-template"
-    );
-    static converterOrTemplate = document.querySelector(
-      "template#converter-or-template"
     );
     // TODO: Make non-static
     static settingsForm = document.querySelector(
@@ -366,15 +311,14 @@
     static settingSelectTemplate = document.querySelector(
       "#converter-setting-select-template"
     );
-    constructor(displayName, thumbName, displayImage, ingredients, products) {
+    constructor(displayName, thumbName, displayImage, ingredientTree, productTree) {
       this.displayName = displayName;
       this.thumbName = thumbName;
       this.displayImage = displayImage;
-      this.ingredients = ingredients;
-      this.products = products;
-      this.settings = this.getAllConverterSettings(
-        this.products,
-        this.getAllConverterSettings(this.ingredients, new ConverterSettings())
+      this.ingredientTree = ingredientTree;
+      this.productTree = productTree;
+      this.settings = this.productTree.registerSettings(
+        this.ingredientTree.registerSettings(new ConverterSettings())
       );
     }
     populateSettingsForm(infoPanel) {
@@ -399,15 +343,16 @@
     }
     // Returns a finalized converter, provided that all ambiguities are resolved
     finalize() {
-      const ingr = this.resourceTreeToList(
-        this.ingredients,
+      console.log(this.ingredientTree);
+      const ingr = this.ingredientTree.addResourcesToList(
         [],
-        _IntermediateConverter.settingsForm
+        _IntermediateConverter.settingsForm,
+        Rational.one
       );
-      const prod = this.resourceTreeToList(
-        this.products,
+      const prod = this.productTree.addResourcesToList(
         [],
-        _IntermediateConverter.settingsForm
+        _IntermediateConverter.settingsForm,
+        Rational.one
       );
       return new Converter(this.getDisplayName(), this.displayImage, ingr, prod);
     }
@@ -419,17 +364,19 @@
       );
       el.querySelector(".rc-info-header").innerText = this.getDisplayName();
       el.querySelector(".rc-info-image").src = this.getDisplayImage();
-      this.addResourceTreeToElement(
-        this.ingredients,
-        null,
-        el.querySelector(".c-info-ingredients"),
-        _IntermediateConverter.settingsForm
+      el.querySelector(".c-info-ingredients").appendChild(
+        this.ingredientTree.getElement(
+          null,
+          _IntermediateConverter.settingsForm,
+          Rational.one
+        ) ?? document.createElement("div")
       );
-      this.addResourceTreeToElement(
-        this.products,
-        null,
-        el.querySelector(".c-info-products"),
-        _IntermediateConverter.settingsForm
+      el.querySelector(".c-info-products").appendChild(
+        this.productTree.getElement(
+          null,
+          _IntermediateConverter.settingsForm,
+          Rational.one
+        ) ?? document.createElement("div")
       );
       infoPanel.appendChild(el);
     }
@@ -528,138 +475,142 @@
       };
       return [settingEl, label, input];
     }
-    // Register all converter settings present in the given tree
-    getAllConverterSettings(node, settings) {
-      switch (node.type) {
-        case "RESOURCE":
-          return settings;
-        case "AND":
-        case "OR":
-          for (const child of node.resources)
-            this.getAllConverterSettings(child, settings);
-          return settings;
-        case "MULTIPLIER":
-          settings.registerSettingsFromAst(node.multiplier);
-          return settings;
-      }
+  };
+
+  // scripts/resource.ts
+  var Resource = class _Resource {
+    static infoTemplate = document.querySelector(
+      "#resource-info-template"
+    );
+    displayName;
+    displayImage;
+    tags;
+    unitGroupName;
+    constructor(name, image, tags, unitGroup) {
+      this.displayName = name;
+      this.displayImage = image;
+      this.tags = tags;
+      this.unitGroupName = unitGroup;
     }
-    // (returns the newly created element)
-    addResourceTreeToElement(node, parentContext, el, settingsForm, multiplier = Rational.one) {
-      if (multiplier.equals(Rational.zero)) return document.createElement("div");
-      switch (node.type) {
-        case "RESOURCE":
-          const resEl = this.createIngredientElement(node, multiplier);
-          el.appendChild(resEl);
-          return resEl;
-        case "AND":
-          const andEl = document.createElement("div");
-          node.resources.map((child, index) => {
-            this.addResourceTreeToElement(
-              child,
-              { parent: node, index },
-              andEl,
-              settingsForm,
-              multiplier
-            );
-          });
-          el.appendChild(andEl);
-          return andEl;
-        case "OR":
-          const selectEl = _IntermediateConverter.converterSelectTemplate.content.cloneNode(
-            true
-          ).firstElementChild;
-          selectEl.querySelector(
-            ".converter-select-count"
-          ).innerText = String(node.resources.length);
-          const selectList = selectEl.querySelector(
-            ".converter-select-children"
-          );
-          for (let i = 0; i < node.resources.length; i++) {
-            const res = node.resources[i];
-            const option = this.addResourceTreeToElement(
-              res,
-              { parent: node, index: i },
-              selectList,
-              settingsForm,
-              multiplier
-            );
-            if (!parentContext)
-              throw new Error("An OR node can't be a root node!");
-            if (option) {
-              option.onclick = () => {
-                if (parentContext.parent.type === "MULTIPLIER") {
-                  parentContext.parent.resource = res;
-                } else {
-                  parentContext.parent.resources[parentContext.index] = res;
-                }
-                selectEl.replaceWith(option);
-                option.onclick = null;
-              };
-            }
-            if (i + 1 === node.resources.length) break;
-            const orEl = _IntermediateConverter.converterOrTemplate.content.cloneNode(
-              true
-            );
-            selectList.appendChild(orEl);
-          }
-          el.appendChild(selectEl);
-          return selectEl;
-        case "MULTIPLIER":
-          multiplier = multiplier.mul(
-            this.evaluateSettingsTree(
-              node.multiplier,
-              settingsForm,
-              new FormData(settingsForm)
-            )
-          );
-          return this.addResourceTreeToElement(
-            node.resource,
-            { parent: node, index: 0 },
-            el,
-            settingsForm,
-            multiplier
-          );
-      }
+    getDisplayName() {
+      return this.displayName;
     }
-    createIngredientElement(ingr, multiplier) {
-      const el = _IntermediateConverter.converterIngredientTemplate.content.cloneNode(
-        true
-      ).firstElementChild;
-      const res = getResource(ingr.id);
-      const unit = getResource(ingr.id).getUnitGroupName();
-      el.querySelector(".converter-ingredient-name").innerText = `${res.getDisplayName()} \u2A09 ${Rational.fromData(ingr.amount).mul(multiplier).getDecimalString()} ${getUnits(unit)[1]}`;
-      el.querySelector(".converter-ingredient-image").src = res.getDisplayImage();
-      return el;
+    getDisplayImage() {
+      return this.displayImage;
     }
-    // Parse the given resource tree and store it in the output list
-    resourceTreeToList(node, output, form, multiplier = Rational.one) {
-      switch (node.type) {
-        case "RESOURCE":
-          output.push({
-            resource: getResource(node.id),
-            amount: Rational.fromData(node.amount).mul(multiplier)
-          });
-          break;
-        case "AND":
-          for (const child of node.resources)
-            this.resourceTreeToList(child, output, form, multiplier);
-          break;
-        case "MULTIPLIER":
-          multiplier = multiplier.mul(
-            this.evaluateSettingsTree(
-              node.multiplier,
-              form,
-              form ? new FormData(form) : null
-            )
-          );
-          this.resourceTreeToList(node.resource, output, form, multiplier);
-          break;
-        case "OR":
-          throw new Error(
-            "Resource tree isn't fully resolved, please select which of the available options to use!"
-          );
-      }
+    getUnitGroupName() {
+      return this.unitGroupName;
+    }
+    getTags() {
+      return [...this.tags];
+    }
+    // (assumes an empty info panel element)
+    populateInfoPanel(panel) {
+      const el = _Resource.infoTemplate.content.cloneNode(true);
+      el.querySelector(".rc-info-header").innerText = this.getDisplayName();
+      el.querySelector(".rc-info-image").src = this.getDisplayImage();
+      panel.appendChild(el);
+    }
+  };
+
+  // scripts/resource-tree/resourceTree.ts
+  var ResourceTree = class {
+  };
+
+  // scripts/resource-tree/resourceTreeNode.ts
+  var ResourceTreeNode = class extends ResourceTree {
+  };
+
+  // scripts/resource-tree/resourceTreeBoolNode.ts
+  var ResourceTreeBoolNode = class extends ResourceTreeNode {
+    children;
+    constructor(children) {
+      super();
+      this.children = children;
+    }
+    getAllPossibleResources(output) {
+      this.children.map((el) => el.getAllPossibleResources(output));
       return output;
+    }
+    registerSettings(settings) {
+      this.children.map((c) => c.registerSettings(settings));
+      return settings;
+    }
+    replaceChild(oldChild, newChild) {
+      for (const i in this.children) {
+        if (this.children[i] === oldChild) {
+          this.children[i] = newChild;
+          return;
+        }
+      }
+      throw new Error("Element not found in boolean node!");
+    }
+  };
+
+  // scripts/resource-tree/andNode.ts
+  var AndNode = class extends ResourceTreeBoolNode {
+    constructor(children) {
+      super(children);
+    }
+    getElement(_, settingsForm, multiplier) {
+      const andEl = document.createElement("div");
+      this.children.map((child) => {
+        const cEl = child.getElement(this, settingsForm, multiplier);
+        if (cEl) andEl.appendChild(cEl);
+      });
+      return andEl;
+    }
+    addResourcesToList(output, settingsForm, multiplier = Rational.one) {
+      this.children.map(
+        (c) => c.addResourcesToList(output, settingsForm, multiplier)
+      );
+      return output;
+    }
+  };
+
+  // scripts/resource-tree/multiplierNode.ts
+  var MultiplierNode = class extends ResourceTreeNode {
+    multiplierAst;
+    resource;
+    constructor(multiplierAst, resource) {
+      super();
+      this.multiplierAst = multiplierAst;
+      this.resource = resource;
+    }
+    getElement(_, settingsForm, multiplier) {
+      multiplier = multiplier.mul(
+        this.evaluateSettingsTree(
+          this.multiplierAst,
+          settingsForm,
+          new FormData(settingsForm)
+        )
+      );
+      return this.resource.getElement(this, settingsForm, multiplier);
+    }
+    addResourcesToList(output, settingsForm, multiplier) {
+      multiplier = multiplier.mul(
+        this.evaluateSettingsTree(
+          this.multiplierAst,
+          settingsForm,
+          settingsForm ? new FormData(settingsForm) : null
+        )
+      );
+      this.resource.addResourcesToList(output, settingsForm, multiplier);
+      return output;
+    }
+    getAllPossibleResources(output) {
+      return this.resource.getAllPossibleResources(output);
+    }
+    registerSettings(settings) {
+      settings.registerSettingsFromAst(this.multiplierAst);
+      return settings;
+    }
+    replaceChild(oldChild, newChild) {
+      if (this.resource !== oldChild)
+        throw new Error(
+          "Tried to replace a resource on a MULTIPLIER that wasn't present on the node!"
+        );
+      this.resource = newChild;
     }
     evaluateSettingsTree(treeNode, form, formData) {
       if (typeof treeNode === "number" || Array.isArray(treeNode))
@@ -730,39 +681,136 @@
     }
   };
 
-  // scripts/resource.ts
-  var Resource = class _Resource {
-    static infoTemplate = document.querySelector(
-      "#resource-info-template"
+  // scripts/resource-tree/orNode.ts
+  var OrNode = class _OrNode extends ResourceTreeBoolNode {
+    constructor(options) {
+      super(options);
+    }
+    // Element representing an option
+    static converterSelectTemplate = document.querySelector(
+      "template#converter-select-template"
     );
-    displayName;
-    displayImage;
-    tags;
-    unitGroupName;
-    constructor(name, image, tags, unitGroup) {
-      this.displayName = name;
-      this.displayImage = image;
-      this.tags = tags;
-      this.unitGroupName = unitGroup;
+    // Element inbetween options that just says "OR"
+    static converterOrTemplate = document.querySelector(
+      "template#converter-or-template"
+    );
+    getElement(parent, settingsForm, multiplier) {
+      if (!parent) throw new Error("An OR node can't be a root node!");
+      const selectEl = _OrNode.converterSelectTemplate.content.cloneNode(true).firstElementChild;
+      selectEl.querySelector(".converter-select-count").innerText = String(this.children.length);
+      const selectList = selectEl.querySelector(
+        ".converter-select-children"
+      );
+      for (let i = 0; i < this.children.length; i++) {
+        const option = this.children[i];
+        const optionEl = option.getElement(this, settingsForm, multiplier);
+        if (!optionEl) continue;
+        selectList.appendChild(optionEl);
+        if (optionEl) {
+          optionEl.onclick = () => {
+            parent.replaceChild(this, option);
+            selectEl.replaceWith(optionEl);
+            optionEl.onclick = null;
+          };
+        }
+        if (i + 1 === this.children.length) break;
+        const orEl = _OrNode.converterOrTemplate.content.cloneNode(
+          true
+        );
+        selectList.appendChild(orEl);
+      }
+      return selectEl;
     }
-    getDisplayName() {
-      return this.displayName;
+    addResourcesToList(_, __, ___ = Rational.one) {
+      throw new Error("All OR nodes aren't resolved, please choose an option!");
     }
-    getDisplayImage() {
-      return this.displayImage;
+  };
+
+  // scripts/units.ts
+  var unitGroups = /* @__PURE__ */ new Map();
+  var defaultUnitGroup = "UNINITIALIZED";
+  function getDefaultUnitGroup() {
+    return defaultUnitGroup;
+  }
+  function loadUnitGroups(groups, defaultGroup) {
+    defaultUnitGroup = defaultGroup;
+    for (const [name, group] of groups) {
+      unitGroups.set(name, {
+        default: group.default,
+        conversions: group.conversions.map(([name2, r]) => [
+          name2,
+          Rational.fromData(r)
+        ])
+      });
     }
-    getUnitGroupName() {
-      return this.unitGroupName;
+  }
+  function convertUnit(groupName, amount, unit) {
+    const group = unitGroups.get(groupName);
+    if (!group) throw new Error(`Unit group ${groupName} not found!`);
+    if (group.default === unit) return amount;
+    const conv = group.conversions.find(([name]) => name === unit);
+    if (!conv)
+      throw new Error(`Unit ${unit} can't be found in unit group ${groupName}!`);
+    return amount.mul(conv[1]);
+  }
+  function getUnits(groupName) {
+    const group = unitGroups.get(groupName);
+    if (!group) throw new Error(`Group ${groupName} not found!`);
+    const output = group.conversions.map((el) => el[0]);
+    output.push(group.default);
+    return [output, group.default];
+  }
+  function populateUnitDropdown(selectEl, groupName) {
+    selectEl.innerHTML = "";
+    const [units, defaultUnit] = getUnits(groupName);
+    for (const unit of units) {
+      const optionEl = document.createElement("option");
+      optionEl.innerText = unit;
+      selectEl.appendChild(optionEl);
+      if (unit === defaultUnit) optionEl.selected = true;
     }
-    getTags() {
-      return [...this.tags];
+  }
+
+  // scripts/resource-tree/resourceNode.ts
+  var ResourceNode = class _ResourceNode extends ResourceTree {
+    id;
+    amount;
+    // Template for a resource element
+    static converterIngredientTemplate = document.querySelector(
+      "template#converter-ingredient-template"
+    );
+    constructor(id, amount) {
+      super();
+      this.id = id;
+      this.amount = amount;
     }
-    // (assumes an empty info panel element)
-    populateInfoPanel(panel) {
-      const el = _Resource.infoTemplate.content.cloneNode(true);
-      el.querySelector(".rc-info-header").innerText = this.getDisplayName();
-      el.querySelector(".rc-info-image").src = this.getDisplayImage();
-      panel.appendChild(el);
+    getElement(_, settingsForm, multiplier) {
+      const resEl = this.createIngredientElement(multiplier);
+      return resEl;
+    }
+    addResourcesToList(output, _, multiplier = Rational.one) {
+      output.push({
+        resource: getResource(this.id),
+        amount: this.amount.mul(multiplier)
+      });
+      return output;
+    }
+    getAllPossibleResources(output) {
+      output.push(getResource(this.id));
+      return output;
+    }
+    registerSettings(s) {
+      return s;
+    }
+    createIngredientElement(multiplier) {
+      const el = _ResourceNode.converterIngredientTemplate.content.cloneNode(
+        true
+      ).firstElementChild;
+      const res = getResource(this.id);
+      const unit = getResource(this.id).getUnitGroupName();
+      el.querySelector(".converter-ingredient-name").innerText = `${res.getDisplayName()} \u2A09 ${this.amount.mul(multiplier).getDecimalString()} ${getUnits(unit)[1]}`;
+      el.querySelector(".converter-ingredient-image").src = res.getDisplayImage();
+      return el;
     }
   };
 
@@ -814,136 +862,85 @@
     const res = await fetch(`data/${graphName}/converters.json`);
     if (!res.ok) throw new Error("Error during resource loading!");
     const json = await res.json();
-    for (const unprocessedData of json) {
-      const data = preprocessConverterData(unprocessedData);
-      const possibleIngr = [];
-      parseIngredientListToAllPossible(possibleIngr, data.consumes);
-      const possibleProd = [];
-      parseIngredientListToAllPossible(possibleProd, data.produces);
+    for (const data of json) {
+      console.log(`Loading ${data.thumbName ?? data.displayName}`);
+      const ingrTree = resourceTreeDataToClass({
+        type: "AND",
+        resources: data.consumes
+      });
+      const prodTree = resourceTreeDataToClass({
+        type: "AND",
+        resources: data.produces
+      });
+      const possibleIngr = ingrTree.getAllPossibleResources([]);
+      const possibleProd = prodTree.getAllPossibleResources([]);
       loadedConverterFactories.set(data.id, {
         name: data.thumbName ?? data.displayName,
-        // TODO: Deal with thumb names and display names in preprocessing; currently I do this in multiple places!
         image: getSrc(data.displayImage),
         tags: data.tags ?? [],
         possibleIngredients: possibleIngr,
         possibleProducts: possibleProd,
-        factory: createFactory(data)
+        factory: () => {
+          return new IntermediateConverter(
+            data.displayName,
+            data.thumbName ?? data.displayName,
+            getSrc(data.displayImage),
+            ingrTree,
+            prodTree
+          );
+        }
       });
     }
   }
-  function preprocessConverterData(data) {
-    const processedConsumes = [];
-    for (const c of data.consumes)
-      preprocessResourceTree({ childList: processedConsumes, type: "AND" }, c);
-    const processedProduces = [];
-    for (const c of data.produces)
-      preprocessResourceTree({ childList: processedProduces, type: "AND" }, c);
-    const processedData = {
-      ...data,
-      consumes: { type: "AND", resources: processedConsumes },
-      produces: { type: "AND", resources: processedProduces }
-    };
-    return processedData;
-  }
-  function preprocessResourceTree(parentContext, node) {
-    switch (node.type) {
-      case "RESOURCE": {
-        parentContext.childList.push(node);
-        return;
-      }
-      case "AND": {
-        if (parentContext.type === "AND") {
-          for (const c of node.resources)
-            preprocessResourceTree(parentContext, c);
-        } else {
-          const processedNode = {
-            ...node,
-            resources: []
-          };
-          const ctx = {
-            type: processedNode.type,
-            childList: processedNode.resources
-          };
-          parentContext.childList.push(processedNode);
-          for (const c of node.resources) preprocessResourceTree(ctx, c);
-        }
-        return;
-      }
-      case "OR": {
-        if (parentContext.type === "OR") {
-          for (const c of node.resources)
-            preprocessResourceTree(parentContext, c);
-        } else {
-          const processedNode = {
-            ...node,
-            resources: []
-          };
-          const ctx = {
-            type: processedNode.type,
-            childList: processedNode.resources
-          };
-          parentContext.childList.push(processedNode);
-          for (const c of node.resources) preprocessResourceTree(ctx, c);
-        }
-        return;
-      }
-      case "MULTIPLIER": {
-        const childList = [];
-        preprocessResourceTree({ type: "MULTIPLIER", childList }, node.resource);
-        const processedNode = {
-          ...node,
-          resource: childList[0]
+  function resourceTreeDataToClass(data) {
+    switch (data.type) {
+      case "RESOURCE":
+        return new ResourceNode(data.id, Rational.fromData(data.amount));
+      case "AND":
+        return new AndNode(
+          data.resources.map((el) => resourceTreeDataToClass(el))
+        );
+      case "OR":
+        const options = [];
+        for (const c of data.resources) handleOrInput(c, options);
+        return new OrNode(options);
+      case "MULTIPLIER":
+        return new MultiplierNode(
+          data.multiplier,
+          resourceTreeDataToClass(data.resource)
+        );
+      case "TAG":
+        const resources = getResourcesWithTag(data.tagName);
+        const resourceData = resources.map(
+          ([id]) => makeResourceFromIdAndAmount(id, data.amount)
+        );
+        const orNode = {
+          type: "OR",
+          resources: resourceData
         };
-        parentContext.childList.push(processedNode);
-        return;
-      }
-      case "TAG": {
-        const resources = getResourcesWithTag(node.tagName);
-        if (parentContext.type === "OR") {
-          for (const [id] of resources) {
-            preprocessResourceTree(parentContext, {
-              type: "RESOURCE",
-              id,
-              amount: node.amount
-            });
-          }
-        } else {
-          const orNode = { type: "OR", resources: [] };
-          parentContext.childList.push(orNode);
-          preprocessResourceTree(
-            { childList: orNode.resources, type: "OR" },
-            node
-          );
-        }
-        return;
-      }
+        return resourceTreeDataToClass(orNode);
     }
   }
-  function createFactory(data) {
-    return () => {
-      return new IntermediateConverter(
-        data.displayName,
-        data.thumbName ?? data.displayName,
-        getSrc(data.displayImage),
-        structuredClone(data.consumes),
-        structuredClone(data.produces)
-      );
-    };
-  }
-  function parseIngredientListToAllPossible(output, node) {
-    switch (node.type) {
+  function handleOrInput(tree, output) {
+    switch (tree.type) {
       case "RESOURCE":
-        output.push(getResource(node.id));
-        break;
       case "AND":
       case "OR":
-        for (const n of node.resources)
-          parseIngredientListToAllPossible(output, n);
-        break;
       case "MULTIPLIER":
-        parseIngredientListToAllPossible(output, node.resource);
+        output.push(resourceTreeDataToClass(tree));
+        break;
+      case "TAG":
+        console.log("Discovered TAG in OR");
+        const amount = Rational.fromData(tree.amount);
+        const resources = getResourcesWithTag(tree.tagName);
+        for (const [id] of resources) {
+          output.push(new ResourceNode(id, amount));
+        }
         break;
     }
+  }
+  function makeResourceFromIdAndAmount(id, amount) {
+    return { type: "RESOURCE", id, amount };
   }
   function getConverterFactory(id) {
     return loadedConverterFactories.get(id);

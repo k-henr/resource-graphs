@@ -1,5 +1,6 @@
 import { ConverterSettings } from "../converterSettings";
 import { Rational } from "../rational";
+import { Resource } from "../resource";
 import { ConverterIngredient } from "../types";
 import { ResourceTreeNode } from "./resourceTreeNode";
 
@@ -9,7 +10,9 @@ export abstract class ResourceTree {
         output: ConverterIngredient[],
         settingsForm: HTMLFormElement | null,
         multiplier: Rational,
-    ): void;
+    ): ConverterIngredient[];
+
+    public abstract getAllPossibleResources(output: Resource[]): Resource[];
 
     // Get an element representing this resource tree
     public abstract getElement(
@@ -18,5 +21,5 @@ export abstract class ResourceTree {
         multiplier: Rational,
     ): HTMLElement | null;
 
-    public abstract registerSettings(settings: ConverterSettings): void;
+    public abstract registerSettings(settings: ConverterSettings): ConverterSettings;
 }

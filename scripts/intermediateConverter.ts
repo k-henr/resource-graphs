@@ -1,16 +1,8 @@
 import { Converter } from "./converter";
 import { ConverterSettings } from "./converterSettings";
-import { getResource } from "./data";
 import { Rational } from "./rational";
-import {
-    ConverterIngredient,
-    ResourceTree,
-    ResourceTreeLeaf,
-    ResourceTreeNode,
-    Setting,
-    SettingsTreeNode,
-} from "./types";
-import { getUnits } from "./units";
+import { ResourceTree } from "./resource-tree/resourceTree";
+import { Setting } from "./types";
 
 /**
  * A class for holding a converter currently being constructed, with ORs and settings
@@ -23,24 +15,12 @@ export class IntermediateConverter {
 
     private settings: ConverterSettings;
 
-    // Ingredients and products are always wrapped in an AND node. Split AND and OR
-    // into two types to enforce this further?
-    private ingredients: ResourceTree<true>;
-    private products: ResourceTree<true>;
+    // Ingredients and products
+    private ingredientTree: ResourceTree;
+    private productTree: ResourceTree;
 
     private static infoTemplate = document.querySelector<HTMLTemplateElement>(
         "#converter-info-template",
-    )!;
-    private static converterIngredientTemplate =
-        document.querySelector<HTMLTemplateElement>(
-            "template#converter-ingredient-template",
-        )!;
-    private static converterSelectTemplate =
-        document.querySelector<HTMLTemplateElement>(
-            "template#converter-select-template",
-        )!;
-    private static converterOrTemplate = document.querySelector<HTMLTemplateElement>(
-        "template#converter-or-template",
     )!;
 
     // TODO: Make non-static
@@ -60,19 +40,18 @@ export class IntermediateConverter {
         displayName: string,
         thumbName: string,
         displayImage: string,
-        ingredients: ResourceTree<true>, // needs processed resource trees!
-        products: ResourceTree<true>,
+        ingredientTree: ResourceTree,
+        productTree: ResourceTree,
     ) {
         this.displayName = displayName;
         this.thumbName = thumbName;
         this.displayImage = displayImage;
-        this.ingredients = ingredients;
-        this.products = products;
+        this.ingredientTree = ingredientTree;
+        this.productTree = productTree;
 
         // Get all the settings present in this converter
-        this.settings = this.getAllConverterSettings(
-            this.products,
-            this.getAllConverterSettings(this.ingredients, new ConverterSettings()),
+        this.settings = this.productTree.registerSettings(
+            this.ingredientTree.registerSettings(new ConverterSettings()),
         );
     }
 
@@ -104,15 +83,16 @@ export class IntermediateConverter {
 
     // Returns a finalized converter, provided that all ambiguities are resolved
     public finalize(): Converter {
-        const ingr = this.resourceTreeToList(
-            this.ingredients,
+        console.log(this.ingredientTree);
+        const ingr = this.ingredientTree.addResourcesToList(
             [],
             IntermediateConverter.settingsForm,
+            Rational.one,
         );
-        const prod = this.resourceTreeToList(
-            this.products,
+        const prod = this.productTree.addResourcesToList(
             [],
             IntermediateConverter.settingsForm,
+            Rational.one,
         );
 
         return new Converter(this.getDisplayName(), this.displayImage, ingr, prod);
@@ -131,18 +111,20 @@ export class IntermediateConverter {
         el.querySelector<HTMLImageElement>(".rc-info-image")!.src =
             this.getDisplayImage();
 
-        // Populate the info panel recursively with ingredients and products
-        this.addResourceTreeToElement(
-            this.ingredients,
-            null,
-            el.querySelector<Element>(".c-info-ingredients")!,
-            IntermediateConverter.settingsForm,
+        // Set ingredient and product trees
+        el.querySelector<Element>(".c-info-ingredients")!.appendChild(
+            this.ingredientTree.getElement(
+                null,
+                IntermediateConverter.settingsForm,
+                Rational.one,
+            ) ?? document.createElement("div"),
         );
-        this.addResourceTreeToElement(
-            this.products,
-            null,
-            el.querySelector<Element>(".c-info-products")!,
-            IntermediateConverter.settingsForm,
+        el.querySelector<Element>(".c-info-products")!.appendChild(
+            this.productTree.getElement(
+                null,
+                IntermediateConverter.settingsForm,
+                Rational.one,
+            ) ?? document.createElement("div"),
         );
 
         infoPanel.appendChild(el);
@@ -285,303 +267,5 @@ export class IntermediateConverter {
         };
 
         return [settingEl, label, input];
-    }
-
-    // Register all converter settings present in the given tree
-    private getAllConverterSettings(
-        node: ResourceTree<true>,
-        settings: ConverterSettings,
-    ) {
-        switch (node.type) {
-            case "RESOURCE":
-                return settings;
-
-            case "AND":
-            case "OR":
-                for (const child of node.resources)
-                    this.getAllConverterSettings(child, settings);
-                return settings;
-
-            case "MULTIPLIER":
-                settings.registerSettingsFromAst(node.multiplier);
-                return settings;
-        }
-    }
-
-    // (returns the newly created element)
-    private addResourceTreeToElement(
-        node: ResourceTree<true>,
-        parentContext: {
-            parent: ResourceTreeNode<true>;
-            index: number;
-        } | null,
-        el: Element,
-        settingsForm: HTMLFormElement,
-        multiplier: Rational = Rational.one,
-    ): HTMLElement | null {
-        // If the multiplier is zero, don't add this branch to the tree since it'll
-        // all just be zero
-        if (multiplier.equals(Rational.zero)) return document.createElement("div");
-
-        switch (node.type) {
-            case "RESOURCE":
-                // Just add the resource to the element
-                const resEl = this.createIngredientElement(node, multiplier);
-                el.appendChild(resEl);
-                return resEl;
-
-            case "AND":
-                // Add all the children to the parent element
-                const andEl = document.createElement("div");
-                node.resources.map((child, index) => {
-                    this.addResourceTreeToElement(
-                        child,
-                        { parent: node, index },
-                        andEl,
-                        settingsForm,
-                        multiplier,
-                    );
-                });
-                el.appendChild(andEl);
-                return andEl;
-
-            case "OR":
-                // Create a new OR element, add all the child nodes as children to
-                // it. Then add a listener which modifies this part of the tree to
-                // replace the OR node with the chosen branch when pressed
-                const selectEl = (
-                    IntermediateConverter.converterSelectTemplate.content.cloneNode(
-                        true,
-                    ) as HTMLElement
-                ).firstElementChild! as HTMLElement; // #casting
-
-                selectEl.querySelector<HTMLElement>(
-                    ".converter-select-count",
-                )!.innerText = String(node.resources.length);
-                const selectList = selectEl.querySelector<Element>(
-                    ".converter-select-children",
-                )!;
-
-                for (let i = 0; i < node.resources.length; i++) {
-                    const res = node.resources[i];
-
-                    const option = this.addResourceTreeToElement(
-                        res,
-                        { parent: node, index: i },
-                        selectList,
-                        settingsForm,
-                        multiplier,
-                    );
-
-                    // (since I wrap everything in an AND node, this shouldn't
-                    // happen so it's fine that I don't support it)
-                    if (!parentContext)
-                        throw new Error("An OR node can't be a root node!");
-
-                    // Add a listener for selecting an option
-                    if (option) {
-                        option.onclick = () => {
-                            // Replace the OR node with the chosen option
-                            if (parentContext.parent.type === "MULTIPLIER") {
-                                parentContext.parent.resource = res;
-                            } else {
-                                parentContext.parent.resources[parentContext.index] =
-                                    res;
-                            }
-                            selectEl.replaceWith(option);
-
-                            option.onclick = null;
-                        };
-                    }
-
-                    if (i + 1 === node.resources.length) break;
-
-                    const orEl =
-                        IntermediateConverter.converterOrTemplate.content.cloneNode(
-                            true,
-                        ) as DocumentFragment;
-                    selectList.appendChild(orEl);
-                }
-
-                el.appendChild(selectEl);
-                return selectEl;
-
-            case "MULTIPLIER":
-                // Parse the settings to modify the multiplier
-                multiplier = multiplier.mul(
-                    this.evaluateSettingsTree(
-                        node.multiplier,
-                        settingsForm,
-                        new FormData(settingsForm),
-                    ),
-                );
-
-                // Add the resource multiplied by the multiplier
-                return this.addResourceTreeToElement(
-                    node.resource,
-                    { parent: node, index: 0 },
-                    el,
-                    settingsForm,
-                    multiplier,
-                );
-        }
-    }
-
-    private createIngredientElement(ingr: ResourceTreeLeaf, multiplier: Rational) {
-        const el = (
-            IntermediateConverter.converterIngredientTemplate.content.cloneNode(
-                true,
-            ) as DocumentFragment
-        ).firstElementChild! as HTMLElement;
-
-        const res = getResource(ingr.id);
-
-        const unit = getResource(ingr.id).getUnitGroupName();
-
-        el.querySelector<HTMLElement>(".converter-ingredient-name")!.innerText =
-            `${res.getDisplayName()} ⨉ ${Rational.fromData(ingr.amount).mul(multiplier).getDecimalString()} ${getUnits(unit)[1]}`;
-        el.querySelector<HTMLImageElement>(".converter-ingredient-image")!.src =
-            res.getDisplayImage();
-
-        return el;
-    }
-
-    // Parse the given resource tree and store it in the output list
-    private resourceTreeToList(
-        node: ResourceTree<true>,
-        output: ConverterIngredient[],
-        form: HTMLFormElement | null, // If running "headless" with default settings, this is null
-        multiplier: Rational = Rational.one,
-    ) {
-        switch (node.type) {
-            case "RESOURCE":
-                output.push({
-                    resource: getResource(node.id),
-                    amount: Rational.fromData(node.amount).mul(multiplier),
-                });
-                break;
-            case "AND":
-                for (const child of node.resources)
-                    this.resourceTreeToList(child, output, form, multiplier);
-                break;
-            case "MULTIPLIER":
-                // Evaluate the settings tree
-                multiplier = multiplier.mul(
-                    this.evaluateSettingsTree(
-                        node.multiplier,
-                        form,
-                        form ? new FormData(form) : null,
-                    ),
-                );
-                this.resourceTreeToList(node.resource, output, form, multiplier);
-                break;
-            case "OR":
-                throw new Error(
-                    "Resource tree isn't fully resolved, please select which of the available options to use!",
-                );
-        }
-
-        return output;
-    }
-
-    private evaluateSettingsTree(
-        treeNode: SettingsTreeNode,
-        form: HTMLFormElement | null,
-        formData: FormData | null,
-    ): Rational {
-        if (typeof treeNode === "number" || Array.isArray(treeNode))
-            return Rational.fromData(treeNode);
-
-        switch (treeNode.type) {
-            case "NUMBER":
-                if (!form || !formData) {
-                    return Rational.fromData(treeNode.default);
-                }
-                // Get the setting from the form data
-                const el = form.querySelector<HTMLInputElement>(
-                    `input[name="${treeNode.name}"]`,
-                );
-                const num = Rational.fromInput(
-                    String(
-                        formData.get(treeNode.name)?.valueOf() ?? treeNode.default,
-                    ),
-                    el,
-                );
-                if (!num) throw new Error("Bad formatting!");
-                return num;
-
-            case "TOGGLE":
-                return this.evaluateSettingsTree(
-                    (form?.querySelector<HTMLInputElement>(
-                        `input[name="${treeNode.name}"]`,
-                    )?.checked ?? treeNode.default)
-                        ? treeNode.true
-                        : treeNode.false,
-                    form,
-                    formData,
-                );
-
-            case "ENUMERATE":
-                const chosen =
-                    form
-                        ?.querySelector<HTMLInputElement>(
-                            `select[name="${treeNode.name}"]`,
-                        )
-                        ?.value.valueOf() ?? treeNode.default;
-                for (const [selector, option] of treeNode.options) {
-                    const selectorMatches =
-                        typeof selector === "string"
-                            ? selector === chosen
-                            : selector.indexOf(chosen) !== -1;
-                    if (selectorMatches)
-                        return this.evaluateSettingsTree(option, form, formData);
-                }
-                // Fallback in case of multiple toggles with the same name and
-                // different options
-                // In case of multiple enumerates with the same name and different
-                // options, sometimes the chosen option won't exist on the node. In
-                // that case, choose the default value instead
-                for (const [name, option] of treeNode.options) {
-                    if (name === treeNode.default)
-                        return this.evaluateSettingsTree(option, form, formData);
-                }
-                // TODO: Error handling in case of graph error where the default
-                // option doesn't exist
-                return Rational.zero;
-
-            case "MUL":
-                let p = Rational.one;
-                for (const child of treeNode.factors)
-                    p = p.mul(this.evaluateSettingsTree(child, form, formData));
-                return p;
-
-            case "DIV":
-                return this.evaluateSettingsTree(
-                    treeNode.numerator,
-                    form,
-                    formData,
-                ).div(
-                    this.evaluateSettingsTree(treeNode.denominator, form, formData),
-                );
-
-            case "ADD":
-                let s = Rational.zero;
-                for (const child of treeNode.terms)
-                    s = s.add(this.evaluateSettingsTree(child, form, formData));
-                return s;
-
-            case "SUB":
-                return this.evaluateSettingsTree(treeNode.term1, form, formData).sub(
-                    this.evaluateSettingsTree(treeNode.term2, form, formData),
-                );
-
-            case "POW":
-                // Hmmmmmm... need to think how to do this
-                throw new Error("Powers aren't supported yet!");
-            // return Math.pow(
-            //     this.evaluateSettingsTree(treeNode.base, form),
-            //     this.evaluateSettingsTree(treeNode.exponent, form),
-            // );
-        }
     }
 }

@@ -1,16 +1,12 @@
-import { ConverterSettings } from "../converterSettings";
 import { Rational } from "../rational";
-import { Resource } from "../resource";
 import { ConverterIngredient } from "../types";
 import { ResourceTree } from "./resourceTree";
+import { ResourceTreeBoolNode } from "./resourceTreeBoolNode";
 import { ResourceTreeNode } from "./resourceTreeNode";
 
-export class AndNode extends ResourceTreeNode {
-    private children: ResourceTree[];
-
+export class AndNode extends ResourceTreeBoolNode {
     public constructor(children: ResourceTree[]) {
-        super();
-        this.children = children;
+        super(children);
     }
 
     public override getElement(
@@ -31,25 +27,10 @@ export class AndNode extends ResourceTreeNode {
         output: ConverterIngredient[],
         settingsForm: HTMLFormElement | null,
         multiplier: Rational = Rational.one,
-    ): void {
+    ) {
         this.children.map((c) =>
             c.addResourcesToList(output, settingsForm, multiplier),
         );
-    }
-    public override registerSettings(settings: ConverterSettings): void {
-        this.children.map((c) => c.registerSettings(settings));
-    }
-
-    public override replaceChild(
-        oldChild: ResourceTree,
-        newChild: ResourceTree,
-    ): void {
-        for (const i in this.children) {
-            if (this.children[i] === oldChild) {
-                this.children[i] = newChild;
-                return;
-            }
-        }
-        throw new Error("Element not found in AND node!");
+        return output;
     }
 }
