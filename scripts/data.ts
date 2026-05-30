@@ -6,6 +6,7 @@ import { IntermediateConverter } from "./intermediateConverter";
 import { Rational } from "./rational";
 import { Resource } from "./resource";
 import { AndNode } from "./resource-tree/andNode";
+import { EntangledOrNode } from "./resource-tree/entangledOr";
 import { MultiplierNode } from "./resource-tree/multiplierNode";
 import { OrNode } from "./resource-tree/orNode";
 import { ResourceNode } from "./resource-tree/resourceNode";
@@ -16,8 +17,8 @@ import {
     ConverterFactory,
     ResourceData,
     ResourceTreeData as ResourceTreeData,
-    ResourceTreeBooleanNode,
-    ResourceTreeMultiplierNode,
+    ResourceTreeDataBooleanNode,
+    ResourceTreeDataMultiplierNode,
     ResourceTreeDataType as ResourceTreeDataType,
     RationalNumber,
 } from "./types";
@@ -91,20 +92,9 @@ export async function loadAllConverters() {
     const json: ConverterData[] = await res.json();
 
     for (const data of json) {
-        console.log(`Loading ${data.thumbName ?? data.displayName}`);
-        // Convert the tree data to classes
-        const ingrTree = resourceTreeDataToClass({
-            type: "AND",
-            resources: data.consumes,
-        });
-        const prodTree = resourceTreeDataToClass({
-            type: "AND",
-            resources: data.produces,
-        });
-
         // Construct lists of all possible ingredients and products from this converter
-        const possibleIngr = ingrTree.getAllPossibleResources([]);
-        const possibleProd = prodTree.getAllPossibleResources([]);
+        const possibleIngr = getAllPossibleResources(andWrap(data.consumes), []);
+        const possibleProd = getAllPossibleResources(andWrap(data.produces), []);
 
         // Create a new converter factory object
         loadedConverterFactories.set(data.id, {
@@ -118,8 +108,8 @@ export async function loadAllConverters() {
                     data.displayName,
                     data.thumbName ?? data.displayName,
                     getSrc(data.displayImage),
-                    ingrTree,
-                    prodTree,
+                    resourceTreeDataToClass(andWrap(data.consumes)),
+                    resourceTreeDataToClass(andWrap(data.produces)),
                 );
             },
         });
@@ -139,6 +129,12 @@ function resourceTreeDataToClass(data: ResourceTreeData): ResourceTree {
             const options: ResourceTree[] = [];
             for (const c of data.resources) handleOrInput(c, options);
             return new OrNode(options);
+        case "ENTANGLED_OR":
+            // Does not support TAGs for now, probably won't ever do
+            return new EntangledOrNode(
+                data.id,
+                data.resources.map(([id, rD]) => [id, resourceTreeDataToClass(rD)]),
+            );
         case "MULTIPLIER":
             return new MultiplierNode(
                 data.multiplier,
@@ -188,6 +184,34 @@ function makeResourceFromIdAndAmount(
     amount: RationalNumber,
 ): ResourceTreeData {
     return { type: "RESOURCE", id, amount };
+}
+
+function andWrap(r: ResourceTreeData[]): ResourceTreeData {
+    return { type: "AND", resources: r };
+}
+
+function getAllPossibleResources(
+    data: ResourceTreeData,
+    output: Resource[],
+): Resource[] {
+    switch (data.type) {
+        case "RESOURCE":
+            output.push(getResource(data.id));
+            return output;
+        case "AND":
+        case "OR":
+            data.resources.map((el) => getAllPossibleResources(el, output));
+            return output;
+        case "MULTIPLIER":
+            return getAllPossibleResources(data.resource, output);
+        case "TAG":
+            const resources = getResourcesWithTag(data.tagName);
+            for (const [, r] of resources) output.push(r);
+            return output;
+        case "ENTANGLED_OR":
+            data.resources.map(([, r]) => getAllPossibleResources(r, output));
+            return output;
+    }
 }
 
 export function getConverterFactory(id: string) {

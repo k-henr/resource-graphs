@@ -1,6 +1,7 @@
 import { Converter } from "./converter";
 import { ConverterSettings } from "./converterSettings";
 import { Rational } from "./rational";
+import { EntangledOrNode } from "./resource-tree/entangledOr";
 import { ResourceTree } from "./resource-tree/resourceTree";
 import { Setting } from "./types";
 
@@ -14,6 +15,7 @@ export class IntermediateConverter {
     private displayImage: string;
 
     private settings: ConverterSettings;
+    private entangledOrs: [string, EntangledOrNode][] = [];
 
     // Ingredients and products
     private ingredientTree: ResourceTree;
@@ -111,12 +113,15 @@ export class IntermediateConverter {
         el.querySelector<HTMLImageElement>(".rc-info-image")!.src =
             this.getDisplayImage();
 
+        this.entangledOrs = [];
+
         // Set ingredient and product trees
         el.querySelector<Element>(".c-info-ingredients")!.appendChild(
             this.ingredientTree.getElement(
                 null,
                 IntermediateConverter.settingsForm,
                 Rational.one,
+                this,
             ) ?? document.createElement("div"),
         );
         el.querySelector<Element>(".c-info-products")!.appendChild(
@@ -124,6 +129,7 @@ export class IntermediateConverter {
                 null,
                 IntermediateConverter.settingsForm,
                 Rational.one,
+                this,
             ) ?? document.createElement("div"),
         );
 
@@ -267,5 +273,38 @@ export class IntermediateConverter {
         };
 
         return [settingEl, label, input];
+    }
+
+    public registerEntangledOr(id: string, node: EntangledOrNode) {
+        this.entangledOrs.push([id, node]);
+    }
+
+    public unregisterEntangledOr(node: EntangledOrNode) {
+        for (let i = 0; i < this.entangledOrs.length; i++) {
+            if (this.entangledOrs[i][1] === node) {
+                this.entangledOrs.splice(i, 1);
+                return;
+            }
+        }
+    }
+
+    public collapseEntangledOrs(entangledOrId: string, optionId: string) {
+        console.log(
+            "Collapsing entangled ORs with ID",
+            entangledOrId,
+            "into option",
+            optionId,
+        );
+        // Loop through all entangled ORs, see their IDs, and collapse them if it
+        //  matches
+        for (const data of [...this.entangledOrs]) {
+            const [id, node] = data;
+            if (id !== entangledOrId) continue;
+
+            console.log("Found entOR");
+
+            node.collapseNodeUsingId(optionId);
+            this.unregisterEntangledOr(node);
+        }
     }
 }

@@ -1,4 +1,5 @@
 import { ConverterSettings } from "../converterSettings";
+import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
 import { Resource } from "../resource";
 import { ConverterIngredient } from "../types";
@@ -19,6 +20,7 @@ export abstract class ResourceTree {
         parent: ResourceTreeNode | null,
         settingsForm: HTMLFormElement,
         multiplier: Rational,
+        requestingConverter: IntermediateConverter,
     ): HTMLElement | null;
 
     public abstract registerSettings(settings: ConverterSettings): ConverterSettings;

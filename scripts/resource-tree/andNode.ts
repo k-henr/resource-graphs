@@ -1,3 +1,4 @@
+import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
 import { ConverterIngredient } from "../types";
 import { ResourceTree } from "./resourceTree";
@@ -13,11 +14,17 @@ export class AndNode extends ResourceTreeBoolNode {
         _: ResourceTreeNode | null,
         settingsForm: HTMLFormElement,
         multiplier: Rational,
+        requestingConverter: IntermediateConverter,
     ): HTMLElement | null {
         // Add all the children to the parent element
         const andEl = document.createElement("div");
         this.children.map((child) => {
-            const cEl = child.getElement(this, settingsForm, multiplier);
+            const cEl = child.getElement(
+                this,
+                settingsForm,
+                multiplier,
+                requestingConverter,
+            );
             if (cEl) andEl.appendChild(cEl);
         });
         return andEl;

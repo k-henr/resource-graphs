@@ -1,7 +1,5 @@
 import { ConverterSettings } from "../converterSettings";
-import { Rational } from "../rational";
 import { Resource } from "../resource";
-import { ConverterIngredient } from "../types";
 import { ResourceTree } from "./resourceTree";
 import { ResourceTreeNode } from "./resourceTreeNode";
 

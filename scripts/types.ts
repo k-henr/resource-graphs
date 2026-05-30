@@ -81,36 +81,44 @@ export type ConverterIngredient = {
 
 // Types for representing a resource tree on a converter (either an ingredient tree
 // or a product tree)
-export type ResourceTreeData = ResourceTreeLeaf | ResourceTreeNode;
-export type ResourceTreeNode =
-    | ResourceTreeBooleanNode
-    | ResourceTreeMultiplierNode
-    | ResourceTreeTagNode;
+export type ResourceTreeData = ResourceTreeDataLeaf | ResourceTreeDataNode;
+export type ResourceTreeDataNode =
+    | ResourceTreeDataBooleanNode
+    | ResourceTreeDataMultiplierNode
+    | ResourceTreeDataTagNode
+    | ResourceTreeDataEntangledOrNode;
 
 // If I need to reference all types somewhere
 export type ResourceTreeDataType = ResourceTreeData["type"];
 
 // A leaf node, representing a single resource with a base amount to be used/produced
-export type ResourceTreeLeaf = {
+export type ResourceTreeDataLeaf = {
     type: "RESOURCE";
     id: string;
     amount: RationalNumber;
 };
 // Combine resources either using AND or OR
-export type ResourceTreeBooleanNode = {
+export type ResourceTreeDataBooleanNode = {
     type: "AND" | "OR";
     resources: ResourceTreeData[];
 };
 // Represents all resources with the given tag. If it sits in an OR, the TAG will
 // automatically add all the resources to that OR. Otherwise, it'll create its own OR
-export type ResourceTreeTagNode = {
+export type ResourceTreeDataTagNode = {
     type: "TAG";
     tagName: string;
     amount: RationalNumber;
 };
+// Represents an entangled OR node, where a collapse will also collapse the other
+// nodes with the same ID
+export type ResourceTreeDataEntangledOrNode = {
+    type: "ENTANGLED_OR";
+    id: string;
+    resources: [string, ResourceTreeData][];
+};
 // Represents a multiplier applied to the child tree, depending on the value that the
 // settings AST takes on. See below.
-export type ResourceTreeMultiplierNode = {
+export type ResourceTreeDataMultiplierNode = {
     type: "MULTIPLIER";
     multiplier: SettingsTreeNode;
     resource: ResourceTreeData;

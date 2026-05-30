@@ -1,3 +1,4 @@
+import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
 import { ConverterIngredient } from "../types";
 import { ResourceTree } from "./resourceTree";
@@ -10,27 +11,29 @@ export class OrNode extends ResourceTreeBoolNode {
     }
 
     // Element representing an option
-    private static converterSelectTemplate =
+    protected static converterSelectTemplate =
         document.querySelector<HTMLTemplateElement>(
             "template#converter-select-template",
         )!;
     // Element inbetween options that just says "OR"
-    private static converterOrTemplate = document.querySelector<HTMLTemplateElement>(
-        "template#converter-or-template",
-    )!;
+    protected static converterOrTemplate =
+        document.querySelector<HTMLTemplateElement>(
+            "template#converter-or-template",
+        )!;
 
     public override getElement(
         parent: ResourceTreeNode | null,
         settingsForm: HTMLFormElement,
         multiplier: Rational,
+        requestingConverter: IntermediateConverter,
     ): HTMLElement | null {
-        // (since I wrap everything in an AND node, this shouldn't
-        // happen so it's fine that I don't support it)
+        // (since I wrap everything in an AND node, this shouldn't happen so it's
+        // fine that I don't support it)
         if (!parent) throw new Error("An OR node can't be a root node!");
 
-        // Create a new OR element, add all the child nodes as children to
-        // it. Then add a listener which modifies this part of the tree to
-        // replace the OR node with the chosen branch when pressed
+        // Create a new OR element, add all the child nodes as children to it. Then
+        // add a listener which modifies this part of the tree to replace the OR node
+        // with the chosen branch when pressed
         const selectEl = (
             OrNode.converterSelectTemplate.content.cloneNode(true) as HTMLElement
         ).firstElementChild! as HTMLElement; // #casting
@@ -44,19 +47,25 @@ export class OrNode extends ResourceTreeBoolNode {
         for (let i = 0; i < this.children.length; i++) {
             const option = this.children[i];
 
-            const optionEl = option.getElement(this, settingsForm, multiplier);
+            const optionEl = option.getElement(
+                this,
+                settingsForm,
+                multiplier,
+                requestingConverter,
+            );
             if (!optionEl) continue; // Ignore invalid paths. TODO: If a multiplier-0
-            //                        branch is discovered, add that as an option
+            //                          branch is discovered, add that as an option
             selectList.appendChild(optionEl);
 
             // Add a listener for selecting an option
             if (optionEl) {
-                optionEl.onclick = () => {
-                    // Replace the OR node with the chosen option
-                    parent.replaceChild(this, option);
-                    selectEl.replaceWith(optionEl);
-                    optionEl.onclick = null;
-                };
+                optionEl.onclick = this.getOnClickForOption(
+                    parent,
+                    option,
+                    selectEl,
+                    optionEl,
+                    requestingConverter,
+                );
             }
 
             // Don't add an "OR" after the last option
@@ -70,6 +79,38 @@ export class OrNode extends ResourceTreeBoolNode {
 
         // Return the finished element
         return selectEl;
+    }
+
+    protected getOnClickForOption(
+        parent: ResourceTreeNode,
+        option: ResourceTree,
+        selectEl: HTMLElement,
+        optionEl: HTMLElement,
+        requestingConverter: IntermediateConverter,
+    ) {
+        return () => {
+            this.collapseNode(
+                parent,
+                option,
+                selectEl,
+                optionEl,
+                requestingConverter,
+            );
+        };
+    }
+
+    // Collapse this node with the given option
+    public collapseNode(
+        orParent: ResourceTreeNode,
+        option: ResourceTree,
+        selectEl: HTMLElement,
+        optionEl: HTMLElement,
+        _requestingConverter: IntermediateConverter,
+    ) {
+        console.log("Collapsing OR node", this, "with parent", orParent);
+        orParent.replaceChild(this, option);
+        selectEl.replaceWith(optionEl);
+        optionEl.onclick = null;
     }
 
     public override addResourcesToList(

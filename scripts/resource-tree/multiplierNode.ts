@@ -1,4 +1,5 @@
 import { ConverterSettings } from "../converterSettings";
+import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
 import { Resource } from "../resource";
 import { ConverterIngredient, SettingsTreeNode } from "../types";
@@ -19,6 +20,7 @@ export class MultiplierNode extends ResourceTreeNode {
         _: ResourceTreeNode | null,
         settingsForm: HTMLFormElement,
         multiplier: Rational,
+        requestingConverter: IntermediateConverter,
     ): HTMLElement | null {
         // Parse the settings to modify the multiplier
         multiplier = multiplier.mul(
@@ -30,7 +32,12 @@ export class MultiplierNode extends ResourceTreeNode {
         );
 
         // Add the resource multiplied by the new multiplier
-        return this.resource.getElement(this, settingsForm, multiplier);
+        return this.resource.getElement(
+            this,
+            settingsForm,
+            multiplier,
+            requestingConverter,
+        );
     }
 
     public override addResourcesToList(

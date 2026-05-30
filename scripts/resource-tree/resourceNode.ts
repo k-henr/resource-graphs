@@ -1,5 +1,6 @@
 import { ConverterSettings } from "../converterSettings";
 import { getResource } from "../data";
+import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
 import { Resource } from "../resource";
 import { ConverterIngredient } from "../types";
@@ -25,8 +26,9 @@ export class ResourceNode extends ResourceTree {
 
     public override getElement(
         _: ResourceTreeNode | null,
-        settingsForm: HTMLFormElement,
+        __: HTMLFormElement,
         multiplier: Rational,
+        ___: IntermediateConverter,
     ): HTMLElement | null {
         // Just make a resource element
         const resEl = this.createIngredientElement(multiplier);
