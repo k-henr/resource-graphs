@@ -21,7 +21,7 @@
             "type": "MULTIPLIER",
             "multiplier": {
                 "type": "ADD",
-                "terms": [
+                "values": [
                     60,
                     {
                         "type": "TOGGLE",
@@ -91,7 +91,7 @@
             "type": "MULTIPLIER",
             "multiplier": {
                 "type": "ADD",
-                "terms": [
+                "values": [
                     1.2,
                     {
                         "type": "TOGGLE",

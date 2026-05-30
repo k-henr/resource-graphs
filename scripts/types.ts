@@ -176,30 +176,30 @@ export type SettingsTreeMathNode =
 // Mutliply the given nodes together
 export type SettingsTreeMulNode = {
     type: "MUL";
-    factors: SettingsTreeNode[];
+    values: SettingsTreeNode[];
 };
 // Divide the nodes
 export type SettingsTreeDivNode = {
     type: "DIV";
-    numerator: SettingsTreeNode;
-    denominator: SettingsTreeNode;
+    value1: SettingsTreeNode;
+    value2: SettingsTreeNode;
 };
 // Add the nodes
 export type SettingsTreeAddNode = {
     type: "ADD";
-    terms: SettingsTreeNode[];
+    values: SettingsTreeNode[];
 };
 // Subtract the nodes
 export type SettingsTreeSubNode = {
     type: "SUB";
-    term1: SettingsTreeNode;
-    term2: SettingsTreeNode;
+    value1: SettingsTreeNode;
+    value2: SettingsTreeNode;
 };
 // Raise one node to the power of the other
 export type SettingsTreePowNode = {
     type: "POW";
-    base: SettingsTreeNode;
-    exponent: SettingsTreeNode;
+    value1: SettingsTreeNode;
+    value2: SettingsTreeNode;
 };
 
 // Represents the settings after parsing, outside of the AST. Not json types!

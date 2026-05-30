@@ -150,29 +150,29 @@ export class MultiplierNode extends ResourceTreeNode {
 
             case "MUL":
                 let p = Rational.one;
-                for (const child of treeNode.factors)
+                for (const child of treeNode.values)
                     p = p.mul(this.evaluateSettingsTree(child, form, formData));
                 return p;
 
             case "DIV":
                 return this.evaluateSettingsTree(
-                    treeNode.numerator,
+                    treeNode.value1,
                     form,
                     formData,
-                ).div(
-                    this.evaluateSettingsTree(treeNode.denominator, form, formData),
-                );
+                ).div(this.evaluateSettingsTree(treeNode.value2, form, formData));
 
             case "ADD":
                 let s = Rational.zero;
-                for (const child of treeNode.terms)
+                for (const child of treeNode.values)
                     s = s.add(this.evaluateSettingsTree(child, form, formData));
                 return s;
 
             case "SUB":
-                return this.evaluateSettingsTree(treeNode.term1, form, formData).sub(
-                    this.evaluateSettingsTree(treeNode.term2, form, formData),
-                );
+                return this.evaluateSettingsTree(
+                    treeNode.value1,
+                    form,
+                    formData,
+                ).sub(this.evaluateSettingsTree(treeNode.value2, form, formData));
 
             case "POW":
                 // Hmmmmmm... need to think how to do this

@@ -38,12 +38,8 @@
             },
             "multiplier": {
                 "type": "MUL",
-                "factors": [
-                    {
-                        "type": "DIV",
-                        "numerator": 85,
-                        "denominator": 21
-                    },
+                "values": [
+                    [85, 21],
                     {
                         "type": "NUMBER",
                         "name": "Flow rate",
@@ -51,12 +47,12 @@
                     },
                     {
                         "type": "SUB",
-                        "term1": {
+                        "value1": {
                             "type": "NUMBER",
                             "name": "Steam temperature",
                             "default": 125
                         },
-                        "term2": 95
+                        "value2": 95
                     }
                 ]
             }

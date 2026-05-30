@@ -27,27 +27,28 @@ export class ConverterSettings {
                 return;
 
             case "MUL":
-                for (const factor of astNode.factors)
+                for (const factor of astNode.values)
                     this.registerSettingsFromAst(factor);
                 return;
 
             case "DIV":
-                this.registerSettingsFromAst(astNode.numerator);
-                this.registerSettingsFromAst(astNode.denominator);
+                this.registerSettingsFromAst(astNode.value1);
+                this.registerSettingsFromAst(astNode.value2);
                 return;
 
             case "ADD":
-                for (const term of astNode.terms) this.registerSettingsFromAst(term);
+                for (const term of astNode.values)
+                    this.registerSettingsFromAst(term);
                 return;
 
             case "SUB":
-                this.registerSettingsFromAst(astNode.term1);
-                this.registerSettingsFromAst(astNode.term2);
+                this.registerSettingsFromAst(astNode.value1);
+                this.registerSettingsFromAst(astNode.value2);
                 return;
 
             case "POW":
-                this.registerSettingsFromAst(astNode.base);
-                this.registerSettingsFromAst(astNode.exponent);
+                this.registerSettingsFromAst(astNode.value1);
+                this.registerSettingsFromAst(astNode.value2);
                 return;
         }
     }

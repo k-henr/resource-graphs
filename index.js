@@ -202,23 +202,24 @@
           }
           return;
         case "MUL":
-          for (const factor of astNode.factors)
+          for (const factor of astNode.values)
             this.registerSettingsFromAst(factor);
           return;
         case "DIV":
-          this.registerSettingsFromAst(astNode.numerator);
-          this.registerSettingsFromAst(astNode.denominator);
+          this.registerSettingsFromAst(astNode.value1);
+          this.registerSettingsFromAst(astNode.value2);
           return;
         case "ADD":
-          for (const term of astNode.terms) this.registerSettingsFromAst(term);
+          for (const term of astNode.values)
+            this.registerSettingsFromAst(term);
           return;
         case "SUB":
-          this.registerSettingsFromAst(astNode.term1);
-          this.registerSettingsFromAst(astNode.term2);
+          this.registerSettingsFromAst(astNode.value1);
+          this.registerSettingsFromAst(astNode.value2);
           return;
         case "POW":
-          this.registerSettingsFromAst(astNode.base);
-          this.registerSettingsFromAst(astNode.exponent);
+          this.registerSettingsFromAst(astNode.value1);
+          this.registerSettingsFromAst(astNode.value2);
           return;
       }
     }
@@ -899,26 +900,26 @@
           return Rational.zero;
         case "MUL":
           let p = Rational.one;
-          for (const child of treeNode.factors)
+          for (const child of treeNode.values)
             p = p.mul(this.evaluateSettingsTree(child, form, formData));
           return p;
         case "DIV":
           return this.evaluateSettingsTree(
-            treeNode.numerator,
+            treeNode.value1,
             form,
             formData
-          ).div(
-            this.evaluateSettingsTree(treeNode.denominator, form, formData)
-          );
+          ).div(this.evaluateSettingsTree(treeNode.value2, form, formData));
         case "ADD":
           let s = Rational.zero;
-          for (const child of treeNode.terms)
+          for (const child of treeNode.values)
             s = s.add(this.evaluateSettingsTree(child, form, formData));
           return s;
         case "SUB":
-          return this.evaluateSettingsTree(treeNode.term1, form, formData).sub(
-            this.evaluateSettingsTree(treeNode.term2, form, formData)
-          );
+          return this.evaluateSettingsTree(
+            treeNode.value1,
+            form,
+            formData
+          ).sub(this.evaluateSettingsTree(treeNode.value2, form, formData));
         case "POW":
           throw new Error("Powers aren't supported yet!");
       }

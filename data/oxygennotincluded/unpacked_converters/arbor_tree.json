@@ -24,7 +24,7 @@
             "type": "MULTIPLIER",
             "multiplier": {
                 "type": "MUL",
-                "factors": [
+                "values": [
                     {
                         "type": "ENUMERATE",
                         "name": "Number of branches",
