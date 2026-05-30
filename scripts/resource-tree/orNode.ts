@@ -1,6 +1,7 @@
 import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
 import { ConverterIngredient } from "../types";
+import { NothingNode } from "./nothingNode";
 import { ResourceTree } from "./resourceTree";
 import { ResourceTreeBoolNode } from "./resourceTreeBoolNode";
 import { ResourceTreeNode } from "./resourceTreeNode";
@@ -44,41 +45,85 @@ export class OrNode extends ResourceTreeBoolNode {
             ".converter-select-children",
         )!;
 
-        for (let i = 0; i < this.children.length; i++) {
-            const option = this.children[i];
+        let encounteredEmptyNode = false;
 
-            const optionEl = option.getElement(
-                this,
+        for (let i = 0; i < this.children.length; i++) {
+            const el = this.addOptionElement(
+                this.children[i],
                 settingsForm,
                 multiplier,
+                parent,
+                selectEl,
+                selectList,
                 requestingConverter,
             );
-            if (!optionEl) continue; // Ignore invalid paths. TODO: If a multiplier-0
-            //                          branch is discovered, add that as an option
-            selectList.appendChild(optionEl);
-
-            // Add a listener for selecting an option
-            if (optionEl) {
-                optionEl.onclick = this.getOnClickForOption(
-                    parent,
-                    option,
-                    selectEl,
-                    optionEl,
-                    requestingConverter,
-                );
+            if (el === null) {
+                encounteredEmptyNode = true;
+            } else {
+                if (i !== this.children.length - 1) this.addOrElement(selectList);
             }
+        }
 
-            // Don't add an "OR" after the last option
-            if (i + 1 === this.children.length) break;
-
-            const orEl = OrNode.converterOrTemplate.content.cloneNode(
-                true,
-            ) as DocumentFragment;
-            selectList.appendChild(orEl);
+        // If there should be a "nothing" option, add it
+        if (encounteredEmptyNode) {
+            console.log("Encounteered empty node");
+            if (true) this.addOrElement(selectList); // If there were any previous options
+            // Make a dummy "nothing" node
+            const nothingNode = new NothingNode();
+            this.addOptionElement(
+                nothingNode,
+                settingsForm,
+                multiplier,
+                parent,
+                selectEl,
+                selectList,
+                requestingConverter,
+            );
         }
 
         // Return the finished element
         return selectEl;
+    }
+
+    // Add an element for the given option
+    private addOptionElement(
+        option: ResourceTree,
+        settingsForm: HTMLFormElement,
+        multiplier: Rational,
+        parent: ResourceTreeNode,
+        selectEl: HTMLElement,
+        selectList: Element,
+        requestingConverter: IntermediateConverter,
+    ): HTMLElement | null {
+        const optionEl = option.getElement(
+            this,
+            settingsForm,
+            multiplier,
+            requestingConverter,
+        );
+
+        // Add a listener for selecting an option
+        if (optionEl) {
+            selectList.appendChild(optionEl);
+            optionEl.onclick = this.getOnClickForOption(
+                parent,
+                option,
+                selectEl,
+                optionEl,
+                requestingConverter,
+            );
+        } else {
+            return null;
+        }
+
+        return optionEl;
+    }
+
+    private addOrElement(list: Element) {
+        const orEl = OrNode.converterOrTemplate.content.cloneNode(
+            true,
+        ) as DocumentFragment;
+        list.appendChild(orEl);
     }
 
     protected getOnClickForOption(
@@ -107,7 +152,6 @@ export class OrNode extends ResourceTreeBoolNode {
         optionEl: HTMLElement,
         _requestingConverter: IntermediateConverter,
     ) {
-        console.log("Collapsing OR node", this, "with parent", orParent);
         orParent.replaceChild(this, option);
         selectEl.replaceWith(optionEl);
         optionEl.onclick = null;

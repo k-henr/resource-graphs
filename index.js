@@ -603,6 +603,33 @@
     }
   };
 
+  // scripts/resource-tree/nothingNode.ts
+  var NothingNode = class _NothingNode extends ResourceTree {
+    static converterIngredientTemplate = document.querySelector(
+      "template#converter-ingredient-template"
+    );
+    constructor() {
+      super();
+    }
+    getElement(_parent, _settingsForm, _multiplier, _requestingConverter) {
+      const el = _NothingNode.converterIngredientTemplate.content.cloneNode(
+        true
+      ).firstElementChild;
+      el.querySelector(".converter-ingredient-name").innerText = `[Nothing]`;
+      el.querySelector(".converter-ingredient-image").remove();
+      return el;
+    }
+    addResourcesToList(output, _) {
+      return output;
+    }
+    getAllPossibleResources(output) {
+      return output;
+    }
+    registerSettings(s) {
+      return s;
+    }
+  };
+
   // scripts/resource-tree/orNode.ts
   var OrNode = class _OrNode extends ResourceTreeBoolNode {
     constructor(options) {
@@ -623,32 +650,66 @@
       const selectList = selectEl.querySelector(
         ".converter-select-children"
       );
+      let encounteredEmptyNode = false;
       for (let i = 0; i < this.children.length; i++) {
-        const option = this.children[i];
-        const optionEl = option.getElement(
-          this,
+        const el = this.addOptionElement(
+          this.children[i],
           settingsForm,
           multiplier,
+          parent,
+          selectEl,
+          selectList,
           requestingConverter
         );
-        if (!optionEl) continue;
-        selectList.appendChild(optionEl);
-        if (optionEl) {
-          optionEl.onclick = this.getOnClickForOption(
-            parent,
-            option,
-            selectEl,
-            optionEl,
-            requestingConverter
-          );
+        if (el === null) {
+          encounteredEmptyNode = true;
+        } else {
+          if (i !== this.children.length - 1) this.addOrElement(selectList);
         }
-        if (i + 1 === this.children.length) break;
-        const orEl = _OrNode.converterOrTemplate.content.cloneNode(
-          true
+      }
+      if (encounteredEmptyNode) {
+        console.log("Encounteered empty node");
+        if (true) this.addOrElement(selectList);
+        const nothingNode = new NothingNode();
+        this.addOptionElement(
+          nothingNode,
+          settingsForm,
+          multiplier,
+          parent,
+          selectEl,
+          selectList,
+          requestingConverter
         );
-        selectList.appendChild(orEl);
       }
       return selectEl;
+    }
+    // Add an element for the given option
+    addOptionElement(option, settingsForm, multiplier, parent, selectEl, selectList, requestingConverter) {
+      const optionEl = option.getElement(
+        this,
+        settingsForm,
+        multiplier,
+        requestingConverter
+      );
+      if (optionEl) {
+        selectList.appendChild(optionEl);
+        optionEl.onclick = this.getOnClickForOption(
+          parent,
+          option,
+          selectEl,
+          optionEl,
+          requestingConverter
+        );
+      } else {
+        return null;
+      }
+      return optionEl;
+    }
+    addOrElement(list) {
+      const orEl = _OrNode.converterOrTemplate.content.cloneNode(
+        true
+      );
+      list.appendChild(orEl);
     }
     getOnClickForOption(parent, option, selectEl, optionEl, requestingConverter) {
       return () => {
@@ -663,7 +724,6 @@
     }
     // Collapse this node with the given option
     collapseNode(orParent, option, selectEl, optionEl, _requestingConverter) {
-      console.log("Collapsing OR node", this, "with parent", orParent);
       orParent.replaceChild(this, option);
       selectEl.replaceWith(optionEl);
       optionEl.onclick = null;
@@ -762,6 +822,7 @@
           new FormData(settingsForm)
         )
       );
+      if (multiplier.equals(Rational.zero)) return null;
       return this.resource.getElement(
         this,
         settingsForm,
@@ -777,6 +838,7 @@
           settingsForm ? new FormData(settingsForm) : null
         )
       );
+      if (multiplier.equals(Rational.zero)) return output;
       this.resource.addResourcesToList(output, settingsForm, multiplier);
       return output;
     }

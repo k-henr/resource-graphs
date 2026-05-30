@@ -31,6 +31,9 @@ export class MultiplierNode extends ResourceTreeNode {
             ),
         );
 
+        // If the multiplier is 0, don't continue
+        if (multiplier.equals(Rational.zero)) return null;
+
         // Add the resource multiplied by the new multiplier
         return this.resource.getElement(
             this,
@@ -53,6 +56,9 @@ export class MultiplierNode extends ResourceTreeNode {
                 settingsForm ? new FormData(settingsForm) : null,
             ),
         );
+        // If the multiplier is 0, don't continue
+        if (multiplier.equals(Rational.zero)) return output;
+
         this.resource.addResourcesToList(output, settingsForm, multiplier);
         return output;
     }
