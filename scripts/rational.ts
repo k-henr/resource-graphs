@@ -55,13 +55,12 @@ export class Rational {
     ): Rational | null {
         // Split into "a b/c", "a", "b/c"
 
-        // TODO: Need to rework thisto be less yucky
-        // I need to match against " +", but only if both FULL *and* NUM/DEN are
-        // filled
+        // Matches for any decimal number followed by a fraction. Any part can be
+        // omitted
         const matcher =
-            /^ *(?<NEG>-)? *(?:(?<FULL>\d+(\.\d*)?))? +(?:(?<NUM>\d+) *\/ *(?<DEN>\d+))? *$/;
+            /^ *(?<NEG>-)? *(?:(?<FULL>\d*?(?:\.\d*)?)) *(?:(?<NUM>\d+) *\/ *(?<DEN>\d+))? *$/;
         // Need to padd with spaces atm to satisfy the bad matcher
-        const match = (" " + inputString + " ").match(matcher);
+        const match = inputString.match(matcher);
 
         if (!match || !match.groups) {
             inputEl?.classList.add("input-invalid-amount");

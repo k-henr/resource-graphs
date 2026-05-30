@@ -54,8 +54,8 @@ Please report this as a bug!`);
     // Parse the input from an input element into a rational, or make the input node
     // red if unparsable
     static fromInput(inputString, inputEl) {
-      const matcher = /^ *(?<NEG>-)? *(?:(?<FULL>\d+(\.\d*)?))? +(?:(?<NUM>\d+) *\/ *(?<DEN>\d+))? *$/;
-      const match = (" " + inputString + " ").match(matcher);
+      const matcher = /^ *(?<NEG>-)? *(?:(?<FULL>\d*?(?:\.\d*)?)) *(?:(?<NUM>\d+) *\/ *(?<DEN>\d+))? *$/;
+      const match = inputString.match(matcher);
       if (!match || !match.groups) {
         inputEl?.classList.add("input-invalid-amount");
         return null;
