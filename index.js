@@ -583,17 +583,19 @@
               settingsForm,
               multiplier
             );
-            option.onclick = () => {
-              if (!parentContext)
-                throw new Error("An OR node can't be a root node!");
-              if (parentContext.parent.type === "MULTIPLIER") {
-                parentContext.parent.resource = res;
-              } else {
-                parentContext.parent.resources[parentContext.index] = res;
-              }
-              selectEl.replaceWith(option);
-              option.onclick = null;
-            };
+            if (!parentContext)
+              throw new Error("An OR node can't be a root node!");
+            if (option) {
+              option.onclick = () => {
+                if (parentContext.parent.type === "MULTIPLIER") {
+                  parentContext.parent.resource = res;
+                } else {
+                  parentContext.parent.resources[parentContext.index] = res;
+                }
+                selectEl.replaceWith(option);
+                option.onclick = null;
+              };
+            }
             if (i + 1 === node.resources.length) break;
             const orEl = _IntermediateConverter.converterOrTemplate.content.cloneNode(
               true
@@ -647,7 +649,7 @@
             this.evaluateSettingsTree(
               node.multiplier,
               form,
-              new FormData(form)
+              form ? new FormData(form) : null
             )
           );
           this.resourceTreeToList(node.resource, output, form, multiplier);
@@ -664,6 +666,9 @@
         return Rational.fromData(treeNode);
       switch (treeNode.type) {
         case "NUMBER":
+          if (!form || !formData) {
+            return Rational.fromData(treeNode.default);
+          }
           const el = form.querySelector(
             `input[name="${treeNode.name}"]`
           );
@@ -677,14 +682,14 @@
           return num;
         case "TOGGLE":
           return this.evaluateSettingsTree(
-            form.querySelector(
+            form?.querySelector(
               `input[name="${treeNode.name}"]`
             )?.checked ?? treeNode.default ? treeNode.true : treeNode.false,
             form,
             formData
           );
         case "ENUMERATE":
-          const chosen = form.querySelector(
+          const chosen = form?.querySelector(
             `select[name="${treeNode.name}"]`
           )?.value.valueOf() ?? treeNode.default;
           for (const [selector, option] of treeNode.options) {

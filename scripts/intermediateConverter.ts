@@ -7,7 +7,6 @@ import {
     ResourceTree,
     ResourceTreeLeaf,
     ResourceTreeNode,
-    ResourceTreeBooleanNode,
     Setting,
     SettingsTreeNode,
 } from "./types";
@@ -319,7 +318,7 @@ export class IntermediateConverter {
         el: Element,
         settingsForm: HTMLFormElement,
         multiplier: Rational = Rational.one,
-    ): HTMLElement {
+    ): HTMLElement | null {
         // If the multiplier is zero, don't add this branch to the tree since it'll
         // all just be zero
         if (multiplier.equals(Rational.zero)) return document.createElement("div");
@@ -374,24 +373,26 @@ export class IntermediateConverter {
                         multiplier,
                     );
 
+                    // (since I wrap everything in an AND node, this shouldn't
+                    // happen so it's fine that I don't support it)
+                    if (!parentContext)
+                        throw new Error("An OR node can't be a root node!");
+
                     // Add a listener for selecting an option
-                    option.onclick = () => {
-                        // (since I wrap everything in an AND node, this shouldn't
-                        // happen so it's fine that I don't support it)
-                        if (!parentContext)
-                            throw new Error("An OR node can't be a root node!");
+                    if (option) {
+                        option.onclick = () => {
+                            // Replace the OR node with the chosen option
+                            if (parentContext.parent.type === "MULTIPLIER") {
+                                parentContext.parent.resource = res;
+                            } else {
+                                parentContext.parent.resources[parentContext.index] =
+                                    res;
+                            }
+                            selectEl.replaceWith(option);
 
-                        // Replace the OR node with the chosen option
-                        if (parentContext.parent.type === "MULTIPLIER") {
-                            parentContext.parent.resource = res;
-                        } else {
-                            parentContext.parent.resources[parentContext.index] =
-                                res;
-                        }
-                        selectEl.replaceWith(option);
-
-                        option.onclick = null;
-                    };
+                            option.onclick = null;
+                        };
+                    }
 
                     if (i + 1 === node.resources.length) break;
 
@@ -449,7 +450,7 @@ export class IntermediateConverter {
     private resourceTreeToList(
         node: ResourceTree<true>,
         output: ConverterIngredient[],
-        form: HTMLFormElement, // If running "headless" with default settings, this is null
+        form: HTMLFormElement | null, // If running "headless" with default settings, this is null
         multiplier: Rational = Rational.one,
     ) {
         switch (node.type) {
@@ -469,7 +470,7 @@ export class IntermediateConverter {
                     this.evaluateSettingsTree(
                         node.multiplier,
                         form,
-                        new FormData(form),
+                        form ? new FormData(form) : null,
                     ),
                 );
                 this.resourceTreeToList(node.resource, output, form, multiplier);
@@ -485,14 +486,17 @@ export class IntermediateConverter {
 
     private evaluateSettingsTree(
         treeNode: SettingsTreeNode,
-        form: HTMLFormElement,
-        formData: FormData,
+        form: HTMLFormElement | null,
+        formData: FormData | null,
     ): Rational {
         if (typeof treeNode === "number" || Array.isArray(treeNode))
             return Rational.fromData(treeNode);
 
         switch (treeNode.type) {
             case "NUMBER":
+                if (!form || !formData) {
+                    return Rational.fromData(treeNode.default);
+                }
                 // Get the setting from the form data
                 const el = form.querySelector<HTMLInputElement>(
                     `input[name="${treeNode.name}"]`,
@@ -508,7 +512,7 @@ export class IntermediateConverter {
 
             case "TOGGLE":
                 return this.evaluateSettingsTree(
-                    (form.querySelector<HTMLInputElement>(
+                    (form?.querySelector<HTMLInputElement>(
                         `input[name="${treeNode.name}"]`,
                     )?.checked ?? treeNode.default)
                         ? treeNode.true
@@ -520,7 +524,7 @@ export class IntermediateConverter {
             case "ENUMERATE":
                 const chosen =
                     form
-                        .querySelector<HTMLInputElement>(
+                        ?.querySelector<HTMLInputElement>(
                             `select[name="${treeNode.name}"]`,
                         )
                         ?.value.valueOf() ?? treeNode.default;

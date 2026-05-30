@@ -131,7 +131,7 @@
                 "options": [
                     ["Lavatory", 11.7],
                     ["Outhouse", 0],
-                    ["Accident", 6.7]
+                    ["Accident", 2]
                 ]
             },
             "resource": {
