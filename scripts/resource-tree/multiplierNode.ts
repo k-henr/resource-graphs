@@ -1,5 +1,5 @@
 import { ConverterSettings } from "../converterSettings";
-import { ProgramError } from "../errors";
+import { GraphError, ProgramError } from "../errors";
 import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
 import { ConverterIngredient, SettingsTreeNode } from "../types";
@@ -21,10 +21,12 @@ export class MultiplierNode implements ResourceTreeNode {
         multiplier: Rational,
         requestingConverter: IntermediateConverter,
     ): HTMLElement | null {
-        // Parse the settings to modify the multiplier
-        multiplier = multiplier.mul(
-            this.evaluateSettingsTree(this.multiplierAst, settings),
+        const newMultiplier = this.evaluateSettingsTree(
+            this.multiplierAst,
+            settings,
         );
+        // Parse the settings to modify the multiplier
+        multiplier = multiplier.mul(newMultiplier);
 
         // If the multiplier is 0, don't continue
         if (multiplier.equals(Rational.zero)) return null;
@@ -101,6 +103,11 @@ export class MultiplierNode implements ResourceTreeNode {
             case "POW":
                 // Hmmmmmm... need to think how to do this
                 throw new ProgramError("Powers aren't supported yet!");
+
+            default:
+                throw new GraphError(
+                    `Unknown settings AST node type: ${(treeNode as any).type}!`,
+                );
         }
     }
 }

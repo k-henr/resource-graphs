@@ -4,6 +4,7 @@
     "thumbName": "Hatch",
     "settings": [
         { "type": "TOGGLE", "name": "Wild", "default": false },
+        { "type": "TOGGLE", "name": "Cramped", "default": false },
         {
             "type": "ENUMERATE",
             "name": "Mood",
@@ -76,7 +77,7 @@
                 "name": "Cramped",
                 "true": 0,
                 "false": {
-                    "type": "TOGGLE",
+                    "type": "SETTING",
                     "name": "Wild",
                     "true": [1, 95],
                     "false": {

@@ -87,7 +87,7 @@ export class Rational {
         );
     }
 
-    public mul(v: Rational /*| number*/) {
+    public mul(v: Rational | number) {
         if (typeof v === "number") {
             return new Rational(this.numerator * v, this.denominator);
         } else {

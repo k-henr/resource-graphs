@@ -800,9 +800,11 @@ Please report this as a bug!`);
       this.resource = resource;
     }
     getElement(_, settings, multiplier, requestingConverter) {
-      multiplier = multiplier.mul(
-        this.evaluateSettingsTree(this.multiplierAst, settings)
+      const newMultiplier = this.evaluateSettingsTree(
+        this.multiplierAst,
+        settings
       );
+      multiplier = multiplier.mul(newMultiplier);
       if (multiplier.equals(Rational.zero)) return null;
       return this.resource.getElement(
         this,
@@ -855,6 +857,10 @@ Please report this as a bug!`);
           );
         case "POW":
           throw new ProgramError("Powers aren't supported yet!");
+        default:
+          throw new GraphError(
+            `Unknown settings AST node type: ${treeNode.type}!`
+          );
       }
     }
   };
