@@ -176,7 +176,6 @@ function handleOrInput(tree: ResourceTreeData, output: ResourceTree[]) {
             output.push(resourceTreeDataToClass(tree));
             break;
         case "TAG":
-            console.log("Discovered TAG in OR");
             const amount = Rational.fromData(tree.amount);
             const resources = getResourcesWithTag(tree.tagName);
             // Create a dummy resource for every resource in the TAG and add as an

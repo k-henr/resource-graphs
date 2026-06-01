@@ -130,19 +130,11 @@ export class IntermediateConverter {
     }
 
     public collapseEntangledOrs(entangledOrId: string, optionId: string) {
-        console.log(
-            "Collapsing entangled ORs with ID",
-            entangledOrId,
-            "into option",
-            optionId,
-        );
         // Loop through all entangled ORs, see their IDs, and collapse them if it
         //  matches
         for (const data of [...this.entangledOrs]) {
             const [id, node] = data;
             if (id !== entangledOrId) continue;
-
-            console.log("Found entOR");
 
             node.collapseNodeUsingId(optionId);
             this.unregisterEntangledOr(node);

@@ -68,7 +68,6 @@ export class OrNode extends ResourceTreeBoolNode {
 
         // If there should be a "nothing" option, add it
         if (encounteredEmptyNode) {
-            console.log("Encounteered empty node");
             if (true) this.addOrElement(selectList); // If there were any previous options
             // Make a dummy "nothing" node
             const nothingNode = new NothingNode();

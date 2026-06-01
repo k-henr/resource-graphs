@@ -73,9 +73,7 @@ export class EntangledOrNode extends OrNode {
     }
 
     public collapseNodeUsingId(id: string) {
-        console.log("Collapsing EntOr into id", id);
         const onclick = this.onclicks.get(id);
-        console.log(onclick);
 
         if (!onclick)
             throw new GraphError(

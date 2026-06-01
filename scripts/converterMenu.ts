@@ -117,7 +117,6 @@ export class ConverterMenu extends SubmitMenu {
         const formData = new FormData(this.filterForm);
         this.searchString = String(formData.get("search-string")!.valueOf());
 
-        console.log("Applying search string: " + this.searchString);
         const converterList = getConverterFactoriesWithFilters(
             this.searchString,
             this.resourceBeingRequested ? [this.resourceBeingRequested] : [],

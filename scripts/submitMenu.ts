@@ -22,6 +22,9 @@ export abstract class SubmitMenu {
     protected infoPanel: HTMLElement;
     protected showOnOpen: HTMLElement;
 
+    protected isOpen: boolean = false;
+    protected detailIsOpen: boolean = false;
+
     constructor(
         graph: ResourceGraph,
         menuElement: HTMLElement,
@@ -63,7 +66,6 @@ export abstract class SubmitMenu {
         // Submit filter form on any change in input elements
         for (const el of filterForm.getElementsByTagName("input")) {
             el.oninput = () => {
-                console.log(filterForm);
                 filterForm.requestSubmit();
             };
         }
@@ -87,6 +89,7 @@ export abstract class SubmitMenu {
         this.headerElement.classList.remove("hidden");
         this.filterForm.classList.remove("hidden");
         this.submissionForm.classList.remove("hidden");
+        this.isOpen = true;
     }
 
     public close() {
@@ -94,19 +97,21 @@ export abstract class SubmitMenu {
         this.clearFilters();
         this.menuElement.classList.add("hidden");
         this.headerElement.classList.add("hidden");
-        console.log(this.headerElement);
         this.filterForm.classList.add("hidden");
         this.submissionForm.classList.add("hidden");
         this.infoPanel.innerHTML = "";
+        this.isOpen = false;
     }
 
     public openDetailPopup() {
         this.submissionForm.reset();
         this.detailPopup.classList.remove("hidden");
+        this.detailIsOpen = true;
     }
 
     public closeDetailPopup() {
         this.detailPopup.classList.add("hidden");
+        this.detailIsOpen = false;
     }
 
     protected addThumbToTagLists(
@@ -193,5 +198,19 @@ export abstract class SubmitMenu {
         thumb.querySelector<HTMLImageElement>("img.thumb-image")!.src = image;
         thumb.onclick = onclick;
         return thumb;
+    }
+
+    public handleEscapePress() {
+        // If closed, ignore
+        if (!this.isOpen) return;
+
+        // If detail popup is open, close it
+        if (this.detailIsOpen) {
+            this.closeDetailPopup();
+            return;
+        }
+
+        // Otherwise, close the whole menu
+        this.close();
     }
 }

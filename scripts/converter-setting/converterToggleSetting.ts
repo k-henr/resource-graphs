@@ -31,8 +31,6 @@ export class ConverterToggleSetting extends ConverterSetting {
     public override chooseBranch(data: SettingsTreeInputNode): SettingsTreeNode {
         const node = data as SettingsTreeToggleInput;
 
-        console.log(data);
-
         if (!Object.hasOwn(node, "true") || !Object.hasOwn(node, "false")) {
             throw new GraphError(
                 `A branch is missing from the toggle setting "${data.name}"!`,

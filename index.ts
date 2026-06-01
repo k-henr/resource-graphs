@@ -141,6 +141,14 @@ import { displayErr, GraphError } from "./scripts/errors";
             cFormWrapper,
         );
 
+        // Close menus when pressing ESC
+        document.onkeydown = (e) => {
+            if (e.code === "Escape") {
+                converterMenu.handleEscapePress();
+                resourceMenu.handleEscapePress();
+            }
+        };
+
         // Open/close converter menu too
         // TODO: Move these into submitMenu
         document.querySelector<HTMLElement>("#open-converter-menu-button")!.onclick =

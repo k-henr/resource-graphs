@@ -27,7 +27,6 @@ export class ConverterSettings {
 
         // Go through the list and populate the settings form
         for (const data of settings) {
-            console.log(data);
             const setting = ConverterSettings.makeSettingInstance(
                 data,
                 requestingConverter,

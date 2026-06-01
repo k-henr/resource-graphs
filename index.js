@@ -330,7 +330,6 @@ Please report this as a bug!`);
     }
     chooseBranch(data) {
       const node = data;
-      console.log(data);
       if (!Object.hasOwn(node, "true") || !Object.hasOwn(node, "false")) {
         throw new GraphError(
           `A branch is missing from the toggle setting "${data.name}"!`
@@ -354,7 +353,6 @@ Please report this as a bug!`);
     constructor(settings, requestingConverter) {
       _ConverterSettings.settingsForm.innerHTML = "";
       for (const data of settings) {
-        console.log(data);
         const setting = _ConverterSettings.makeSettingInstance(
           data,
           requestingConverter
@@ -502,16 +500,9 @@ Please report this as a bug!`);
       }
     }
     collapseEntangledOrs(entangledOrId, optionId) {
-      console.log(
-        "Collapsing entangled ORs with ID",
-        entangledOrId,
-        "into option",
-        optionId
-      );
       for (const data of [...this.entangledOrs]) {
         const [id, node] = data;
         if (id !== entangledOrId) continue;
-        console.log("Found entOR");
         node.collapseNodeUsingId(optionId);
         this.unregisterEntangledOr(node);
       }
@@ -653,7 +644,6 @@ Please report this as a bug!`);
         }
       }
       if (encounteredEmptyNode) {
-        console.log("Encounteered empty node");
         if (true) this.addOrElement(selectList);
         const nothingNode = new NothingNode();
         this.addOptionElement(
@@ -771,9 +761,7 @@ Please report this as a bug!`);
       );
     }
     collapseNodeUsingId(id) {
-      console.log("Collapsing EntOr into id", id);
       const onclick = this.onclicks.get(id);
-      console.log(onclick);
       if (!onclick)
         throw new GraphError(
           `Option with id ${id} not present on this entangled OR!`
@@ -1070,7 +1058,6 @@ Please report this as a bug!`);
         output.push(resourceTreeDataToClass(tree));
         break;
       case "TAG":
-        console.log("Discovered TAG in OR");
         const amount = Rational.fromData(tree.amount);
         const resources = getResourcesWithTag(tree.tagName);
         for (const [id] of resources) {
@@ -1247,6 +1234,8 @@ Please report this as a bug!`);
     submissionForm;
     infoPanel;
     showOnOpen;
+    isOpen = false;
+    detailIsOpen = false;
     constructor(graph, menuElement, detailPopup, headerElement, thumbList, filterForm, submissionForm, infoPanel, showOnOpen) {
       this.graph = graph;
       this.menuElement = menuElement;
@@ -1272,7 +1261,6 @@ Please report this as a bug!`);
       };
       for (const el of filterForm.getElementsByTagName("input")) {
         el.oninput = () => {
-          console.log(filterForm);
           filterForm.requestSubmit();
         };
       }
@@ -1285,23 +1273,26 @@ Please report this as a bug!`);
       this.headerElement.classList.remove("hidden");
       this.filterForm.classList.remove("hidden");
       this.submissionForm.classList.remove("hidden");
+      this.isOpen = true;
     }
     close() {
       this.closeDetailPopup();
       this.clearFilters();
       this.menuElement.classList.add("hidden");
       this.headerElement.classList.add("hidden");
-      console.log(this.headerElement);
       this.filterForm.classList.add("hidden");
       this.submissionForm.classList.add("hidden");
       this.infoPanel.innerHTML = "";
+      this.isOpen = false;
     }
     openDetailPopup() {
       this.submissionForm.reset();
       this.detailPopup.classList.remove("hidden");
+      this.detailIsOpen = true;
     }
     closeDetailPopup() {
       this.detailPopup.classList.add("hidden");
+      this.detailIsOpen = false;
     }
     addThumbToTagLists(tags, tagListMap, thumbData) {
       for (const tagName of tags) {
@@ -1351,6 +1342,14 @@ Please report this as a bug!`);
       thumb.querySelector("img.thumb-image").src = image;
       thumb.onclick = onclick;
       return thumb;
+    }
+    handleEscapePress() {
+      if (!this.isOpen) return;
+      if (this.detailIsOpen) {
+        this.closeDetailPopup();
+        return;
+      }
+      this.close();
     }
   };
 
@@ -1428,7 +1427,6 @@ Please report this as a bug!`);
       this.thumbList.innerHTML = "";
       const formData = new FormData(this.filterForm);
       this.searchString = String(formData.get("search-string").valueOf());
-      console.log("Applying search string: " + this.searchString);
       const converterList = getConverterFactoriesWithFilters(
         this.searchString,
         this.resourceBeingRequested ? [this.resourceBeingRequested] : [],
@@ -1676,6 +1674,12 @@ Please report this as a bug!`);
         infoPanel,
         cFormWrapper
       );
+      document.onkeydown = (e) => {
+        if (e.code === "Escape") {
+          converterMenu.handleEscapePress();
+          resourceMenu.handleEscapePress();
+        }
+      };
       document.querySelector("#open-converter-menu-button").onclick = () => converterMenu.open();
       document.querySelector(
         "#close-converter-menu-button"
