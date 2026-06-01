@@ -1577,6 +1577,8 @@ Please report this as a bug!`);
       window.location.reload();
     };
     try {
+      const loadingScreen = document.querySelector("#loading-screen");
+      const loadingText = loadingScreen.querySelector("p");
       const resourceDeltaList = document.querySelector(
         "#resources"
       );
@@ -1587,6 +1589,7 @@ Please report this as a bug!`);
       const converterTemplate = document.querySelector(
         "template#converter-template"
       );
+      loadingText.innerText = "Loading files...";
       const confRes = await fetch(
         `/data/${window.location.hash.replace(/^#/, "")}/config.json`
       );
@@ -1600,6 +1603,7 @@ Please report this as a bug!`);
       loadUnitGroups(config.unitGroups, config.defaultUnitGroup);
       await loadAllResources();
       await loadAllConverters();
+      loadingText.innerText = "Constructing class instances...";
       const graph = new ResourceGraph(
         resourceDeltaList,
         converterList,
@@ -1674,6 +1678,7 @@ Please report this as a bug!`);
         infoPanel,
         cFormWrapper
       );
+      loadingText.innerText = "Setting event listeners...";
       document.onkeydown = (e) => {
         if (e.code === "Escape") {
           converterMenu.handleEscapePress();
@@ -1688,6 +1693,7 @@ Please report this as a bug!`);
         "#close-converter-popup-button"
       ).onclick = () => converterMenu.closeDetailPopup();
       graph.setConverterRequestTarget(converterMenu);
+      loadingScreen.remove();
     } catch (e) {
       displayErr(e);
     }

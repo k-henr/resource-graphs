@@ -22,6 +22,9 @@ import { displayErr, GraphError } from "./scripts/errors";
     };
 
     try {
+        const loadingScreen = document.querySelector("#loading-screen")!;
+        const loadingText = loadingScreen.querySelector("p")!;
+
         const resourceDeltaList = document.querySelector(
             "#resources",
         ) as HTMLElement;
@@ -32,6 +35,8 @@ import { displayErr, GraphError } from "./scripts/errors";
         const converterTemplate = document.querySelector(
             "template#converter-template",
         ) as HTMLTemplateElement;
+
+        loadingText.innerText = "Loading files...";
 
         // Get the config file
         const confRes = await fetch(
@@ -53,6 +58,8 @@ import { displayErr, GraphError } from "./scripts/errors";
         // Load data files
         await loadAllResources();
         await loadAllConverters();
+
+        loadingText.innerText = "Constructing class instances...";
 
         // Make a new graph and link it to the page elements
         const graph = new ResourceGraph(
@@ -141,6 +148,8 @@ import { displayErr, GraphError } from "./scripts/errors";
             cFormWrapper,
         );
 
+        loadingText.innerText = "Setting event listeners...";
+
         // Close menus when pressing ESC
         document.onkeydown = (e) => {
             if (e.code === "Escape") {
@@ -162,6 +171,9 @@ import { displayErr, GraphError } from "./scripts/errors";
 
         // Set the graph's request target to the converter menu
         graph.setConverterRequestTarget(converterMenu);
+
+        // Remove the loading screen
+        loadingScreen.remove();
     } catch (e: any) {
         displayErr(e);
     }

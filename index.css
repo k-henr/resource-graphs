@@ -208,7 +208,8 @@ well? */
     gap: 8px;
 }
 
-#add-rc-menu-wrapper {
+#add-rc-menu-wrapper,
+#loading-screen {
     position: absolute;
     top: 0px;
     left: 0px;
@@ -216,6 +217,24 @@ well? */
     height: 100vh;
     overflow-y: auto;
     overscroll-behavior-y: none;
+}
+
+#loading-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    & > * {
+        background-color: var(--muted-background);
+        border: 2px solid var(--muted-border);
+        padding: 24px;
+        width: 20%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
 }
 
 #add-rc-menu {
