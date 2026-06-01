@@ -1,137 +1,100 @@
-import { GraphError } from "./errors";
-import { Setting, SettingsTreeInputNode, SettingsTreeNode } from "./types";
+import { ConverterEnumerateSetting } from "./converter-setting/converterEnumerateSetting";
+import { ConverterNumberSetting } from "./converter-setting/converterNumberSetting";
+import { ConverterSetting } from "./converter-setting/converterSetting";
+import { ConverterToggleSetting } from "./converter-setting/converterToggleSetting";
+import { GraphError, ProgramError } from "./errors";
+import { IntermediateConverter } from "./intermediateConverter";
+import { Rational } from "./rational";
+import {
+    ConverterSettingData,
+    SettingsTreeInputNode,
+    SettingsTreeNode,
+} from "./types";
 
 export class ConverterSettings {
-    private settingsLookup = new Map<string, Setting>();
-    private settingsOrder: string[] = [];
+    private settingsLookup = new Map<string, ConverterSetting>();
 
-    // Parse an AST node and register all settings in it
-    public registerSettingsFromAst(astNode: SettingsTreeNode) {
-        if (typeof astNode === "number" || Array.isArray(astNode)) return;
+    // todo: make non-static?
+    private static settingsForm: HTMLFormElement =
+        document.querySelector<HTMLFormElement>("#converter-settings-form")!;
 
-        switch (astNode.type) {
-            case "NUMBER":
-                this.registerSetting(astNode);
-                return;
+    constructor(
+        settings: ConverterSettingData[],
+        requestingConverter: IntermediateConverter,
+    ) {
+        // (assumes there's only ever one active instance at a time!)
+        ConverterSettings.settingsForm.innerHTML = "";
 
-            case "TOGGLE":
-                this.registerSetting(astNode);
-                this.registerSettingsFromAst(astNode.true);
-                this.registerSettingsFromAst(astNode.false);
-                return;
-
-            case "ENUMERATE":
-                this.registerSetting(astNode);
-                for (const [, option] of astNode.options) {
-                    this.registerSettingsFromAst(option);
-                }
-                return;
-
-            case "MUL":
-                for (const factor of astNode.values)
-                    this.registerSettingsFromAst(factor);
-                return;
-
-            case "DIV":
-                this.registerSettingsFromAst(astNode.value1);
-                this.registerSettingsFromAst(astNode.value2);
-                return;
-
-            case "ADD":
-                for (const term of astNode.values)
-                    this.registerSettingsFromAst(term);
-                return;
-
-            case "SUB":
-                this.registerSettingsFromAst(astNode.value1);
-                this.registerSettingsFromAst(astNode.value2);
-                return;
-
-            case "POW":
-                this.registerSettingsFromAst(astNode.value1);
-                this.registerSettingsFromAst(astNode.value2);
-                return;
+        // Go through the list and populate the settings form
+        for (const data of settings) {
+            console.log(data);
+            const setting = ConverterSettings.makeSettingInstance(
+                data,
+                requestingConverter,
+            );
+            ConverterSettings.settingsForm.appendChild(setting.getElement());
+            this.settingsLookup.set(data.name, setting);
         }
     }
 
-    private registerSetting(node: SettingsTreeInputNode) {
-        // Check if the setting already exists
-        if (this.settingsLookup.has(node.name)) {
-            const prev = this.settingsLookup.get(node.name)!;
-
-            // If the types don't match, throw an error
-            if (node.type !== prev.type)
-                throw new GraphError(
-                    `Mismatched type for converter setting ${node.name}!`,
+    private static makeSettingInstance(
+        data: ConverterSettingData,
+        requestingConverter: IntermediateConverter,
+    ): ConverterSetting {
+        switch (data.type) {
+            case "NUMBER":
+                return new ConverterNumberSetting(
+                    data.name,
+                    Rational.fromData(data.default),
+                    data.unit,
+                    requestingConverter,
                 );
-
-            // If the setting is an enumerate setting, any additional options present
-            // on this node but not the previous have to be added
-            if (node.type === "ENUMERATE") {
-                // This return can never happen, but I need typescript to recognize
-                // that prev is also an enumerable at this point
-                if (prev.type !== "ENUMERATE") return;
-
-                for (const [selector] of node.options) {
-                    function addOptionNameIfNew(name: string, options: string[]) {
-                        if (options.indexOf(name) === -1) options.push(name);
-                    }
-                    if (typeof selector === "string")
-                        addOptionNameIfNew(selector, prev.options);
-                    else
-                        for (const s of selector)
-                            addOptionNameIfNew(s, prev.options);
-                }
-            }
-        } else {
-            // First time a setting appears, add it
-            this.settingsOrder.push(node.name);
-            this.settingsLookup.set(node.name, this.makeNewSettingObject(node));
-        }
-    }
-
-    public getSetting(name: string) {
-        return this.settingsLookup.get(name);
-    }
-
-    // Construct a list of all settings that have been registered
-    public getAllSettings(): [string, Setting][] {
-        const output: [string, Setting][] = [];
-        for (const name of this.settingsOrder) {
-            output.push([name, this.settingsLookup.get(name)!]);
-        }
-        return output;
-    }
-
-    private makeNewSettingObject(node: SettingsTreeInputNode): Setting {
-        switch (node.type) {
-            case "NUMBER":
-                console.log(node);
-                console.log(node.unit);
-                return {
-                    type: "NUMBER",
-                    default: node.default,
-                    unit: node.unit ?? null,
-                };
-
             case "TOGGLE":
-                return {
-                    type: "TOGGLE",
-                    default: node.default,
-                };
-
+                return new ConverterToggleSetting(
+                    data.name,
+                    data.default,
+                    requestingConverter,
+                );
             case "ENUMERATE":
-                const options = [];
-                // Flatten the options into a single list
-                for (const [selector] of node.options) {
-                    if (typeof selector === "string") options.push(selector);
-                    else for (const s of selector) options.push(s);
-                }
-                return {
-                    type: "ENUMERATE",
-                    options: options,
-                    default: node.default,
-                };
+                return new ConverterEnumerateSetting(
+                    data.name,
+                    data.default,
+                    data.options,
+                    requestingConverter,
+                );
         }
+    }
+
+    public getBranch(node: SettingsTreeInputNode): SettingsTreeNode {
+        const setting = this.settingsLookup.get(node.name);
+        if (!setting) throw new GraphError(`Setting ${node.name} doesn't exist!`);
+        return setting.chooseBranch(node);
+    }
+
+    public getAllSettings(): ConverterSetting[] {
+        throw new ProgramError("Not implemented!");
+    }
+
+    public parseFormattedString(input: string): string {
+        // Format the string
+        return input.replaceAll(/\{(.*?)\}/gim, (_, inner) =>
+            this.parseFormatting(inner),
+        );
+    }
+
+    // Replace a given string with the text it represents from settings data
+    private parseFormatting(toFormat: string): string {
+        const args = toFormat.split("|");
+
+        // The first argument is always the name of the setting
+        const settingName = args[0];
+        const setting = this.settingsLookup.get(settingName);
+
+        if (!setting)
+            throw new GraphError(
+                `Setting "${settingName}" not found! Have you misspelt a formatting string?`,
+            );
+
+        return setting.getFormattedString(args);
     }
 }

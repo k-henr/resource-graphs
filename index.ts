@@ -154,14 +154,6 @@ import { displayErr, GraphError } from "./scripts/errors";
 
         // Set the graph's request target to the converter menu
         graph.setConverterRequestTarget(converterMenu);
-
-        // SAMPLE CONVERSION FOR ONI:
-        const dupe = getConverterFactory("duplicant")!.factory().finalize();
-        const electrolyzer = getConverterFactory("electrolyzer")!
-            .factory()
-            .finalize();
-        graph.addConverter(dupe, new Rational(3));
-        graph.addConverter(electrolyzer, new Rational(3 / 5));
     } catch (e: any) {
         displayErr(e);
     }

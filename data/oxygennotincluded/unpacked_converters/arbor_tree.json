@@ -1,12 +1,24 @@
 {
     "tags": ["Plants"],
+    "settings": [
+        {
+            "type": "ENUMERATE",
+            "name": "Number of branches",
+            "default": "5",
+            "options": ["0", "1", "2", "3", "4", "5"]
+        },
+        {
+            "type": "TOGGLE",
+            "name": "Wild",
+            "default": false
+        }
+    ],
     "consumes": [
         {
             "type": "MULTIPLIER",
             "multiplier": {
-                "type": "TOGGLE",
+                "type": "SETTING",
                 "name": "Wild",
-                "default": false,
                 "true": 0,
                 "false": 1
             },
@@ -26,9 +38,8 @@
                 "type": "MUL",
                 "values": [
                     {
-                        "type": "ENUMERATE",
+                        "type": "SETTING",
                         "name": "Number of branches",
-                        "default": "5",
                         "options": [
                             ["0", 0],
                             ["1", 1],
@@ -39,7 +50,7 @@
                         ]
                     },
                     {
-                        "type": "TOGGLE",
+                        "type": "SETTING",
                         "name": "Wild",
                         "true": [1, 18],
                         "false": [1, 4.5]

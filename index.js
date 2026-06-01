@@ -199,113 +199,218 @@ Please report this as a bug!`);
     }
   };
 
-  // scripts/converterSettings.ts
-  var ConverterSettings = class {
-    settingsLookup = /* @__PURE__ */ new Map();
-    settingsOrder = [];
-    // Parse an AST node and register all settings in it
-    registerSettingsFromAst(astNode) {
-      if (typeof astNode === "number" || Array.isArray(astNode)) return;
-      switch (astNode.type) {
-        case "NUMBER":
-          this.registerSetting(astNode);
-          return;
-        case "TOGGLE":
-          this.registerSetting(astNode);
-          this.registerSettingsFromAst(astNode.true);
-          this.registerSettingsFromAst(astNode.false);
-          return;
-        case "ENUMERATE":
-          this.registerSetting(astNode);
-          for (const [, option] of astNode.options) {
-            this.registerSettingsFromAst(option);
-          }
-          return;
-        case "MUL":
-          for (const factor of astNode.values)
-            this.registerSettingsFromAst(factor);
-          return;
-        case "DIV":
-          this.registerSettingsFromAst(astNode.value1);
-          this.registerSettingsFromAst(astNode.value2);
-          return;
-        case "ADD":
-          for (const term of astNode.values)
-            this.registerSettingsFromAst(term);
-          return;
-        case "SUB":
-          this.registerSettingsFromAst(astNode.value1);
-          this.registerSettingsFromAst(astNode.value2);
-          return;
-        case "POW":
-          this.registerSettingsFromAst(astNode.value1);
-          this.registerSettingsFromAst(astNode.value2);
-          return;
-      }
+  // scripts/converter-setting/converterSetting.ts
+  var ConverterSetting = class _ConverterSetting {
+    element;
+    static settingInputTemplate = document.querySelector(
+      "#converter-setting-input-template"
+    );
+    static settingSelectTemplate = document.querySelector(
+      "#converter-setting-select-template"
+    );
+    constructor(element) {
+      if (!element)
+        throw new ProgramError("Setting element not found on template");
+      this.element = element;
     }
-    registerSetting(node) {
-      if (this.settingsLookup.has(node.name)) {
-        const prev = this.settingsLookup.get(node.name);
-        if (node.type !== prev.type)
+    getElement() {
+      return this.element;
+    }
+    static makeInputElement(name, postText, requestingConverter) {
+      const settingEl = _ConverterSetting.settingInputTemplate.content.cloneNode(
+        true
+      );
+      const label = settingEl.querySelector("label");
+      const input = settingEl.querySelector("input");
+      const post = settingEl.querySelector("span");
+      label.htmlFor = name;
+      label.innerText = name;
+      input.name = name;
+      post.innerText = postText;
+      input.onchange = () => requestingConverter.tryPopulateInfoPanel();
+      return [settingEl, label, input];
+    }
+    static makeSelectElement(name, requestingConverter) {
+      const settingEl = _ConverterSetting.settingSelectTemplate.content.cloneNode(
+        true
+      );
+      const label = settingEl.querySelector("label");
+      const input = settingEl.querySelector("select");
+      label.htmlFor = name;
+      label.innerText = name;
+      input.name = name;
+      input.onchange = () => requestingConverter.tryPopulateInfoPanel();
+      return [settingEl, label, input];
+    }
+  };
+
+  // scripts/converter-setting/converterEnumerateSetting.ts
+  var ConverterEnumerateSetting = class extends ConverterSetting {
+    selectElement;
+    constructor(name, defaultOption, options, requestingConverter) {
+      const [settingEl, , select] = ConverterSetting.makeSelectElement(
+        name,
+        requestingConverter
+      );
+      for (const optionName of options) {
+        const optionEl = document.createElement("option");
+        optionEl.value = optionName;
+        optionEl.innerText = optionName;
+        select.appendChild(optionEl);
+        const defIndex = options.indexOf(defaultOption);
+        if (defIndex === -1)
           throw new GraphError(
-            `Mismatched type for converter setting ${node.name}!`
+            `Default option "${defaultOption}" not present on setting "${name}"!`
           );
-        if (node.type === "ENUMERATE") {
-          if (prev.type !== "ENUMERATE") return;
-          for (const [selector] of node.options) {
-            let addOptionNameIfNew = function(name, options) {
-              if (options.indexOf(name) === -1) options.push(name);
-            };
-            if (typeof selector === "string")
-              addOptionNameIfNew(selector, prev.options);
-            else
-              for (const s of selector)
-                addOptionNameIfNew(s, prev.options);
-          }
-        }
-      } else {
-        this.settingsOrder.push(node.name);
-        this.settingsLookup.set(node.name, this.makeNewSettingObject(node));
+        select.selectedIndex = defIndex;
+      }
+      super(settingEl.firstElementChild);
+      this.selectElement = select;
+    }
+    chooseBranch(data) {
+      const node = data;
+      if (!Object.hasOwn(node, "options")) {
+        throw new GraphError(
+          `Instance of enumerate setting "${data.name}" lacks option list!`
+        );
+      }
+      const chosen = String(this.selectElement.value);
+      for (const [selector, option] of node.options) {
+        const selectorMatches = typeof selector === "string" ? selector === chosen : selector.indexOf(chosen) !== -1;
+        if (selectorMatches) return option;
+      }
+      throw new GraphError(
+        `An instance of the enumerate setting ${data.name} doesn't cover the option ${chosen}!`
+      );
+    }
+    getElement() {
+      return this.element;
+    }
+    getFormattedString(_) {
+      return this.selectElement.value;
+    }
+  };
+
+  // scripts/converter-setting/converterNumberSetting.ts
+  var ConverterNumberSetting = class extends ConverterSetting {
+    inputElement;
+    constructor(name, defaultValue, unit, requestingConverter) {
+      const [settingEl, , input] = ConverterSetting.makeInputElement(
+        name,
+        unit,
+        requestingConverter
+      );
+      input.type = "text";
+      input.value = String(defaultValue);
+      super(settingEl.firstElementChild);
+      this.inputElement = input;
+    }
+    chooseBranch(_) {
+      return Number(this.inputElement.value);
+    }
+    getFormattedString(_) {
+      const rational = Rational.fromInput(this.inputElement.value, null);
+      return rational?.getDecimalString() ?? "???";
+    }
+  };
+
+  // scripts/converter-setting/converterToggleSetting.ts
+  var ConverterToggleSetting = class extends ConverterSetting {
+    inputElement;
+    constructor(name, defaultValue, requestingConverter) {
+      const [settingEl, , input] = ConverterSetting.makeInputElement(
+        name,
+        "",
+        requestingConverter
+      );
+      input.type = "checkbox";
+      input.checked = defaultValue;
+      super(settingEl.firstElementChild);
+      this.inputElement = input;
+    }
+    chooseBranch(data) {
+      const node = data;
+      console.log(data);
+      if (!Object.hasOwn(node, "true") || !Object.hasOwn(node, "false")) {
+        throw new GraphError(
+          `A branch is missing from the toggle setting "${data.name}"!`
+        );
+      }
+      return this.inputElement.checked ? node.true : node.false;
+    }
+    getElement() {
+      return this.element;
+    }
+    getFormattedString(args) {
+      return this.inputElement.checked ? args[1] ?? "" : args[2] ?? "";
+    }
+  };
+
+  // scripts/converterSettings.ts
+  var ConverterSettings = class _ConverterSettings {
+    settingsLookup = /* @__PURE__ */ new Map();
+    // todo: make non-static?
+    static settingsForm = document.querySelector("#converter-settings-form");
+    constructor(settings, requestingConverter) {
+      _ConverterSettings.settingsForm.innerHTML = "";
+      for (const data of settings) {
+        console.log(data);
+        const setting = _ConverterSettings.makeSettingInstance(
+          data,
+          requestingConverter
+        );
+        _ConverterSettings.settingsForm.appendChild(setting.getElement());
+        this.settingsLookup.set(data.name, setting);
       }
     }
-    getSetting(name) {
-      return this.settingsLookup.get(name);
-    }
-    // Construct a list of all settings that have been registered
-    getAllSettings() {
-      const output = [];
-      for (const name of this.settingsOrder) {
-        output.push([name, this.settingsLookup.get(name)]);
-      }
-      return output;
-    }
-    makeNewSettingObject(node) {
-      switch (node.type) {
+    static makeSettingInstance(data, requestingConverter) {
+      switch (data.type) {
         case "NUMBER":
-          console.log(node);
-          console.log(node.unit);
-          return {
-            type: "NUMBER",
-            default: node.default,
-            unit: node.unit ?? null
-          };
+          return new ConverterNumberSetting(
+            data.name,
+            Rational.fromData(data.default),
+            data.unit,
+            requestingConverter
+          );
         case "TOGGLE":
-          return {
-            type: "TOGGLE",
-            default: node.default
-          };
+          return new ConverterToggleSetting(
+            data.name,
+            data.default,
+            requestingConverter
+          );
         case "ENUMERATE":
-          const options = [];
-          for (const [selector] of node.options) {
-            if (typeof selector === "string") options.push(selector);
-            else for (const s of selector) options.push(s);
-          }
-          return {
-            type: "ENUMERATE",
-            options,
-            default: node.default
-          };
+          return new ConverterEnumerateSetting(
+            data.name,
+            data.default,
+            data.options,
+            requestingConverter
+          );
       }
+    }
+    getBranch(node) {
+      const setting = this.settingsLookup.get(node.name);
+      if (!setting) throw new GraphError(`Setting ${node.name} doesn't exist!`);
+      return setting.chooseBranch(node);
+    }
+    getAllSettings() {
+      throw new ProgramError("Not implemented!");
+    }
+    parseFormattedString(input) {
+      return input.replaceAll(
+        /\{(.*?)\}/gim,
+        (_, inner) => this.parseFormatting(inner)
+      );
+    }
+    // Replace a given string with the text it represents from settings data
+    parseFormatting(toFormat) {
+      const args = toFormat.split("|");
+      const settingName = args[0];
+      const setting = this.settingsLookup.get(settingName);
+      if (!setting)
+        throw new GraphError(
+          `Setting "${settingName}" not found! Have you misspelt a formatting string?`
+        );
+      return setting.getFormattedString(args);
     }
   };
 
@@ -323,42 +428,20 @@ Please report this as a bug!`);
     static infoTemplate = document.querySelector(
       "#converter-info-template"
     );
-    // TODO: Make non-static
-    static settingsForm = document.querySelector(
-      "#converter-settings-form"
-    );
-    static settingInputTemplate = document.querySelector(
-      "#converter-setting-input-template"
-    );
-    static settingSelectTemplate = document.querySelector(
-      "#converter-setting-select-template"
-    );
-    constructor(displayName, thumbName, displayImage, ingredientTree, productTree) {
+    static infoPanel = document.querySelector("#rc-info-panel");
+    constructor(displayName, thumbName, displayImage, settingList, ingredientTree, productTree) {
       this.displayName = displayName;
       this.thumbName = thumbName;
       this.displayImage = displayImage;
       this.ingredientTree = ingredientTree;
       this.productTree = productTree;
-      this.settings = this.productTree.registerSettings(
-        this.ingredientTree.registerSettings(new ConverterSettings())
-      );
-    }
-    populateSettingsForm(infoPanel) {
-      _IntermediateConverter.settingsForm.innerHTML = "";
-      for (const [name, setting] of this.settings.getAllSettings()) {
-        const settingEl = this.createSettingInput(name, setting, infoPanel);
-        _IntermediateConverter.settingsForm.appendChild(settingEl);
-      }
+      this.settings = new ConverterSettings(settingList, this);
     }
     getThumbName() {
       return this.thumbName;
     }
     getDisplayName() {
-      const formData = new FormData(_IntermediateConverter.settingsForm);
-      return this.displayName.replaceAll(
-        /\{(.*?)\}/gim,
-        (_, inner) => this.parseFormatting(inner, formData)
-      );
+      return this.settings.parseFormattedString(this.displayName);
     }
     getDisplayImage() {
       return this.displayImage;
@@ -367,19 +450,27 @@ Please report this as a bug!`);
     finalize() {
       const ingr = this.ingredientTree.addResourcesToList(
         [],
-        _IntermediateConverter.settingsForm,
+        this.settings,
         Rational.one
       );
       const prod = this.productTree.addResourcesToList(
         [],
-        _IntermediateConverter.settingsForm,
+        this.settings,
         Rational.one
       );
       return new Converter(this.getDisplayName(), this.displayImage, ingr, prod);
     }
+    tryPopulateInfoPanel() {
+      try {
+        this.populateInfoPanel();
+      } catch (e) {
+        displayErr(e);
+        throw e;
+      }
+    }
     // Populate an info panel with information regarding this converter
-    // Assumes empty panel element!
-    populateInfoPanel(infoPanel) {
+    populateInfoPanel() {
+      _IntermediateConverter.infoPanel.innerHTML = "";
       const el = _IntermediateConverter.infoTemplate.content.cloneNode(
         true
       );
@@ -389,124 +480,15 @@ Please report this as a bug!`);
       el.querySelector(".c-info-ingredients").appendChild(
         this.ingredientTree.getElement(
           null,
-          _IntermediateConverter.settingsForm,
+          this.settings,
           Rational.one,
           this
         ) ?? document.createElement("div")
       );
       el.querySelector(".c-info-products").appendChild(
-        this.productTree.getElement(
-          null,
-          _IntermediateConverter.settingsForm,
-          Rational.one,
-          this
-        ) ?? document.createElement("div")
+        this.productTree.getElement(null, this.settings, Rational.one, this) ?? document.createElement("div")
       );
-      infoPanel.appendChild(el);
-    }
-    // Replace a given string with the text it represents, given settings data
-    parseFormatting(toFormat, formData) {
-      const args = toFormat.split("|");
-      const settingName = args[0];
-      const setting = this.settings.getSetting(settingName);
-      if (!setting) throw new GraphError(`Setting "${settingName}" not found!`);
-      switch (setting.type) {
-        case "TOGGLE": {
-          return formData.get(settingName) ? args[1] ?? "" : args[2] ?? "";
-        }
-        case "NUMBER": {
-          const rational = Rational.fromInput(
-            String(formData.get(settingName).valueOf()),
-            null
-          );
-          if (!rational) return "???";
-          return rational.getDecimalString();
-        }
-        case "ENUMERATE": {
-          return String(formData.get(settingName).valueOf());
-        }
-      }
-    }
-    createSettingInput(name, setting, infoPanel) {
-      switch (setting.type) {
-        case "NUMBER": {
-          const [settingEl, , input] = this.createInputElement(
-            name,
-            infoPanel,
-            setting.unit ?? ""
-          );
-          input.type = "text";
-          input.value = String(setting.default ?? 0);
-          return settingEl;
-        }
-        case "TOGGLE": {
-          const [settingEl, , input] = this.createInputElement(
-            name,
-            infoPanel,
-            ""
-          );
-          input.type = "checkbox";
-          input.checked = setting.default ?? false;
-          return settingEl;
-        }
-        case "ENUMERATE": {
-          const [settingEl, , select] = this.createSelectElement(
-            name,
-            infoPanel
-          );
-          for (const optionName of setting.options) {
-            const optionEl = document.createElement("option");
-            optionEl.value = optionName;
-            optionEl.innerText = optionName;
-            select.appendChild(optionEl);
-            const defIndex = setting.options.indexOf(setting.default);
-            select.selectedIndex = defIndex !== -1 ? defIndex : 0;
-          }
-          return settingEl;
-        }
-      }
-    }
-    createInputElement(name, infoPanel, postText) {
-      const settingEl = _IntermediateConverter.settingInputTemplate.content.cloneNode(
-        true
-      );
-      const label = settingEl.querySelector("label");
-      const input = settingEl.querySelector("input");
-      const post = settingEl.querySelector("span");
-      label.htmlFor = name;
-      label.innerText = name;
-      input.name = name;
-      post.innerText = postText;
-      input.onchange = () => {
-        try {
-          infoPanel.innerHTML = "";
-          this.populateInfoPanel(infoPanel);
-        } catch (e) {
-          displayErr(e);
-          throw e;
-        }
-      };
-      return [settingEl, label, input];
-    }
-    createSelectElement(name, infoPanel) {
-      const settingEl = _IntermediateConverter.settingSelectTemplate.content.cloneNode(
-        true
-      );
-      const label = settingEl.querySelector("label");
-      const input = settingEl.querySelector("select");
-      label.htmlFor = name;
-      label.innerText = name;
-      input.name = name;
-      input.onchange = () => {
-        try {
-          infoPanel.innerHTML = "";
-          this.populateInfoPanel(infoPanel);
-        } catch (e) {
-          displayErr(e);
-          throw e;
-        }
-      };
-      return [settingEl, label, input];
+      _IntermediateConverter.infoPanel.appendChild(el);
     }
     registerEntangledOr(id, node) {
       this.entangledOrs.push([id, node]);
@@ -587,10 +569,6 @@ Please report this as a bug!`);
       super();
       this.children = children;
     }
-    registerSettings(settings) {
-      this.children.map((c) => c.registerSettings(settings));
-      return settings;
-    }
     replaceChild(oldChild, newChild) {
       for (const i in this.children) {
         if (this.children[i] === oldChild) {
@@ -609,12 +587,12 @@ Please report this as a bug!`);
     constructor(children) {
       super(children);
     }
-    getElement(_, settingsForm, multiplier, requestingConverter) {
+    getElement(_, settings, multiplier, requestingConverter) {
       const andEl = document.createElement("div");
       this.children.map((child) => {
         const cEl = child.getElement(
           this,
-          settingsForm,
+          settings,
           multiplier,
           requestingConverter
         );
@@ -622,10 +600,8 @@ Please report this as a bug!`);
       });
       return andEl;
     }
-    addResourcesToList(output, settingsForm, multiplier = Rational.one) {
-      this.children.map(
-        (c) => c.addResourcesToList(output, settingsForm, multiplier)
-      );
+    addResourcesToList(output, settings, multiplier = Rational.one) {
+      this.children.map((c) => c.addResourcesToList(output, settings, multiplier));
       return output;
     }
   };
@@ -638,7 +614,7 @@ Please report this as a bug!`);
     constructor() {
       super();
     }
-    getElement(_parent, _settingsForm, _multiplier, _requestingConverter) {
+    getElement(_parent, _settings, _multiplier, _requestingConverter) {
       const el = _NothingNode.converterIngredientTemplate.content.cloneNode(
         true
       ).firstElementChild;
@@ -648,9 +624,6 @@ Please report this as a bug!`);
     }
     addResourcesToList(output, _) {
       return output;
-    }
-    registerSettings(s) {
-      return s;
     }
   };
 
@@ -667,7 +640,7 @@ Please report this as a bug!`);
     static converterOrTemplate = document.querySelector(
       "template#converter-or-template"
     );
-    getElement(parent, settingsForm, multiplier, requestingConverter) {
+    getElement(parent, settings, multiplier, requestingConverter) {
       if (!parent) throw new GraphError("An OR node can't be a root node!");
       const selectEl = _OrNode.converterSelectTemplate.content.cloneNode(true).firstElementChild;
       selectEl.querySelector(".converter-select-count").innerText = String(this.children.length);
@@ -678,7 +651,7 @@ Please report this as a bug!`);
       for (let i = 0; i < this.children.length; i++) {
         const el = this.addOptionElement(
           this.children[i],
-          settingsForm,
+          settings,
           multiplier,
           parent,
           selectEl,
@@ -697,7 +670,7 @@ Please report this as a bug!`);
         const nothingNode = new NothingNode();
         this.addOptionElement(
           nothingNode,
-          settingsForm,
+          settings,
           multiplier,
           parent,
           selectEl,
@@ -708,10 +681,10 @@ Please report this as a bug!`);
       return selectEl;
     }
     // Add an element for the given option
-    addOptionElement(option, settingsForm, multiplier, parent, selectEl, selectList, requestingConverter) {
+    addOptionElement(option, settings, multiplier, parent, selectEl, selectList, requestingConverter) {
       const optionEl = option.getElement(
         this,
-        settingsForm,
+        settings,
         multiplier,
         requestingConverter
       );
@@ -779,14 +752,9 @@ Please report this as a bug!`);
       this.id = id;
       this.optionIds = options.map(([id2]) => id2);
     }
-    getElement(parent, settingsForm, multiplier, requestingConverter) {
+    getElement(parent, settings, multiplier, requestingConverter) {
       requestingConverter.registerEntangledOr(this.id, this);
-      return super.getElement(
-        parent,
-        settingsForm,
-        multiplier,
-        requestingConverter
-      );
+      return super.getElement(parent, settings, multiplier, requestingConverter);
     }
     // When creating the onclick, also store it in a dictionary here
     getOnClickForOption(parent, option, selectEl, optionEl, requestingConverter) {
@@ -849,37 +817,25 @@ Please report this as a bug!`);
       this.multiplierAst = multiplierAst;
       this.resource = resource;
     }
-    getElement(_, settingsForm, multiplier, requestingConverter) {
+    getElement(_, settings, multiplier, requestingConverter) {
       multiplier = multiplier.mul(
-        this.evaluateSettingsTree(
-          this.multiplierAst,
-          settingsForm,
-          new FormData(settingsForm)
-        )
+        this.evaluateSettingsTree(this.multiplierAst, settings)
       );
       if (multiplier.equals(Rational.zero)) return null;
       return this.resource.getElement(
         this,
-        settingsForm,
+        settings,
         multiplier,
         requestingConverter
       );
     }
-    addResourcesToList(output, settingsForm, multiplier) {
+    addResourcesToList(output, settings, multiplier) {
       multiplier = multiplier.mul(
-        this.evaluateSettingsTree(
-          this.multiplierAst,
-          settingsForm,
-          settingsForm ? new FormData(settingsForm) : null
-        )
+        this.evaluateSettingsTree(this.multiplierAst, settings)
       );
       if (multiplier.equals(Rational.zero)) return output;
-      this.resource.addResourcesToList(output, settingsForm, multiplier);
+      this.resource.addResourcesToList(output, settings, multiplier);
       return output;
-    }
-    registerSettings(settings) {
-      settings.registerSettingsFromAst(this.multiplierAst);
-      return settings;
     }
     replaceChild(oldChild, newChild) {
       if (this.resource !== oldChild)
@@ -888,75 +844,33 @@ Please report this as a bug!`);
         );
       this.resource = newChild;
     }
-    evaluateSettingsTree(treeNode, form, formData) {
+    evaluateSettingsTree(treeNode, settings) {
       if (typeof treeNode === "number" || Array.isArray(treeNode))
         return Rational.fromData(treeNode);
       switch (treeNode.type) {
-        case "NUMBER":
-          if (!form || !formData) {
-            return Rational.fromData(treeNode.default);
-          }
-          const el = form.querySelector(
-            `input[name="${treeNode.name}"]`
-          );
-          const num = Rational.fromInput(
-            String(
-              formData.get(treeNode.name)?.valueOf() ?? treeNode.default
-            ),
-            el
-          );
-          if (!num)
-            throw new UserError(
-              "Bad formatting, all number settings have to contain a rational or decimal number!"
-            );
-          return num;
-        case "TOGGLE":
+        case "SETTING":
           return this.evaluateSettingsTree(
-            form?.querySelector(
-              `input[name="${treeNode.name}"]`
-            )?.checked ?? treeNode.default ? treeNode.true : treeNode.false,
-            form,
-            formData
-          );
-        case "ENUMERATE":
-          const chosen = form?.querySelector(
-            `select[name="${treeNode.name}"]`
-          )?.value.valueOf() ?? treeNode.default;
-          for (const [selector, option] of treeNode.options) {
-            const selectorMatches = typeof selector === "string" ? selector === chosen : selector.indexOf(chosen) !== -1;
-            if (selectorMatches)
-              return this.evaluateSettingsTree(option, form, formData);
-          }
-          for (const [name, option] of treeNode.options) {
-            if (name === treeNode.default)
-              return this.evaluateSettingsTree(option, form, formData);
-          }
-          console.log(treeNode);
-          throw new GraphError(
-            `Default setting "${treeNode.default}" for setting "${treeNode.name}" does not exist as an option!`
+            settings.getBranch(treeNode),
+            settings
           );
         case "MUL":
           let p = Rational.one;
           for (const child of treeNode.values)
-            p = p.mul(this.evaluateSettingsTree(child, form, formData));
+            p = p.mul(this.evaluateSettingsTree(child, settings));
           return p;
         case "DIV":
-          return this.evaluateSettingsTree(
-            treeNode.value1,
-            form,
-            formData
-          ).div(this.evaluateSettingsTree(treeNode.value2, form, formData));
+          return this.evaluateSettingsTree(treeNode.value1, settings).div(
+            this.evaluateSettingsTree(treeNode.value2, settings)
+          );
         case "ADD":
           let s = Rational.zero;
           for (const child of treeNode.values)
-            s = s.add(this.evaluateSettingsTree(child, form, formData));
+            s = s.add(this.evaluateSettingsTree(child, settings));
           return s;
         case "SUB":
-          return this.evaluateSettingsTree(
-            treeNode.value1,
-            form,
-            formData
-          ).sub(this.evaluateSettingsTree(treeNode.value2, form, formData));
+          return this.evaluateSettingsTree(treeNode.value1, settings).sub(
+            this.evaluateSettingsTree(treeNode.value2, settings)
+          );
         case "POW":
           throw new ProgramError("Powers aren't supported yet!");
       }
@@ -1033,9 +947,6 @@ Please report this as a bug!`);
         amount: this.amount.mul(multiplier)
       });
       return output;
-    }
-    registerSettings(s) {
-      return s;
     }
     createIngredientElement(multiplier) {
       const el = _ResourceNode.converterIngredientTemplate.content.cloneNode(
@@ -1118,6 +1029,7 @@ Please report this as a bug!`);
               data.displayName,
               data.thumbName ?? data.displayName,
               getSrc(data.displayImage),
+              data.settings ?? [],
               resourceTreeDataToClass(andWrap(data.consumes)),
               resourceTreeDataToClass(andWrap(data.produces))
             );
@@ -1206,9 +1118,6 @@ Please report this as a bug!`);
         data.resources.map(([, r]) => getAllPossibleResources(r, output));
         return output;
     }
-  }
-  function getConverterFactory(id) {
-    return loadedConverterFactories.get(id);
   }
   function getConverterFactoriesWithFilters(searchString = "", anyResourceProduced = [], anyResourceConsumed = []) {
     const list = loadedConverterFactories.entries();
@@ -1551,16 +1460,10 @@ Please report this as a bug!`);
       for (const [_, cFact] of converterList) {
         const tags = cFact.tags.length > 0 ? cFact.tags : ["Miscellaneous"];
         let onclickFn = () => {
-          try {
-            this.intermediateConverter = cFact.factory();
-            this.infoPanel.innerHTML = "";
-            this.intermediateConverter.populateSettingsForm(this.infoPanel);
-            this.intermediateConverter.populateInfoPanel(this.infoPanel);
-            this.openDetailPopup();
-          } catch (e) {
-            displayErr(e);
-            throw e;
-          }
+          this.intermediateConverter = cFact.factory();
+          this.infoPanel.innerHTML = "";
+          this.intermediateConverter.tryPopulateInfoPanel();
+          this.openDetailPopup();
         };
         this.addThumbToTagLists(tags, tagLists, {
           name: cFact.name,
@@ -1795,10 +1698,6 @@ Please report this as a bug!`);
         "#close-converter-popup-button"
       ).onclick = () => converterMenu.closeDetailPopup();
       graph.setConverterRequestTarget(converterMenu);
-      const dupe = getConverterFactory("duplicant").factory().finalize();
-      const electrolyzer = getConverterFactory("electrolyzer").factory().finalize();
-      graph.addConverter(dupe, new Rational(3));
-      graph.addConverter(electrolyzer, new Rational(3 / 5));
     } catch (e) {
       displayErr(e);
     }

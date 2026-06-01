@@ -1,32 +1,12 @@
 {
     "tags": ["Refinement"],
     "consumes": [
-        {
-            "type": "RESOURCE",
-            "id": "power",
-            "amount": 240
-        },
-        {
-            "type": "RESOURCE",
-            "id": "wood",
-            "amount": 600
-        }
+        { "type": "RESOURCE", "id": "power", "amount": 240 },
+        { "type": "RESOURCE", "id": "wood", "amount": 600 }
     ],
     "produces": [
-        {
-            "type": "RESOURCE",
-            "id": "ethanol",
-            "amount": 300
-        },
-        {
-            "type": "RESOURCE",
-            "id": "polluted_dirt",
-            "amount": 200
-        },
-        {
-            "type": "RESOURCE",
-            "id": "carbon_dioxide",
-            "amount": 100
-        }
+        { "type": "RESOURCE", "id": "ethanol", "amount": 300 },
+        { "type": "RESOURCE", "id": "polluted_dirt", "amount": 200 },
+        { "type": "RESOURCE", "id": "carbon_dioxide", "amount": 100 }
     ]
 }

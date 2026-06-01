@@ -8,17 +8,15 @@ export abstract class ResourceTree {
     // Add all resources present in this tree to the given list
     public abstract addResourcesToList(
         output: ConverterIngredient[],
-        settingsForm: HTMLFormElement | null,
+        settings: ConverterSettings,
         multiplier: Rational,
     ): ConverterIngredient[];
 
     // Get an element representing this resource tree
     public abstract getElement(
         parent: ResourceTreeNode | null,
-        settingsForm: HTMLFormElement,
+        settings: ConverterSettings,
         multiplier: Rational,
         requestingConverter: IntermediateConverter,
     ): HTMLElement | null;
-
-    public abstract registerSettings(settings: ConverterSettings): ConverterSettings;
 }

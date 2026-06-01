@@ -1,27 +1,9 @@
 {
     "tags": ["Power"],
-    "consumes": [
-        {
-            "type": "TAG",
-            "tagName": "Combustible Liquid",
-            "amount": 1200
-        }
-    ],
+    "consumes": [{ "type": "TAG", "tagName": "Combustible Liquid", "amount": 1200 }],
     "produces": [
-        {
-            "type": "RESOURCE",
-            "id": "power",
-            "amount": 2000
-        },
-        {
-            "type": "RESOURCE",
-            "id": "polluted_water",
-            "amount": 450
-        },
-        {
-            "type": "RESOURCE",
-            "id": "carbon_dioxide",
-            "amount": 300
-        }
+        { "type": "RESOURCE", "id": "power", "amount": 2000 },
+        { "type": "RESOURCE", "id": "polluted_water", "amount": 450 },
+        { "type": "RESOURCE", "id": "carbon_dioxide", "amount": 300 }
     ]
 }

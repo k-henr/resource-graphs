@@ -1,3 +1,4 @@
+import { ConverterSettings } from "../converterSettings";
 import { displayErr, GraphError } from "../errors";
 import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
@@ -28,17 +29,12 @@ export class EntangledOrNode extends OrNode {
 
     public override getElement(
         parent: ResourceTreeNode | null,
-        settingsForm: HTMLFormElement,
+        settings: ConverterSettings,
         multiplier: Rational,
         requestingConverter: IntermediateConverter,
     ): HTMLElement | null {
         requestingConverter.registerEntangledOr(this.id, this);
-        return super.getElement(
-            parent,
-            settingsForm,
-            multiplier,
-            requestingConverter,
-        );
+        return super.getElement(parent, settings, multiplier, requestingConverter);
     }
 
     // When creating the onclick, also store it in a dictionary here

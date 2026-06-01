@@ -26,7 +26,7 @@ export class ResourceNode extends ResourceTree {
 
     public override getElement(
         _: ResourceTreeNode | null,
-        __: HTMLFormElement,
+        __: ConverterSettings,
         multiplier: Rational,
         ___: IntermediateConverter,
     ): HTMLElement | null {
@@ -37,7 +37,7 @@ export class ResourceNode extends ResourceTree {
 
     public override addResourcesToList(
         output: ConverterIngredient[],
-        _: HTMLFormElement | null,
+        _: ConverterSettings,
         multiplier: Rational = Rational.one,
     ) {
         output.push({
@@ -45,10 +45,6 @@ export class ResourceNode extends ResourceTree {
             amount: this.amount.mul(multiplier),
         });
         return output;
-    }
-
-    public override registerSettings(s: ConverterSettings) {
-        return s;
     }
 
     private createIngredientElement(multiplier: Rational) {

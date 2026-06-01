@@ -1,3 +1,4 @@
+import { ConverterSettings } from "../converterSettings";
 import { displayErr, GraphError, UserError } from "../errors";
 import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
@@ -25,7 +26,7 @@ export class OrNode extends ResourceTreeBoolNode {
 
     public override getElement(
         parent: ResourceTreeNode | null,
-        settingsForm: HTMLFormElement,
+        settings: ConverterSettings,
         multiplier: Rational,
         requestingConverter: IntermediateConverter,
     ): HTMLElement | null {
@@ -51,7 +52,7 @@ export class OrNode extends ResourceTreeBoolNode {
         for (let i = 0; i < this.children.length; i++) {
             const el = this.addOptionElement(
                 this.children[i],
-                settingsForm,
+                settings,
                 multiplier,
                 parent,
                 selectEl,
@@ -73,7 +74,7 @@ export class OrNode extends ResourceTreeBoolNode {
             const nothingNode = new NothingNode();
             this.addOptionElement(
                 nothingNode,
-                settingsForm,
+                settings,
                 multiplier,
                 parent,
                 selectEl,
@@ -89,7 +90,7 @@ export class OrNode extends ResourceTreeBoolNode {
     // Add an element for the given option
     private addOptionElement(
         option: ResourceTree,
-        settingsForm: HTMLFormElement,
+        settings: ConverterSettings,
         multiplier: Rational,
         parent: ResourceTreeNode,
         selectEl: HTMLElement,
@@ -98,7 +99,7 @@ export class OrNode extends ResourceTreeBoolNode {
     ): HTMLElement | null {
         const optionEl = option.getElement(
             this,
-            settingsForm,
+            settings,
             multiplier,
             requestingConverter,
         );
@@ -165,7 +166,7 @@ export class OrNode extends ResourceTreeBoolNode {
 
     public override addResourcesToList(
         _: ConverterIngredient[],
-        __: HTMLFormElement | null,
+        __: ConverterSettings,
         ___: Rational = Rational.one,
     ): ConverterIngredient[] {
         throw new UserError(

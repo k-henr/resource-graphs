@@ -2,15 +2,24 @@
     "tags": ["Ranching"],
     "displayName": "{Cramped|Cramped }{Mood} {Wild|Wild }Hatch",
     "thumbName": "Hatch",
+    "settings": [
+        { "type": "TOGGLE", "name": "Wild", "default": false },
+        {
+            "type": "ENUMERATE",
+            "name": "Mood",
+            "options": ["Miserable", "Glum", "Satisfied", "Happy"],
+            "default": "Happy"
+        }
+    ],
     "consumes": [
         {
             "type": "MULTIPLIER",
             "multiplier": {
-                "type": "TOGGLE",
+                "type": "SETTING",
                 "name": "Wild",
                 "true": 0,
                 "false": {
-                    "type": "ENUMERATE",
+                    "type": "SETTING",
                     "name": "Mood",
                     "options": [
                         [["Miserable", "Glum"], 0.2],
@@ -22,41 +31,25 @@
             "resource": {
                 "type": "OR",
                 "resources": [
-                    {
-                        "type": "TAG",
-                        "tagName": "Raw Mineral",
-                        "amount": 140
-                    },
-                    {
-                        "type": "RESOURCE",
-                        "id": "dirt",
-                        "amount": 140
-                    },
-                    {
-                        "type": "RESOURCE",
-                        "id": "sand",
-                        "amount": 140
-                    }
+                    { "type": "TAG", "tagName": "Raw Mineral", "amount": 140 },
+                    { "type": "RESOURCE", "id": "dirt", "amount": 140 },
+                    { "type": "RESOURCE", "id": "sand", "amount": 140 }
                 ]
             }
         },
-        {
-            "type": "RESOURCE",
-            "id": "hatch_egg",
-            "amount": [1, 95]
-        }
+        { "type": "RESOURCE", "id": "hatch_egg", "amount": [1, 95] }
     ],
     "produces": [
         {
             "type": "MULTIPLIER",
             "multiplier": {
-                "type": "ENUMERATE",
+                "type": "SETTING",
                 "name": "Mood",
                 "options": [
                     [
                         ["Miserable", "Glum"],
                         {
-                            "type": "TOGGLE",
+                            "type": "SETTING",
                             "name": "Wild",
                             "true": 0.1,
                             "false": 0.2
@@ -65,7 +58,7 @@
                     [
                         ["Satisfied", "Happy"],
                         {
-                            "type": "TOGGLE",
+                            "type": "SETTING",
                             "name": "Wild",
                             "true": 0.25,
                             "false": 1
@@ -74,16 +67,12 @@
                 ],
                 "default": "Happy"
             },
-            "resource": {
-                "type": "RESOURCE",
-                "id": "coal",
-                "amount": 70
-            }
+            "resource": { "type": "RESOURCE", "id": "coal", "amount": 70 }
         },
         {
             "type": "MULTIPLIER",
             "multiplier": {
-                "type": "TOGGLE",
+                "type": "SETTING",
                 "name": "Cramped",
                 "true": 0,
                 "false": {
@@ -91,7 +80,7 @@
                     "name": "Wild",
                     "true": [1, 95],
                     "false": {
-                        "type": "ENUMERATE",
+                        "type": "SETTING",
                         "name": "Mood",
                         "options": [
                             ["Miserable", 0],
@@ -105,11 +94,7 @@
                     }
                 }
             },
-            "resource": {
-                "type": "RESOURCE",
-                "id": "hatch_egg",
-                "amount": 1
-            }
+            "resource": { "type": "RESOURCE", "id": "hatch_egg", "amount": 1 }
         },
         { "type": "RESOURCE", "id": "meat", "amount": [3200, 95] }
     ]

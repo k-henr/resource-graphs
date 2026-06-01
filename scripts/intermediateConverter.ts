@@ -1,10 +1,10 @@
 import { Converter } from "./converter";
 import { ConverterSettings } from "./converterSettings";
-import { displayErr as displayErr, GraphError, ProgramError } from "./errors";
+import { displayErr } from "./errors";
 import { Rational } from "./rational";
 import { EntangledOrNode } from "./resource-tree/entangledOr";
 import { ResourceTree } from "./resource-tree/resourceTree";
-import { Setting } from "./types";
+import { ConverterSettingData } from "./types";
 
 /**
  * A class for holding a converter currently being constructed, with ORs and settings
@@ -26,23 +26,14 @@ export class IntermediateConverter {
         "#converter-info-template",
     )!;
 
-    // TODO: Make non-static
-    private static settingsForm = document.querySelector<HTMLFormElement>(
-        "#converter-settings-form",
-    )!;
-    private static settingInputTemplate =
-        document.querySelector<HTMLTemplateElement>(
-            "#converter-setting-input-template",
-        )!;
-    private static settingSelectTemplate =
-        document.querySelector<HTMLTemplateElement>(
-            "#converter-setting-select-template",
-        )!;
+    private static infoPanel =
+        document.querySelector<HTMLElement>("#rc-info-panel")!;
 
     constructor(
         displayName: string,
         thumbName: string,
         displayImage: string,
+        settingList: ConverterSettingData[],
         ingredientTree: ResourceTree,
         productTree: ResourceTree,
     ) {
@@ -52,32 +43,15 @@ export class IntermediateConverter {
         this.ingredientTree = ingredientTree;
         this.productTree = productTree;
 
-        // Get all the settings present in this converter
-        this.settings = this.productTree.registerSettings(
-            this.ingredientTree.registerSettings(new ConverterSettings()),
-        );
-    }
-
-    public populateSettingsForm(infoPanel: HTMLElement) {
-        // Add settings to the settings form
-        IntermediateConverter.settingsForm.innerHTML = "";
-        for (const [name, setting] of this.settings.getAllSettings()) {
-            const settingEl = this.createSettingInput(name, setting, infoPanel);
-
-            IntermediateConverter.settingsForm.appendChild(settingEl);
-        }
+        this.settings = new ConverterSettings(settingList, this);
     }
 
     public getThumbName() {
         return this.thumbName;
     }
-    public getDisplayName() {
-        const formData = new FormData(IntermediateConverter.settingsForm);
 
-        // Format the string
-        return this.displayName.replaceAll(/\{(.*?)\}/gim, (_, inner) =>
-            this.parseFormatting(inner, formData),
-        );
+    public getDisplayName() {
+        return this.settings.parseFormattedString(this.displayName);
     }
 
     public getDisplayImage() {
@@ -88,21 +62,31 @@ export class IntermediateConverter {
     public finalize(): Converter {
         const ingr = this.ingredientTree.addResourcesToList(
             [],
-            IntermediateConverter.settingsForm,
+            this.settings,
             Rational.one,
         );
         const prod = this.productTree.addResourcesToList(
             [],
-            IntermediateConverter.settingsForm,
+            this.settings,
             Rational.one,
         );
 
         return new Converter(this.getDisplayName(), this.displayImage, ingr, prod);
     }
 
+    public tryPopulateInfoPanel() {
+        try {
+            this.populateInfoPanel();
+        } catch (e: any) {
+            displayErr(e);
+            throw e;
+        }
+    }
+
     // Populate an info panel with information regarding this converter
-    // Assumes empty panel element!
-    public populateInfoPanel(infoPanel: HTMLElement) {
+    public populateInfoPanel() {
+        IntermediateConverter.infoPanel.innerHTML = "";
+
         const el = IntermediateConverter.infoTemplate.content.cloneNode(
             true,
         ) as DocumentFragment;
@@ -119,169 +103,17 @@ export class IntermediateConverter {
         el.querySelector<Element>(".c-info-ingredients")!.appendChild(
             this.ingredientTree.getElement(
                 null,
-                IntermediateConverter.settingsForm,
+                this.settings,
                 Rational.one,
                 this,
             ) ?? document.createElement("div"),
         );
         el.querySelector<Element>(".c-info-products")!.appendChild(
-            this.productTree.getElement(
-                null,
-                IntermediateConverter.settingsForm,
-                Rational.one,
-                this,
-            ) ?? document.createElement("div"),
+            this.productTree.getElement(null, this.settings, Rational.one, this) ??
+                document.createElement("div"),
         );
 
-        infoPanel.appendChild(el);
-    }
-
-    // Replace a given string with the text it represents, given settings data
-    private parseFormatting(toFormat: string, formData: FormData): string {
-        const args = toFormat.split("|");
-
-        // The first argument is always the name of the setting
-        const settingName = args[0];
-        const setting = this.settings.getSetting(settingName);
-
-        if (!setting) throw new GraphError(`Setting "${settingName}" not found!`);
-
-        // Depending on the type of the setting, do different things
-        switch (setting.type) {
-            case "TOGGLE": {
-                // Depending on if the toggle is on or not, return the first or
-                // second alternative
-                return formData.get(settingName) ? (args[1] ?? "") : (args[2] ?? "");
-            }
-
-            case "NUMBER": {
-                // Return the value of the setting
-                const rational = Rational.fromInput(
-                    String(formData.get(settingName)!.valueOf()),
-                    null,
-                );
-                if (!rational) return "???";
-                return rational.getDecimalString();
-            }
-
-            case "ENUMERATE": {
-                // Return the name of the chosen setting
-                return String(formData.get(settingName)!.valueOf());
-            }
-        }
-    }
-
-    private createSettingInput(
-        name: string,
-        setting: Setting,
-        infoPanel: HTMLElement,
-    ): DocumentFragment {
-        switch (setting.type) {
-            case "NUMBER": {
-                const [settingEl, , input] = this.createInputElement(
-                    name,
-                    infoPanel,
-                    setting.unit ?? "",
-                );
-                // Add a text input (which will be parsed to a rational) with the
-                // correct name and label
-                input.type = "text";
-                input.value = String(setting.default ?? 0);
-                return settingEl;
-            }
-
-            case "TOGGLE": {
-                const [settingEl, , input] = this.createInputElement(
-                    name,
-                    infoPanel,
-                    "",
-                );
-                // Add a toggle box
-                input.type = "checkbox";
-                input.checked = setting.default ?? false;
-                return settingEl;
-            }
-
-            case "ENUMERATE": {
-                const [settingEl, , select] = this.createSelectElement(
-                    name,
-                    infoPanel,
-                );
-                // Add all the options
-                for (const optionName of setting.options) {
-                    const optionEl = document.createElement("option");
-                    optionEl.value = optionName;
-                    optionEl.innerText = optionName;
-                    select.appendChild(optionEl);
-
-                    const defIndex = setting.options.indexOf(setting.default);
-                    select.selectedIndex = defIndex !== -1 ? defIndex : 0;
-                }
-
-                return settingEl;
-            }
-        }
-    }
-
-    private createInputElement(
-        name: string,
-        infoPanel: HTMLElement,
-        postText: string,
-    ): [DocumentFragment, HTMLLabelElement, HTMLInputElement] {
-        const settingEl =
-            IntermediateConverter.settingInputTemplate.content.cloneNode(
-                true,
-            ) as DocumentFragment;
-        const label = settingEl.querySelector<HTMLLabelElement>("label")!;
-        const input = settingEl.querySelector<HTMLInputElement>("input")!;
-        const post = settingEl.querySelector<HTMLElement>("span")!;
-
-        label.htmlFor = name;
-        label.innerText = name;
-        input.name = name;
-        post.innerText = postText;
-
-        input.onchange = () => {
-            // Clear info panel and show again
-            try {
-                infoPanel.innerHTML = "";
-                this.populateInfoPanel(infoPanel);
-            } catch (e: any) {
-                displayErr(e);
-                throw e;
-            }
-        };
-
-        return [settingEl, label, input];
-    }
-
-    private createSelectElement(
-        name: string,
-        infoPanel: HTMLElement,
-    ): [DocumentFragment, HTMLLabelElement, HTMLSelectElement] {
-        const settingEl =
-            IntermediateConverter.settingSelectTemplate.content.cloneNode(
-                true,
-            ) as DocumentFragment;
-        const label = settingEl.querySelector<HTMLLabelElement>("label")!;
-        const input = settingEl.querySelector<HTMLSelectElement>("select")!;
-
-        label.htmlFor = name;
-        label.innerText = name;
-        input.name = name;
-
-        input.onchange = () => {
-            // Clear info panel and show again
-            try {
-                infoPanel.innerHTML = "";
-                this.populateInfoPanel(infoPanel);
-            } catch (e: any) {
-                displayErr(e);
-                throw e;
-            }
-        };
-
-        return [settingEl, label, input];
+        IntermediateConverter.infoPanel.appendChild(el);
     }
 
     public registerEntangledOr(id: string, node: EntangledOrNode) {

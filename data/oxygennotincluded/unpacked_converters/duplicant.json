@@ -1,13 +1,24 @@
 {
     "displayName": "Duplicant{Bottomless stomach| (bottomless stomach)}{Mouth breather| (mouth breather)}",
     "thumbName": "Duplicant",
+    "settings": [
+        { "type": "TOGGLE", "name": "Bottomless stomach", "default": false },
+        { "type": "TOGGLE", "name": "Mouth breather", "default": false },
+        { "type": "TOGGLE", "name": "Diver's Lungs", "default": false },
+        { "type": "TOGGLE", "name": "Deep Diver's Lungs", "default": false },
+        {
+            "type": "ENUMERATE",
+            "name": "Waste expelled by",
+            "default": "Lavatory",
+            "options": ["Lavatory", "Outhouse", "Accident"]
+        }
+    ],
     "consumes": [
         {
             "type": "MULTIPLIER",
             "multiplier": {
-                "type": "TOGGLE",
+                "type": "SETTING",
                 "name": "Bottomless stomach",
-                "default": false,
                 "true": 1.5,
                 "false": 1
             },
@@ -24,23 +35,20 @@
                 "values": [
                     60,
                     {
-                        "type": "TOGGLE",
+                        "type": "SETTING",
                         "name": "Mouth breather",
-                        "default": false,
                         "true": 60,
                         "false": 0
                     },
                     {
-                        "type": "TOGGLE",
+                        "type": "SETTING",
                         "name": "Diver's Lungs",
-                        "default": false,
                         "true": -15,
                         "false": 0
                     },
                     {
-                        "type": "TOGGLE",
+                        "type": "SETTING",
                         "name": "Deep Diver's Lungs",
-                        "default": false,
                         "true": -30,
                         "false": 0
                     }
@@ -55,9 +63,8 @@
         {
             "type": "MULTIPLIER",
             "multiplier": {
-                "type": "ENUMERATE",
+                "type": "SETTING",
                 "name": "Waste expelled by",
-                "default": "Lavatory",
                 "options": [
                     ["Lavatory", 5],
                     [["Outhouse", "Accident"], 0]
@@ -72,9 +79,8 @@
         {
             "type": "MULTIPLIER",
             "multiplier": {
-                "type": "ENUMERATE",
+                "type": "SETTING",
                 "name": "Waste expelled by",
-                "default": "Lavatory",
                 "options": [
                     ["Outhouse", 1],
                     [["Lavatory", "Accident"], 0]
@@ -95,23 +101,20 @@
                 "values": [
                     1.2,
                     {
-                        "type": "TOGGLE",
+                        "type": "SETTING",
                         "name": "Mouth breather",
-                        "default": false,
                         "true": 1.2,
                         "false": 0
                     },
                     {
-                        "type": "TOGGLE",
+                        "type": "SETTING",
                         "name": "Diver's Lungs",
-                        "default": false,
                         "true": -0.3,
                         "false": 0
                     },
                     {
-                        "type": "TOGGLE",
+                        "type": "SETTING",
                         "name": "Deep Diver's Lungs",
-                        "default": false,
                         "true": -0.6,
                         "false": 0
                     }
@@ -126,9 +129,8 @@
         {
             "type": "MULTIPLIER",
             "multiplier": {
-                "type": "ENUMERATE",
+                "type": "SETTING",
                 "name": "Waste expelled by",
-                "default": "Lavatory",
                 "options": [
                     ["Lavatory", 11.7],
                     ["Outhouse", 0],
@@ -144,9 +146,8 @@
         {
             "type": "MULTIPLIER",
             "multiplier": {
-                "type": "ENUMERATE",
+                "type": "SETTING",
                 "name": "Waste expelled by",
-                "default": "Lavatory",
                 "options": [
                     ["Outhouse", 1],
                     [["Lavatory", "Accident"], 0]

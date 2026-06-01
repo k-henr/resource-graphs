@@ -1,34 +1,12 @@
 {
     "tags": ["Refinement"],
-    "id": "water_sieve",
-    "displayName": "Water Sieve",
     "consumes": [
-        {
-            "type": "RESOURCE",
-            "id": "power",
-            "amount": 120
-        },
-        {
-            "type": "RESOURCE",
-            "id": "polluted_water",
-            "amount": 3000
-        },
-        {
-            "type": "TAG",
-            "tagName": "Filtration medium",
-            "amount": 600
-        }
+        { "type": "RESOURCE", "id": "power", "amount": 120 },
+        { "type": "RESOURCE", "id": "polluted_water", "amount": 3000 },
+        { "type": "TAG", "tagName": "Filtration medium", "amount": 600 }
     ],
     "produces": [
-        {
-            "type": "RESOURCE",
-            "id": "water",
-            "amount": 3000
-        },
-        {
-            "type": "RESOURCE",
-            "id": "polluted_dirt",
-            "amount": 120
-        }
+        { "type": "RESOURCE", "id": "water", "amount": 3000 },
+        { "type": "RESOURCE", "id": "polluted_dirt", "amount": 120 }
     ]
 }

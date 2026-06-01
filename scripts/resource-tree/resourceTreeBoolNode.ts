@@ -1,6 +1,5 @@
 import { ConverterSettings } from "../converterSettings";
 import { ProgramError } from "../errors";
-import { Resource } from "../resource";
 import { ResourceTree } from "./resourceTree";
 import { ResourceTreeNode } from "./resourceTreeNode";
 
@@ -10,11 +9,6 @@ export abstract class ResourceTreeBoolNode extends ResourceTreeNode {
     public constructor(children: ResourceTree[]) {
         super();
         this.children = children;
-    }
-
-    public override registerSettings(settings: ConverterSettings) {
-        this.children.map((c) => c.registerSettings(settings));
-        return settings;
     }
 
     public override replaceChild(

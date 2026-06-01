@@ -17,7 +17,7 @@ export class NothingNode extends ResourceTree {
 
     public override getElement(
         _parent: ResourceTreeNode | null,
-        _settingsForm: HTMLFormElement,
+        _settings: ConverterSettings,
         _multiplier: Rational,
         _requestingConverter: IntermediateConverter,
     ): HTMLElement | null {
@@ -36,12 +36,8 @@ export class NothingNode extends ResourceTree {
 
     public override addResourcesToList(
         output: ConverterIngredient[],
-        _: HTMLFormElement | null,
+        _: ConverterSettings,
     ) {
         return output;
-    }
-
-    public override registerSettings(s: ConverterSettings) {
-        return s;
     }
 }

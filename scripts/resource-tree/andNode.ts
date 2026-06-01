@@ -1,3 +1,4 @@
+import { ConverterSettings } from "../converterSettings";
 import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
 import { ConverterIngredient } from "../types";
@@ -12,7 +13,7 @@ export class AndNode extends ResourceTreeBoolNode {
 
     public override getElement(
         _: ResourceTreeNode | null,
-        settingsForm: HTMLFormElement,
+        settings: ConverterSettings,
         multiplier: Rational,
         requestingConverter: IntermediateConverter,
     ): HTMLElement | null {
@@ -21,7 +22,7 @@ export class AndNode extends ResourceTreeBoolNode {
         this.children.map((child) => {
             const cEl = child.getElement(
                 this,
-                settingsForm,
+                settings,
                 multiplier,
                 requestingConverter,
             );
@@ -32,12 +33,10 @@ export class AndNode extends ResourceTreeBoolNode {
 
     public override addResourcesToList(
         output: ConverterIngredient[],
-        settingsForm: HTMLFormElement | null,
+        settings: ConverterSettings,
         multiplier: Rational = Rational.one,
     ) {
-        this.children.map((c) =>
-            c.addResourcesToList(output, settingsForm, multiplier),
-        );
+        this.children.map((c) => c.addResourcesToList(output, settings, multiplier));
         return output;
     }
 }

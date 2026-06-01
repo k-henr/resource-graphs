@@ -112,6 +112,7 @@ export async function loadAllConverters() {
                         data.displayName,
                         data.thumbName ?? data.displayName,
                         getSrc(data.displayImage),
+                        data.settings ?? [],
                         resourceTreeDataToClass(andWrap(data.consumes)),
                         resourceTreeDataToClass(andWrap(data.produces)),
                     );

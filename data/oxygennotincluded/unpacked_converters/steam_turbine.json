@@ -3,59 +3,55 @@
     "id": "steam_turbine",
     "displayName": "Steam Turbine ({Steam temperature}°C)",
     "thumbName": "Steam Turbine",
+    "settings": [
+        {
+            "type": "NUMBER",
+            "name": "Flow rate",
+            "default": 2,
+            "unit": "kg/s"
+        },
+        {
+            "type": "NUMBER",
+            "name": "Steam temperature",
+            "default": 125
+        }
+    ],
     "consumes": [
         {
             "type": "MULTIPLIER",
+            "multiplier": { "type": "SETTING", "name": "Flow rate" },
             "resource": {
                 "type": "RESOURCE",
                 "id": "steam",
                 "amount": 600
-            },
-            "multiplier": {
-                "type": "NUMBER",
-                "name": "Flow rate",
-                "default": 2,
-                "unit": "kg/s"
             }
         }
     ],
     "produces": [
         {
             "type": "MULTIPLIER",
+            "multiplier": { "type": "SETTING", "name": "Flow rate" },
             "resource": {
                 "type": "RESOURCE",
                 "id": "water",
                 "amount": 600
-            },
-            "multiplier": { "type": "NUMBER", "name": "Flow rate" }
+            }
         },
         {
             "type": "MULTIPLIER",
-            "resource": {
-                "type": "RESOURCE",
-                "id": "power",
-                "amount": 1
-            },
             "multiplier": {
                 "type": "MUL",
                 "values": [
                     [85, 21],
-                    {
-                        "type": "NUMBER",
-                        "name": "Flow rate",
-                        "default": 2
-                    },
+                    { "type": "SETTING", "name": "Flow rate", "default": 2 },
                     {
                         "type": "SUB",
-                        "value1": {
-                            "type": "NUMBER",
-                            "name": "Steam temperature",
-                            "default": 125
-                        },
+                        "value1": { "type": "SETTING", "name": "Steam temperature" },
                         "value2": 95
                     }
                 ]
-            }
+            },
+            "resource": { "type": "RESOURCE", "id": "power", "amount": 1 }
         }
     ]
 }

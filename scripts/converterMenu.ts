@@ -143,20 +143,12 @@ export class ConverterMenu extends SubmitMenu {
             // Check the tags of this factory
             const tags = cFact.tags.length > 0 ? cFact.tags : ["Miscellaneous"];
 
-            // Create an onclick function
+            // Create an onclick function that opens the details for this converter
             let onclickFn = () => {
-                try {
-                    this.intermediateConverter = cFact.factory();
-                    // TODO: Clear settings form
-
-                    this.infoPanel.innerHTML = "";
-                    this.intermediateConverter.populateSettingsForm(this.infoPanel);
-                    this.intermediateConverter.populateInfoPanel(this.infoPanel);
-                    this.openDetailPopup();
-                } catch (e: any) {
-                    displayErr(e);
-                    throw e;
-                }
+                this.intermediateConverter = cFact.factory();
+                this.infoPanel.innerHTML = "";
+                this.intermediateConverter.tryPopulateInfoPanel();
+                this.openDetailPopup();
             };
 
             // Add this thumb to all tag lists where it should be

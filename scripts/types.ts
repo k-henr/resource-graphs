@@ -32,8 +32,8 @@ export type UnitGroupData = {
 };
 
 // The processed version of the unit group. Not a JSON type!
-// (TODO: Use generics here too? Maybe in general I should use generics where I
-// process rationals to avoid duplicating types like this)
+// (todo: merge this and the above by adding <Processed extends boolean> and using
+// the same type?)
 export type UnitGroup = {
     default: string;
     conversions: [string, Rational][];
@@ -41,33 +41,31 @@ export type UnitGroup = {
 
 // = = = = = = = = CONVERTER = = = = = = = =
 
-// Describes a single converter. If it's processed, that means that any illegal or
-// inferred fields have been correctly resolved, making it safe for later parts of
-// the program to handle
-// TODO: Speed up loading by adding a needsPreprocessing field here and skipping the
-// ones that don't need it? I should be able to automatically generate that in the
-// python
+// Describes a single converter.
 export type ConverterData = {
     id: string;
     tags: string[] | undefined;
     displayName: string;
     thumbName: string | undefined;
     displayImage: string;
+    // Configuration for all the settings on this converter
+    settings: ConverterSettingData[];
     // The trees are wrapped in implicit ANDs in the data, but this gets resolved
-    // during processing. Yucky, should make better later I think
+    // during processing
     consumes: ResourceTreeData[];
     produces: ResourceTreeData[];
 };
 
 // A type for a factory of a converter, before any settings or ingredient trees are
-// resolved. Stores some basic information for display and filtering. Not a json type!
+// resolved. Stores some basic information for display and filtering. Not a json
+// type!
 export type ConverterFactory = {
     name: string;
     image: string;
     tags: string[];
     possibleIngredients: Resource[];
     possibleProducts: Resource[];
-    // switch to using an interface to not mix paradigms?
+    // todo: switch to using an interface to not mix paradigms?
     factory: () => IntermediateConverter;
 };
 
@@ -124,7 +122,38 @@ export type ResourceTreeDataMultiplierNode = {
     resource: ResourceTreeData;
 };
 
-// -------- Setting nodes --------
+// -------- Setting definitions --------
+
+export type ConverterSettingData =
+    | ConverterNumberSettingData
+    | ConverterToggleSettingData
+    | ConverterEnumerateSettingData;
+
+// A number input. User can input any rational number, and this node will return the
+// chosen number
+export type ConverterNumberSettingData = {
+    type: "NUMBER";
+    name: string;
+    default: RationalNumber;
+    unit: string; // Written after the input. todo: Give actual functionality
+};
+// A toggle input. User can toggle a checkbox, which either evaluates the "true"
+// branch or the "false" branch
+export type ConverterToggleSettingData = {
+    type: "TOGGLE";
+    name: string;
+    default: boolean;
+};
+// An enumerate input. User can choose any of a given number of options, and the node
+// will evaluate the tree associated to that input
+export type ConverterEnumerateSettingData = {
+    type: "ENUMERATE";
+    name: string;
+    default: string;
+    options: string[];
+};
+
+// -------- AST nodes --------
 
 // Types for specifying an AST tree describing the efficiency of a process as the
 // result of a number of user-configurable settings
@@ -135,35 +164,27 @@ export type SettingsTreeNode =
 
 // A simple number
 export type SettingsTreeNumberNode = RationalNumber;
-// An input node, of any of the given types
+
+// A setting node, will get the contents of the correct input on the settings form
 export type SettingsTreeInputNode =
     | SettingsTreeNumberInput
     | SettingsTreeToggleInput
     | SettingsTreeEnumerateInput;
-// A number input. User can input any rational number, and this node will return the
-// chosen number
+
 export type SettingsTreeNumberInput = {
-    type: "NUMBER";
+    type: "SETTING";
     name: string;
-    default: RationalNumber;
-    unit: string | undefined;
 };
-// A toggle input. User can toggle a checkbox, which either evaluates the "true"
-// branch or the "false" branch
 export type SettingsTreeToggleInput = {
-    type: "TOGGLE";
+    type: "SETTING";
     name: string;
     true: SettingsTreeNode;
     false: SettingsTreeNode;
-    default: boolean;
 };
-// An enumerate input. User can choose any of a given number of options, and the node
-// will evaluate the tree associated to that input
 export type SettingsTreeEnumerateInput = {
-    type: "ENUMERATE";
+    type: "SETTING";
     name: string;
     options: [string | string[], SettingsTreeNode][];
-    default: string;
 };
 
 // Performs maths on the given nodes, for more complex ASTs
@@ -200,23 +221,6 @@ export type SettingsTreePowNode = {
     type: "POW";
     value1: SettingsTreeNode;
     value2: SettingsTreeNode;
-};
-
-// Represents the settings after parsing, outside of the AST. Not json types!
-export type Setting = NumberSetting | ToggleSetting | EnumerateSetting;
-export type NumberSetting = {
-    type: "NUMBER";
-    default: RationalNumber; // TODO: Since this isn't a json type, this should be Rational
-    unit: string | null; // This text is written after the input element, purely cosmetic
-};
-export type ToggleSetting = {
-    type: "TOGGLE";
-    default: boolean;
-};
-export type EnumerateSetting = {
-    type: "ENUMERATE";
-    options: string[];
-    default: string;
 };
 
 // = = = = = = = = RESOURCES = = = = = = = =
