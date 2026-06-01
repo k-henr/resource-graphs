@@ -73,8 +73,9 @@ export class Converter {
             }
         }
 
-        // In case the converter isn't actually going positive, return 0
-        // (todo: popup)
+        // In case the converter isn't actually producing the requested resource (as
+        // a result of choosing the wrong ORs or whatever), return 0
+        // (todo: popup?)
         if (!total.greaterThan(Rational.zero)) return Rational.zero;
 
         return amount.div(total).negate();

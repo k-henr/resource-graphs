@@ -4,9 +4,6 @@ import { Resource } from "./resource";
 
 /**
  * Contains all types, even the ones that aren't from the data.
- *
- * TODO: Move into two files, jsonTypes and programTypes? That way jsonTypes won't
- * need any imports, which'd be nice
  */
 
 // = = = = = = = = CONFIG = = = = = = = =
@@ -135,7 +132,7 @@ export type ConverterNumberSettingData = {
     type: "NUMBER";
     name: string;
     default: RationalNumber;
-    unit: string; // Written after the input. todo: Give actual functionality
+    unit: string; // Written after the input, no functionality atm
 };
 // A toggle input. User can toggle a checkbox, which either evaluates the "true"
 // branch or the "false" branch

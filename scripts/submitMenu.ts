@@ -131,7 +131,6 @@ export abstract class SubmitMenu {
             );
 
             // Add the thumb to the end of the tag list
-            // TODO: Alphabetical order (break out into function in SubmitMenu)
             const thumb = SubmitMenu.createThumb(
                 thumbData.name,
                 thumbData.image,
