@@ -60,7 +60,8 @@
                 </form>
                 <!-- Filter form for when adding converters. Currently the same as
                  the resource form, but different elements due to listeners being
-                 different. Can also be expanded later -->
+                 different. Can also be expanded later, so I think it's reasonable to
+                 keep them separate -->
                 <form id="converter-filter-form" class="hidden">
                     <label for="search-string">Search</label>
                     <input type="text" name="search-string" autocomplete="off" />
@@ -70,7 +71,6 @@
                     <!-- All resource/converter thumbs are loaded in here -->
                     <div class="tag-list-content"></div>
                 </div>
-                <!-- TODO: Break out footer to its own popup -->
             </div>
 
             <div id="rc-detail-popup" class="hidden">
@@ -83,8 +83,14 @@
                                 type="text"
                                 name="delta"
                                 value="1"
-                                step="0.01"
                                 autocomplete="off"
+                                onkeydown="
+                                    // Prevent enter from submitting the form
+                                    if (event.key === 'Enter') {
+                                        event.preventDefault();
+                                        return false;
+                                    }
+                                "
                             />
                             <select id="resource-unit-select"></select>
                         </div>
@@ -116,8 +122,14 @@
                                         type="text"
                                         name="amount"
                                         value="1"
-                                        step="0.01"
                                         autocomplete="off"
+                                        onkeydown="
+                                            // Prevent enter from submitting the form
+                                            if (event.key === 'Enter') {
+                                                event.preventDefault();
+                                                return false;
+                                            }
+                                        "
                                     />
                                 </div>
                             </div>

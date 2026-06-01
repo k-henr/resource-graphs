@@ -1576,9 +1576,9 @@ Please report this as a bug!`);
     window.onhashchange = () => {
       window.location.reload();
     };
+    const loadingScreen = document.querySelector("#loading-screen");
+    const loadingText = loadingScreen.querySelector("p");
     try {
-      const loadingScreen = document.querySelector("#loading-screen");
-      const loadingText = loadingScreen.querySelector("p");
       const resourceDeltaList = document.querySelector(
         "#resources"
       );
@@ -1696,6 +1696,7 @@ Please report this as a bug!`);
       loadingScreen.remove();
     } catch (e) {
       displayErr(e);
+      loadingText.innerText = "Error encountered during loading";
     }
   })();
 })();

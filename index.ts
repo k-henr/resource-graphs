@@ -21,10 +21,9 @@ import { displayErr, GraphError } from "./scripts/errors";
         window.location.reload();
     };
 
+    const loadingScreen = document.querySelector("#loading-screen")!;
+    const loadingText = loadingScreen.querySelector("p")!;
     try {
-        const loadingScreen = document.querySelector("#loading-screen")!;
-        const loadingText = loadingScreen.querySelector("p")!;
-
         const resourceDeltaList = document.querySelector(
             "#resources",
         ) as HTMLElement;
@@ -176,5 +175,6 @@ import { displayErr, GraphError } from "./scripts/errors";
         loadingScreen.remove();
     } catch (e: any) {
         displayErr(e);
+        loadingText.innerText = "Error encountered during loading";
     }
 })();
