@@ -129,6 +129,9 @@ Please report this as a bug!`);
       const rest = num - whole * den;
       return `${isNeg ? "-" : ""}${whole !== 0 ? whole : ""}${whole !== 0 && rest !== 0 ? " " : ""}${rest !== 0 ? `${rest}/${den}` : ""}`;
     }
+    getList() {
+      return [this.numerator, this.denominator];
+    }
   };
 
   // scripts/converter.ts
@@ -216,7 +219,7 @@ Please report this as a bug!`);
     getElement() {
       return this.element;
     }
-    static makeInputElement(name, postText, requestingConverter) {
+    static makeInputElement(name, unit, requestingConverter) {
       const settingEl = _ConverterSetting.settingInputTemplate.content.cloneNode(
         true
       );
@@ -226,7 +229,7 @@ Please report this as a bug!`);
       label.htmlFor = name;
       label.innerText = name;
       input.name = name;
-      post.innerText = postText;
+      post.innerText = unit ?? "";
       input.onchange = () => requestingConverter.tryPopulateInfoPanel();
       return [settingEl, label, input];
     }
@@ -301,12 +304,16 @@ Please report this as a bug!`);
         requestingConverter
       );
       input.type = "text";
-      input.value = String(defaultValue);
+      input.value = defaultValue.getMixedFractionString();
       super(settingEl.firstElementChild);
       this.inputElement = input;
     }
     chooseBranch(_) {
-      return Number(this.inputElement.value);
+      console.log("value of input:", JSON.stringify(this.inputElement.value));
+      return Rational.fromInput(
+        this.inputElement.value,
+        this.inputElement
+      )?.getList() ?? 0;
     }
     getFormattedString(_) {
       const rational = Rational.fromInput(this.inputElement.value, null);
@@ -367,7 +374,7 @@ Please report this as a bug!`);
           return new ConverterNumberSetting(
             data.name,
             Rational.fromData(data.default),
-            data.unit,
+            data.unit ?? null,
             requestingConverter
           );
         case "TOGGLE":

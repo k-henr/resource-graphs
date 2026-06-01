@@ -132,7 +132,7 @@ export type ConverterNumberSettingData = {
     type: "NUMBER";
     name: string;
     default: RationalNumber;
-    unit: string; // Written after the input, no functionality atm
+    unit: string | undefined; // Written after the input, no functionality atm
 };
 // A toggle input. User can toggle a checkbox, which either evaluates the "true"
 // branch or the "false" branch

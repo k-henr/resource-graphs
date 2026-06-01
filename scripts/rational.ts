@@ -153,4 +153,8 @@ export class Rational {
         const rest = num - whole * den;
         return `${isNeg ? "-" : ""}${whole !== 0 ? whole : ""}${whole !== 0 && rest !== 0 ? " " : ""}${rest !== 0 ? `${rest}/${den}` : ""}`;
     }
+
+    public getList(): [number, number] {
+        return [this.numerator, this.denominator];
+    }
 }

@@ -36,7 +36,7 @@ export abstract class ConverterSetting {
 
     protected static makeInputElement(
         name: string,
-        postText: string,
+        unit: string | null,
         requestingConverter: IntermediateConverter,
     ): [DocumentFragment, HTMLLabelElement, HTMLInputElement] {
         const settingEl = ConverterSetting.settingInputTemplate.content.cloneNode(
@@ -49,7 +49,7 @@ export abstract class ConverterSetting {
         label.htmlFor = name;
         label.innerText = name;
         input.name = name;
-        post.innerText = postText;
+        post.innerText = unit ?? "";
 
         input.onchange = () => requestingConverter.tryPopulateInfoPanel();
 

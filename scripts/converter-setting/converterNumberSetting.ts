@@ -9,7 +9,7 @@ export class ConverterNumberSetting extends ConverterSetting {
     constructor(
         name: string,
         defaultValue: Rational,
-        unit: string,
+        unit: string | null,
         requestingConverter: IntermediateConverter,
     ) {
         const [settingEl, , input] = ConverterSetting.makeInputElement(
@@ -20,14 +20,20 @@ export class ConverterNumberSetting extends ConverterSetting {
         // Add a text input (which will be parsed to a rational) with the correct
         // name and label
         input.type = "text";
-        input.value = String(defaultValue);
+        input.value = defaultValue.getMixedFractionString();
 
         super(settingEl.firstElementChild);
         this.inputElement = input;
     }
 
     public override chooseBranch(_: SettingsTreeInputNode): SettingsTreeNode {
-        return Number(this.inputElement.value);
+        console.log("value of input:", JSON.stringify(this.inputElement.value)); // [object Object]
+        return (
+            Rational.fromInput(
+                this.inputElement.value,
+                this.inputElement,
+            )?.getList() ?? 0
+        );
     }
 
     public override getFormattedString(_: string[]): string {

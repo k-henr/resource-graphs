@@ -45,7 +45,7 @@ export class ConverterSettings {
                 return new ConverterNumberSetting(
                     data.name,
                     Rational.fromData(data.default),
-                    data.unit,
+                    data.unit ?? null,
                     requestingConverter,
                 );
             case "TOGGLE":
