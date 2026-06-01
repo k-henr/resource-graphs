@@ -106,6 +106,8 @@ export class ResourceGraph {
             // If there's a negative delta for this resource, highlight it and add a listener for opening the converter menu with that as a filter
             if (amount.lessThan(Rational.zero)) {
                 el.classList.add("negative-resource-delta");
+                el.classList.add("red");
+                el.classList.add("interactive");
                 el.onclick = () =>
                     this.converterRequestTarget?.requestConverterForResource(
                         resource,

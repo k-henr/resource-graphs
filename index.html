@@ -14,7 +14,10 @@
                     <div id="converters">
                         <!-- Contains converters that are used and the "number" of conversions required -->
                     </div>
-                    <button id="open-converter-menu-button" class="primary-button">
+                    <button
+                        id="open-converter-menu-button"
+                        class="primary interactive"
+                    >
                         <img src="icons/add.svg" />
                         Add new converter
                     </button>
@@ -25,7 +28,7 @@
                 <div id="resources">
                     <!-- Contains resources and their rate of consumption/production -->
                 </div>
-                <button id="open-item-delta-menu-button" class="primary-button">
+                <button id="open-item-delta-menu-button" class="interactive primary">
                     <img src="icons/add.svg" />
                     Add new resource source/drain
                 </button>
@@ -56,7 +59,6 @@
                 <form id="resource-filter-form" class="hidden">
                     <label for="search-string">Search</label>
                     <input type="text" name="search-string" autocomplete="off" />
-                    <button type="submit">Apply</button>
                 </form>
                 <!-- Filter form for when adding converters. Currently the same as
                  the resource form, but different elements due to listeners being
@@ -65,7 +67,6 @@
                 <form id="converter-filter-form" class="hidden">
                     <label for="search-string">Search</label>
                     <input type="text" name="search-string" autocomplete="off" />
-                    <button type="submit">Apply</button>
                 </form>
                 <div id="add-rc-tag-list">
                     <!-- All resource/converter thumbs are loaded in here -->
@@ -97,13 +98,13 @@
                         <div>
                             <button
                                 type="submit"
-                                class="primary-button rc-submit-button"
+                                class="primary interactive rc-submit-button"
                             >
                                 Add Resource
                             </button>
                             <button
                                 id="close-item-popup-button"
-                                class="rc-submit-button"
+                                class="interactive rc-submit-button"
                             >
                                 Cancel
                             </button>
@@ -136,14 +137,14 @@
                             <div>
                                 <button
                                     type="submit"
-                                    class="primary-button rc-submit-button"
+                                    class="primary interactive rc-submit-button"
                                 >
                                     Add Converter
                                 </button>
                                 <button
                                     type="button"
                                     id="close-converter-popup-button"
-                                    class="rc-submit-button"
+                                    class="interactive rc-submit-button"
                                 >
                                     Cancel
                                 </button>
@@ -154,13 +155,13 @@
             </div>
         </div>
 
-        <div id="loading-screen"><p>Loading...</p></div>
+        <div id="loading-screen"><p class="muted">Loading...</p></div>
 
         <!-------------------------------------------------------------------------->
 
         <!-- Template for a resource displayed in the resource list -->
         <template id="resource-delta-template">
-            <div class="thumb">
+            <div class="thumb muted">
                 <img class="resource-image" />
                 <div class="resource-name small-text"></div>
                 <div>
@@ -172,14 +173,14 @@
 
         <!-- Template for a resource converter displayed in the converter list -->
         <template id="converter-template">
-            <div class="converter">
+            <div class="converter muted">
                 <img class="converter-image" />
                 <div class="converter-name"></div>
                 ⨉
                 <input type="text" class="converter-amount" />
                 <div class="flex-1"></div>
                 <!-- TODO: Visuals of what it converts? Just using images -->
-                <button class="remove-converter-button">
+                <button class="remove-converter-button red interactive">
                     <img src="icons/delete.svg" />
                 </button>
             </div>
@@ -198,7 +199,7 @@
 
         <!-- Template for an item or converter thumb in the selection lists -->
         <template id="item-converter-thumb">
-            <div class="thumb">
+            <div class="thumb interactive muted">
                 <img class="thumb-image" />
                 <div class="thumb-name"></div>
             </div>

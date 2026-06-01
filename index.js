@@ -1174,6 +1174,8 @@ Please report this as a bug!`);
         el.querySelector(".resource-delta-unit").innerText = getUnits(resource.getUnitGroupName())[1];
         if (amount.lessThan(Rational.zero)) {
           el.classList.add("negative-resource-delta");
+          el.classList.add("red");
+          el.classList.add("interactive");
           el.onclick = () => this.converterRequestTarget?.requestConverterForResource(
             resource,
             amount
