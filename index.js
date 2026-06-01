@@ -554,19 +554,10 @@ Please report this as a bug!`);
     }
   };
 
-  // scripts/resource-tree/resourceTree.ts
-  var ResourceTree = class {
-  };
-
-  // scripts/resource-tree/resourceTreeNode.ts
-  var ResourceTreeNode = class extends ResourceTree {
-  };
-
   // scripts/resource-tree/resourceTreeBoolNode.ts
-  var ResourceTreeBoolNode = class extends ResourceTreeNode {
+  var ResourceTreeBoolNode = class {
     children;
     constructor(children) {
-      super();
       this.children = children;
     }
     replaceChild(oldChild, newChild) {
@@ -607,13 +598,10 @@ Please report this as a bug!`);
   };
 
   // scripts/resource-tree/nothingNode.ts
-  var NothingNode = class _NothingNode extends ResourceTree {
+  var NothingNode = class _NothingNode {
     static converterIngredientTemplate = document.querySelector(
       "template#converter-ingredient-template"
     );
-    constructor() {
-      super();
-    }
     getElement(_parent, _settings, _multiplier, _requestingConverter) {
       const el = _NothingNode.converterIngredientTemplate.content.cloneNode(
         true
@@ -809,11 +797,10 @@ Please report this as a bug!`);
   };
 
   // scripts/resource-tree/multiplierNode.ts
-  var MultiplierNode = class extends ResourceTreeNode {
+  var MultiplierNode = class {
     multiplierAst;
     resource;
     constructor(multiplierAst, resource) {
-      super();
       this.multiplierAst = multiplierAst;
       this.resource = resource;
     }
@@ -925,7 +912,7 @@ Please report this as a bug!`);
   }
 
   // scripts/resource-tree/resourceNode.ts
-  var ResourceNode = class _ResourceNode extends ResourceTree {
+  var ResourceNode = class _ResourceNode {
     id;
     amount;
     // Template for a resource element
@@ -933,7 +920,6 @@ Please report this as a bug!`);
       "template#converter-ingredient-template"
     );
     constructor(id, amount) {
-      super();
       this.id = id;
       this.amount = amount;
     }

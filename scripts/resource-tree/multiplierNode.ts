@@ -6,17 +6,16 @@ import { ConverterIngredient, SettingsTreeNode } from "../types";
 import { ResourceTree } from "./resourceTree";
 import { ResourceTreeNode } from "./resourceTreeNode";
 
-export class MultiplierNode extends ResourceTreeNode {
+export class MultiplierNode implements ResourceTreeNode {
     private multiplierAst: SettingsTreeNode;
     private resource: ResourceTree;
 
     constructor(multiplierAst: SettingsTreeNode, resource: ResourceTree) {
-        super();
         this.multiplierAst = multiplierAst;
         this.resource = resource;
     }
 
-    public override getElement(
+    public getElement(
         _: ResourceTreeNode | null,
         settings: ConverterSettings,
         multiplier: Rational,
@@ -39,7 +38,7 @@ export class MultiplierNode extends ResourceTreeNode {
         );
     }
 
-    public override addResourcesToList(
+    public addResourcesToList(
         output: ConverterIngredient[],
         settings: ConverterSettings,
         multiplier: Rational,
@@ -55,10 +54,7 @@ export class MultiplierNode extends ResourceTreeNode {
         return output;
     }
 
-    public override replaceChild(
-        oldChild: ResourceTree,
-        newChild: ResourceTree,
-    ): void {
+    public replaceChild(oldChild: ResourceTree, newChild: ResourceTree): void {
         if (this.resource !== oldChild)
             throw new ProgramError(
                 "Tried to replace a resource on a MULTIPLIER that wasn't present on the node!",

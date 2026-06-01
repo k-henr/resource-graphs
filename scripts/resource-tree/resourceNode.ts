@@ -2,13 +2,12 @@ import { ConverterSettings } from "../converterSettings";
 import { getResource } from "../data";
 import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
-import { Resource } from "../resource";
 import { ConverterIngredient } from "../types";
 import { getUnits } from "../units";
 import { ResourceTree } from "./resourceTree";
 import { ResourceTreeNode } from "./resourceTreeNode";
 
-export class ResourceNode extends ResourceTree {
+export class ResourceNode implements ResourceTree {
     private id: string;
     private amount: Rational;
 
@@ -19,12 +18,11 @@ export class ResourceNode extends ResourceTree {
         )!;
 
     public constructor(id: string, amount: Rational) {
-        super();
         this.id = id;
         this.amount = amount;
     }
 
-    public override getElement(
+    public getElement(
         _: ResourceTreeNode | null,
         __: ConverterSettings,
         multiplier: Rational,
@@ -35,7 +33,7 @@ export class ResourceNode extends ResourceTree {
         return resEl;
     }
 
-    public override addResourcesToList(
+    public addResourcesToList(
         output: ConverterIngredient[],
         _: ConverterSettings,
         multiplier: Rational = Rational.one,

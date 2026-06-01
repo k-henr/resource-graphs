@@ -5,17 +5,13 @@ import { ConverterIngredient } from "../types";
 import { ResourceTree } from "./resourceTree";
 import { ResourceTreeNode } from "./resourceTreeNode";
 
-export class NothingNode extends ResourceTree {
+export class NothingNode implements ResourceTree {
     private static converterIngredientTemplate =
         document.querySelector<HTMLTemplateElement>(
             "template#converter-ingredient-template",
         )!;
 
-    public constructor() {
-        super();
-    }
-
-    public override getElement(
+    public getElement(
         _parent: ResourceTreeNode | null,
         _settings: ConverterSettings,
         _multiplier: Rational,
@@ -34,10 +30,7 @@ export class NothingNode extends ResourceTree {
         return el;
     }
 
-    public override addResourcesToList(
-        output: ConverterIngredient[],
-        _: ConverterSettings,
-    ) {
+    public addResourcesToList(output: ConverterIngredient[], _: ConverterSettings) {
         return output;
     }
 }

@@ -53,10 +53,8 @@ export class Rational {
         inputString: string,
         inputEl: HTMLInputElement | null,
     ): Rational | null {
-        // Split into "a b/c", "a", "b/c"
-
-        // Matches for any decimal number followed by a fraction. Any part can be
-        // omitted
+        // Split into "a b/c", "a", "a/b", "a.b" or "a.b c/d", or any negations of
+        // these. Also puts the parts into their respective groups
         const matcher =
             /^ *(?<NEG>-)? *(?:(?<FULL>\d*?(?:\.\d*)?)) *(?:(?<NUM>\d+) *\/ *(?<DEN>\d+))? *$/;
         // Need to padd with spaces atm to satisfy the bad matcher
