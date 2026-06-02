@@ -99,7 +99,7 @@ export class ResourceGraph {
                 resource.getDisplayImage();
             el.querySelector<HTMLElement>(".resource-amount")!.innerText =
                 (amount.greaterThan(Rational.zero) ? "+" : "") +
-                amount.getDecimalString(); // todo: option to switch between decimal and mixed?
+                amount.getDecimalString();
             el.querySelector<HTMLElement>(".resource-delta-unit")!.innerText =
                 getUnits(resource.getUnitGroupName())[1];
 

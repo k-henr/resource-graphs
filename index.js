@@ -197,7 +197,12 @@ Please report this as a bug!`);
           break;
         }
       }
-      if (!total.greaterThan(Rational.zero)) return Rational.zero;
+      if (!total.greaterThan(Rational.zero)) {
+        alert(
+          "The converter isn't producing any of the requested resoure due to the settings chosen. No converter will be added."
+        );
+        return Rational.zero;
+      }
       return amount.div(total).negate();
     }
     consumesIngredient(ingr) {
