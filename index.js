@@ -966,7 +966,8 @@ Please report this as a bug!`);
       ).firstElementChild;
       const res = getResource(this.id);
       const unit = res.getUnitGroupName();
-      el.querySelector(".converter-ingredient-name").innerText = `${res.getDisplayName()} \u2A09 ${this.amount.mul(multiplier).getDecimalString()} ${getUnits(unit)[1]}`;
+      el.querySelector(".converter-ingredient-name").innerText = res.getDisplayName();
+      el.querySelector(".converter-ingredient-amount").innerText = `\u2A09 ${this.amount.mul(multiplier).getDecimalString()} ${getUnits(unit)[1]}`;
       el.querySelector(".converter-ingredient-image").src = res.getDisplayImage();
       return el;
     }

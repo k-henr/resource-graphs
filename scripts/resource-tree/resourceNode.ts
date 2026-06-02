@@ -56,7 +56,9 @@ export class ResourceNode implements ResourceTree {
         const unit = res.getUnitGroupName();
 
         el.querySelector<HTMLElement>(".converter-ingredient-name")!.innerText =
-            `${res.getDisplayName()} ⨉ ${this.amount.mul(multiplier).getDecimalString()} ${getUnits(unit)[1]}`;
+            res.getDisplayName();
+        el.querySelector<HTMLElement>(".converter-ingredient-amount")!.innerText =
+            `⨉ ${this.amount.mul(multiplier).getDecimalString()} ${getUnits(unit)[1]}`;
         el.querySelector<HTMLImageElement>(".converter-ingredient-image")!.src =
             res.getDisplayImage();
 

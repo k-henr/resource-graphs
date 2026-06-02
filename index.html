@@ -10,7 +10,7 @@
     </head>
     <body>
         <main>
-            <div class="flex-3">
+            <section class="flex-3 converter-section">
                 <h2>Converters</h2>
                 <div id="converter-wrapper">
                     <div id="converters">
@@ -24,8 +24,8 @@
                         Add new converter
                     </button>
                 </div>
-            </div>
-            <div class="flex-2">
+            </section>
+            <section class="flex-2" id="resource-section">
                 <h2>Resources</h2>
                 <div id="resources">
                     <!-- Contains resources and their rate of consumption/production -->
@@ -37,7 +37,7 @@
                     <img src="icons/add.svg" />
                     Add new resource source/drain
                 </button>
-            </div>
+            </section>
         </main>
         <footer>
             <small>
@@ -193,17 +193,21 @@
         <!-- Template for a resource converter displayed in the converter list -->
         <template id="converter-template">
             <div class="converter muted">
-                <img class="converter-image" />
-                <div class="converter-name"></div>
-                ⨉
-                <input type="text" class="converter-amount" />
-                =
-                <div class="converter-decimal-approx"></div>
-                <div class="flex-1"></div>
-                <!-- TODO: Visuals of what it converts? Just using images -->
-                <button class="remove-converter-button red interactive">
-                    <img src="icons/delete.svg" />
-                </button>
+                <div>
+                    <img class="converter-image" />
+                    <div class="converter-name"></div>
+                </div>
+                <div>
+                    ⨉
+                    <input type="text" class="converter-amount" />
+                    =
+                    <div class="converter-decimal-approx"></div>
+                    <div class="flex-1"></div>
+                    <!-- TODO: Visuals of what it converts? Just using images -->
+                    <button class="remove-converter-button red interactive">
+                        <img src="icons/delete.svg" />
+                    </button>
+                </div>
             </div>
         </template>
 
@@ -230,7 +234,7 @@
 
         <!-- Template for the info panel's look when selecting a resource -->
         <template id="resource-info-template">
-            <div class="horizontal-center">
+            <div class="resource-info">
                 <img class="rc-info-image" />
                 <h2 class="rc-info-header"></h2>
             </div>
@@ -238,11 +242,11 @@
 
         <!-- Template for the info panel's look when selecting a converter -->
         <template id="converter-info-template">
-            <div class="horizontal-center">
+            <div class="image-heading">
                 <img class="rc-info-image" />
                 <h2 class="rc-info-header"></h2>
             </div>
-            <div class="horizontal-center">
+            <div class="resource-tree-container">
                 <div class="c-info-ingredients flex-1"></div>
                 <img src="icons/arrow_right.svg" />
                 <div class="c-info-products flex-1"></div>
@@ -267,9 +271,12 @@
 
         <!-- Template for elements in converters' infoboxes' lists of ingredients/products -->
         <template id="converter-ingredient-template">
-            <div class="converter-ingredient">
+            <div class="converter-ingredient image-heading">
                 <img class="converter-ingredient-image" />
-                <div class="converter-ingredient-name"></div>
+                <div>
+                    <div class="converter-ingredient-name"></div>
+                    <div class="converter-ingredient-amount"></div>
+                </div>
             </div>
         </template>
 

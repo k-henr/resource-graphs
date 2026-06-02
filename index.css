@@ -45,7 +45,7 @@ main {
     flex: 1;
     height: 100%;
 
-    & > div {
+    & > section {
         padding: 16px;
 
         &:first-child {
@@ -138,7 +138,7 @@ main {
 
 #converters,
 #resources {
-    margin-bottom: 4px;
+    margin: 4px 0px;
 }
 #converters {
     display: flex;
@@ -153,9 +153,13 @@ main {
     border-width: 4px;
     border-style: solid;
 
-    gap: 8px;
     display: flex;
-    align-items: center;
+
+    & > div {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
 }
 
 .converter-image {
@@ -177,7 +181,7 @@ main {
 
 #add-rc-menu-wrapper,
 #loading-screen {
-    position: absolute;
+    position: fixed;
     top: 0px;
     left: 0px;
     width: 100vw;
@@ -305,6 +309,11 @@ input {
 .converter-ingredient {
     height: 32px;
     padding: 4px;
+
+    & > div {
+        display: flex;
+        margin: 0px 8px;
+    }
 }
 
 .converter-select {
@@ -315,10 +324,9 @@ input {
     overflow-y: auto;
 }
 
-.converter-ingredient-name {
+.image-heading {
     display: flex;
     align-items: center;
-    margin: 0px 8px;
 }
 
 .converter-ingredient-image {
@@ -327,15 +335,20 @@ input {
     object-fit: contain;
 }
 
+.resource-info {
+    display: flex;
+    align-items: center;
+}
+
+.resource-tree-container {
+    display: flex;
+    align-items: center;
+}
+
 /* ===== */
 
 .flex {
     display: flex;
-}
-
-.horizontal-center {
-    display: flex;
-    align-items: center;
 }
 
 .flex-1 {
@@ -425,4 +438,90 @@ input {
     /* I dislike using !important outside of browser extensions, but I can't make
     this more specific and it has to override everything */
     display: none !important;
+}
+
+@media screen and (max-width: 800px) {
+    main {
+        flex-direction: column-reverse;
+    }
+
+    #resources,
+    .tag-list-content {
+        grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+
+        & .thumb {
+            height: 96px;
+            font-size: smaller;
+        }
+    }
+
+    #resources {
+        grid-auto-flow: column;
+        grid-template-rows: 96px 96px;
+        overflow-x: auto;
+    }
+
+    #add-rc-menu {
+        width: 100%;
+        min-height: 100vh;
+        margin: 0px;
+        padding: 16px;
+        box-shadow: none;
+        border: none;
+    }
+    #rc-detail-popup {
+        width: 90%;
+    }
+
+    #converter-wrapper {
+        display: flex;
+        flex-direction: column-reverse;
+    }
+
+    .converter {
+        flex-direction: column;
+        height: fit-content;
+        align-items: start;
+        gap: 8px;
+        & > div {
+            width: 100%;
+        }
+        & .converter-image {
+            height: 32px;
+        }
+    }
+
+    main > section {
+        padding: 8px;
+
+        &:first-child {
+            border-right: none;
+        }
+    }
+
+    #resource-section {
+        flex: none;
+    }
+
+    .resource-tree-container {
+        flex-direction: column;
+        & > div {
+            width: 100%;
+        }
+        & > img {
+            rotate: 90deg;
+        }
+    }
+
+    .converter-ingredient > div {
+        display: block;
+    }
+
+    .rc-form-option {
+        display: block;
+
+        & input[type="text"] {
+            width: 72px;
+        }
+    }
 }
