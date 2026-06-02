@@ -128,6 +128,8 @@ export class ResourceGraph {
                 converter.getDisplayName();
             el.querySelector<HTMLImageElement>(".converter-image")!.src =
                 converter.getDisplayImage();
+            el.querySelector<HTMLElement>(".converter-decimal-approx")!.innerText =
+                number.getDecimalString();
 
             const amountEl =
                 el.querySelector<HTMLInputElement>(".converter-amount")!;

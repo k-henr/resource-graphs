@@ -1225,6 +1225,7 @@ Please report this as a bug!`);
         const el = this.converterTemplate.content.cloneNode(true).firstElementChild;
         el.querySelector(".converter-name").innerText = converter.getDisplayName();
         el.querySelector(".converter-image").src = converter.getDisplayImage();
+        el.querySelector(".converter-decimal-approx").innerText = number.getDecimalString();
         const amountEl = el.querySelector(".converter-amount");
         amountEl.value = number.getMixedFractionString();
         amountEl.onchange = (e) => {
