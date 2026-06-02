@@ -67,6 +67,12 @@
         "unitGroup": "units/time"
     },
     {
+        "id": "slickster_egg",
+        "displayName": "Slickster Egg",
+        "displayImage": "images/resources/slickster_egg.png",
+        "unitGroup": "units/time"
+    },
+    {
         "id": "steam",
         "displayName": "Steam",
         "displayImage": "images/resources/steam.png"
@@ -100,8 +106,32 @@
         "displayImage": "images/resources/ethanol.png"
     },
     {
+        "id": "petroleum",
+        "tags": ["Combustible Liquid"],
+        "displayName": "Petroleum",
+        "displayImage": "images/resources/petroleum.png"
+    },
+    {
         "id": "polluted_dirt",
         "displayName": "Polluted Dirt",
         "displayImage": "images/resources/polluted_dirt.png"
+    },
+    {
+        "id": "blastshot",
+        "displayName": "Blastshot",
+        "displayImage": "images/resources/blastshot.png",
+        "unitGroup": "units/time"
+    },
+    {
+        "id": "iron",
+        "tags": ["Refined Metal"],
+        "displayName": "Iron",
+        "displayImage": "images/resources/iron.png"
+    },
+    {
+        "id": "iron_ore",
+        "tags": ["Ore", "Solid", "General Buildable"],
+        "displayName": "Iron Ore",
+        "displayImage": "images/resources/iron_ore.png"
     }
 ]

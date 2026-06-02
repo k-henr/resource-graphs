@@ -1,13 +1,13 @@
 {
     "tags": ["Ranching"],
     "displayName": "{Cramped|Cramped }{Mood} {Wild|Wild }{Morph}",
-    "thumbName": "Hatch",
+    "thumbName": "Slickster",
     "settings": [
         {
             "type": "ENUMERATE",
             "name": "Morph",
-            "options": ["Hatch", "Stone Hatch", "Smooth Hatch", "Sage Hatch"],
-            "default": "Hatch"
+            "options": ["Molten Slickster"],
+            "default": "Molten Slickster"
         },
         { "type": "TOGGLE", "name": "Wild", "default": false },
         { "type": "TOGGLE", "name": "Cramped", "default": false },
@@ -44,53 +44,20 @@
                             "type": "SETTING",
                             "name": "Morph",
                             "options": [
-                                ["Stone Hatch", 1],
-                                [["Hatch", "Smooth Hatch", "Sage Hatch"], 0]
+                                ["Molten Slickster", 1],
+                                [[], 0]
                             ]
                         },
                         "resource": {
-                            "type": "OR",
-                            "resources": [
-                                {
-                                    "type": "TAG",
-                                    "tagName": "Raw Mineral",
-                                    "amount": 140
-                                },
-                                { "type": "RESOURCE", "id": "dirt", "amount": 140 },
-                                { "type": "RESOURCE", "id": "sand", "amount": 140 }
-                            ]
-                        }
-                    },
-                    {
-                        "type": "MULTIPLIER",
-                        "multiplier": {
-                            "type": "SETTING",
-                            "name": "Morph",
-                            "options": [
-                                ["Smooth Hatch", 1],
-                                [["Stone Hatch", "Hatch", "Sage Hatch"], 0]
-                            ]
-                        },
-                        "resource": {
-                            "type": "ENTANGLED_OR",
-                            "name": "metal",
-
-                            "resources": [
-                                [
-                                    "iron",
-                                    {
-                                        "type": "RESOURCE",
-                                        "id": "iron_ore",
-                                        "amount": 100
-                                    }
-                                ]
-                            ]
+                            "type": "RESOURCE",
+                            "id": "carbon_dioxide",
+                            "amount": 20
                         }
                     }
                 ]
             }
         },
-        { "type": "RESOURCE", "id": "hatch_egg", "amount": [1, 95] }
+        { "type": "RESOURCE", "id": "slickster_egg", "amount": [1, 95] }
     ],
     "produces": [
         {
@@ -129,40 +96,14 @@
                             "type": "SETTING",
                             "name": "Morph",
                             "options": [
-                                ["Stone Hatch", 1],
-                                [["Hatch", "Smooth Hatch", "Sage Hatch"], 0]
+                                ["Molten Slickster", 1],
+                                [[], 0]
                             ]
                         },
                         "resource": {
                             "type": "RESOURCE",
-                            "id": "coal",
-                            "amount": 70
-                        }
-                    },
-                    {
-                        "type": "MULTIPLIER",
-                        "multiplier": {
-                            "type": "SETTING",
-                            "name": "Morph",
-                            "options": [
-                                ["Smooth Hatch", 1],
-                                [["Stone Hatch", "Hatch", "Sage Hatch"], 0]
-                            ]
-                        },
-                        "resource": {
-                            "type": "ENTANGLED_OR",
-                            "name": "metal",
-
-                            "resources": [
-                                [
-                                    "iron",
-                                    {
-                                        "type": "RESOURCE",
-                                        "id": "iron",
-                                        "amount": 75
-                                    }
-                                ]
-                            ]
+                            "id": "petroleum",
+                            "amount": 10
                         }
                     }
                 ]
@@ -193,7 +134,7 @@
                     }
                 }
             },
-            "resource": { "type": "RESOURCE", "id": "hatch_egg", "amount": 1 }
+            "resource": { "type": "RESOURCE", "id": "slickster_egg", "amount": 1 }
         },
         { "type": "RESOURCE", "id": "meat", "amount": [3200, 95] }
     ]

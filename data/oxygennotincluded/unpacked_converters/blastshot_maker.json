@@ -1,0 +1,12 @@
+{
+    "tags": ["Refinement"],
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": 960 },
+        { "type": "RESOURCE", "id": "iron", "amount": 187.5 },
+        { "type": "RESOURCE", "id": "petroleum", "amount": 375 }
+    ],
+    "produces": [
+        { "type": "RESOURCE", "id": "blastshot", "amount": 37.5 },
+        { "type": "RESOURCE", "id": "carbon_dioxide", "amount": 7.5 }
+    ]
+}
