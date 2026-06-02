@@ -70,6 +70,15 @@ main {
     background-color: var(--muted-background);
     margin: 8px 0px;
     padding: 8px;
+
+    & button {
+        width: 32px;
+        aspect-ratio: 1;
+        & img {
+            width: 24px;
+            aspect-ratio: 1;
+        }
+    }
 }
 
 .tag-list-name {
@@ -100,10 +109,7 @@ main {
     border-width: 4px;
     border-style: solid;
 
-    display: flex;
     flex-direction: column;
-    align-items: center;
-    text-align: center;
     padding: 4px;
     gap: 4px;
 
@@ -119,25 +125,30 @@ main {
     font-size: unset;
 }
 
-#open-item-delta-menu-button {
-    /* Temporary until I move the item delta button somewhere better */
+#open-item-delta-menu-button,
+#open-converter-menu-button {
     width: 100%;
     height: 64px;
-    margin-top: 16px;
 
     border-width: 2px;
 
     font-size: large;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     gap: 8px;
+}
+
+#converters,
+#resources {
+    margin-bottom: 4px;
+}
+#converters {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .converter {
     height: 32px;
     padding: 8px;
-    margin-bottom: 4px;
 
     border-width: 4px;
     border-style: solid;
@@ -164,19 +175,6 @@ main {
     background-color: var(--red-background);
 }
 
-#open-converter-menu-button {
-    width: 100%;
-    height: 64px;
-
-    border-width: 2px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: large;
-    gap: 8px;
-}
-
 #add-rc-menu-wrapper,
 #loading-screen {
     position: absolute;
@@ -189,9 +187,6 @@ main {
 }
 
 #loading-screen {
-    display: flex;
-    align-items: center;
-    justify-content: center;
     flex-direction: column;
 
     & > * {
@@ -199,10 +194,6 @@ main {
         border-style: solid;
         padding: 24px;
         width: 20%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
     }
 }
 
@@ -214,20 +205,23 @@ main {
     box-shadow: black 0px 0px 50px;
 
     padding: 32px;
-    display: flex;
     flex-direction: column;
-    align-items: center;
     gap: 16px;
 }
 
 #add-resource-header,
 #add-converter-header {
-    display: flex;
     width: 100%;
 
     & > h2 {
-        flex: 1;
-        text-align: center;
+        text-align: left;
+        margin: 16px 32px;
+    }
+
+    & > button {
+        padding: 16px;
+        gap: 8px;
+        font-size: larger;
     }
 }
 
@@ -418,6 +412,13 @@ input {
 
 .no-bg {
     background-color: transparent;
+}
+
+.center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 .hidden {

@@ -16,7 +16,7 @@
                     </div>
                     <button
                         id="open-converter-menu-button"
-                        class="primary interactive"
+                        class="primary interactive center"
                     >
                         <img src="icons/add.svg" />
                         Add new converter
@@ -28,7 +28,10 @@
                 <div id="resources">
                     <!-- Contains resources and their rate of consumption/production -->
                 </div>
-                <button id="open-item-delta-menu-button" class="interactive primary">
+                <button
+                    id="open-item-delta-menu-button"
+                    class="interactive primary center"
+                >
                     <img src="icons/add.svg" />
                     Add new resource source/drain
                 </button>
@@ -46,14 +49,26 @@
 
         <!-- Menu for adding resources or converters to the graph -->
         <div id="add-rc-menu-wrapper" class="hidden">
-            <div id="add-rc-menu">
-                <div id="add-resource-header" class="hidden">
+            <div id="add-rc-menu" class="center">
+                <div id="add-resource-header" class="hidden center">
                     <h2 class="flex-1">Add Resource source/drain</h2>
-                    <button id="close-resource-menu-button">CLOSE</button>
+                    <button
+                        id="close-resource-menu-button"
+                        class="muted interactive center"
+                    >
+                        <img src="/icons/close.svg" />
+                        CLOSE
+                    </button>
                 </div>
-                <div id="add-converter-header" class="hidden">
+                <div id="add-converter-header" class="hidden center">
                     <h2 class="flex-1">Add Converter</h2>
-                    <button id="close-converter-menu-button">CLOSE</button>
+                    <button
+                        id="close-converter-menu-button"
+                        class="muted interactive center"
+                    >
+                        <img src="/icons/close.svg" />
+                        CLOSE
+                    </button>
                 </div>
                 <!-- Filter form for when adding resources. -->
                 <form id="resource-filter-form" class="hidden">
@@ -155,13 +170,15 @@
             </div>
         </div>
 
-        <div id="loading-screen"><p class="muted">Loading...</p></div>
+        <div id="loading-screen" class="center">
+            <p class="muted center">Loading...</p>
+        </div>
 
         <!-------------------------------------------------------------------------->
 
         <!-- Template for a resource displayed in the resource list -->
         <template id="resource-delta-template">
-            <div class="thumb muted">
+            <div class="thumb center muted">
                 <img class="resource-image" />
                 <div class="resource-name small-text"></div>
                 <div>
@@ -190,8 +207,10 @@
         <template id="tag-list-template">
             <section>
                 <div class="tag-list-header">
-                    <button>open/close</button>
-                    <div class="tag-list-name flex-1">TAG LIST:</div>
+                    <button class="muted interactive center">
+                        <img src="/icons/expand.svg" />
+                    </button>
+                    <div class="tag-list-name center flex-1">TAG LIST:</div>
                 </div>
                 <div class="tag-list-content"></div>
             </section>
@@ -199,7 +218,7 @@
 
         <!-- Template for an item or converter thumb in the selection lists -->
         <template id="item-converter-thumb">
-            <div class="thumb interactive muted">
+            <div class="thumb center interactive muted">
                 <img class="thumb-image" />
                 <div class="thumb-name"></div>
             </div>
