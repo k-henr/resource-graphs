@@ -319,16 +319,6 @@ input {
 .converter-select-children {
     max-height: 250px;
     overflow-y: auto;
-
-    /* Styles selectable children but not the ORs interspersed between */
-    & > :not(.converter-select) {
-        background-color: var(--primary-background);
-        transition-duration: 0.2s;
-
-        &:hover {
-            background-color: var(--primary-background-hover);
-        }
-    }
 }
 
 .converter-ingredient-name {
@@ -376,7 +366,7 @@ input {
     border-color: var(--muted-border);
     background-color: var(--muted-background);
 
-    &.interactive {
+    &:not(select).interactive {
         &:hover {
             background-color: var(--muted-background-hover);
         }
@@ -389,7 +379,7 @@ input {
     border-color: var(--primary-border);
     background-color: var(--primary-background);
 
-    &.interactive {
+    &:not(select).interactive {
         &:hover {
             background-color: var(--primary-background-hover);
             border-color: var(--primary-border-hover);
@@ -404,7 +394,7 @@ input {
     border-color: var(--red-border);
     background-color: var(--red-background);
 
-    &.interactive {
+    &:not(select).interactive {
         &:hover {
             background-color: var(--red-background-hover);
             border-color: var(--red-border-hover);
@@ -424,6 +414,10 @@ input {
     &:active {
         transition-duration: 0s;
     }
+}
+
+.no-bg {
+    background-color: transparent;
 }
 
 .hidden {

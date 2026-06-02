@@ -690,6 +690,7 @@ Please report this as a bug!`);
         requestingConverter
       );
       if (optionEl) {
+        optionEl.classList.add("primary", "interactive");
         selectList.appendChild(optionEl);
         optionEl.onclick = this.getOnClickForOption(
           parent,
@@ -729,6 +730,7 @@ Please report this as a bug!`);
     collapseNode(orParent, option, selectEl, optionEl, _requestingConverter) {
       orParent.replaceChild(this, option);
       selectEl.replaceWith(optionEl);
+      optionEl.classList.remove("primary", "interactive");
       optionEl.onclick = null;
     }
     addResourcesToList(_, __, ___ = Rational.one) {

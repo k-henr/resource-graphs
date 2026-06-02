@@ -110,6 +110,7 @@ export class OrNode extends ResourceTreeBoolNode {
 
         // Add a listener for selecting an option
         if (optionEl) {
+            optionEl.classList.add("primary", "interactive");
             selectList.appendChild(optionEl);
             optionEl.onclick = this.getOnClickForOption(
                 parent,
@@ -165,6 +166,7 @@ export class OrNode extends ResourceTreeBoolNode {
     ) {
         orParent.replaceChild(this, option);
         selectEl.replaceWith(optionEl);
+        optionEl.classList.remove("primary", "interactive");
         optionEl.onclick = null;
     }
 
