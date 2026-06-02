@@ -48,6 +48,7 @@ export class OrNode extends ResourceTreeBoolNode {
         )!;
 
         let encounteredEmptyNode = false;
+        let encounteredNonemptyNode = false;
 
         for (let i = 0; i < this.children.length; i++) {
             const el = this.addOptionElement(
@@ -62,9 +63,13 @@ export class OrNode extends ResourceTreeBoolNode {
             if (el === null) {
                 encounteredEmptyNode = true;
             } else {
+                encounteredNonemptyNode = true;
                 if (i !== this.children.length - 1) this.addOrElement(selectList);
             }
         }
+
+        // If there were no filled nodes in this OR, return null
+        if (!encounteredNonemptyNode) return null;
 
         // If there should be a "nothing" option, add it
         if (encounteredEmptyNode) {

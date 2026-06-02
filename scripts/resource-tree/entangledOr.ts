@@ -33,8 +33,15 @@ export class EntangledOrNode extends OrNode {
         multiplier: Rational,
         requestingConverter: IntermediateConverter,
     ): HTMLElement | null {
+        const el = super.getElement(
+            parent,
+            settings,
+            multiplier,
+            requestingConverter,
+        );
+        if (!el) return null;
         requestingConverter.registerEntangledOr(this.id, this);
-        return super.getElement(parent, settings, multiplier, requestingConverter);
+        return el;
     }
 
     // When creating the onclick, also store it in a dictionary here

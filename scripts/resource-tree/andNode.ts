@@ -28,7 +28,8 @@ export class AndNode extends ResourceTreeBoolNode {
             );
             if (cEl) andEl.appendChild(cEl);
         });
-        return andEl;
+        // Don't create an element if the node contains no children
+        return andEl.childNodes.length !== 0 ? andEl : null;
     }
 
     public override addResourcesToList(

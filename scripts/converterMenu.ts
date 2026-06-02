@@ -54,28 +54,24 @@ export class ConverterMenu extends SubmitMenu {
         // If no converter is "loaded", ignore
         if (!this.intermediateConverter) return;
 
-        try {
-            const converter = this.intermediateConverter.finalize();
+        const converter = this.intermediateConverter.finalize();
 
-            // If being requested by item, get the amount automatically from the converter
-            const amount = this.getAmountToProduce(
-                converter,
-                this.submissionForm.querySelector<HTMLInputElement>(
-                    "input[name=amount]",
-                )!,
+        // If being requested by item, get the amount automatically from the converter
+        const amount = this.getAmountToProduce(
+            converter,
+            this.submissionForm.querySelector<HTMLInputElement>(
+                "input[name=amount]",
+            )!,
+        );
+
+        if (!amount) {
+            throw new UserError(
+                "Entered an invalid number! Please write a rational or floating-point number",
             );
+        }
 
-            if (!amount) {
-                throw new UserError(
-                    "Entered an invalid number! Please write a rational or floating-point number",
-                );
-            }
-
-            if (!amount.equals(Rational.zero)) {
-                this.graph.addConverter(converter, amount);
-            }
-        } catch (e: any) {
-            displayErr(e);
+        if (!amount.equals(Rational.zero)) {
+            this.graph.addConverter(converter, amount);
         }
 
         this.close();

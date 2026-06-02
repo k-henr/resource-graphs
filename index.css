@@ -156,11 +156,6 @@ main {
     width: 96px;
     min-height: 80%;
 
-    border: 2px solid var(--muted-border);
-    border-radius: 4px;
-    background-color: transparent;
-    transition: color 0.2s;
-
     text-align: center;
     font-size: large;
 }
@@ -250,6 +245,20 @@ main {
     padding: 16px;
     background-color: var(--background-color);
     box-shadow: black 0px 0px 50px;
+}
+
+input {
+    &[type="text"] {
+        border: 2px solid var(--muted-border);
+        border-radius: 4px;
+        background-color: transparent;
+        transition: color 0.2s;
+
+        &.input-invalid-amount {
+            background-color: var(--red-background);
+            border-color: var(--red-border);
+        }
+    }
 }
 
 .popup-form {

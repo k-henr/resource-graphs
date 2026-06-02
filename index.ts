@@ -2,13 +2,8 @@
  * Endpoint of the app
  */
 
-import {
-    loadAllResources,
-    loadAllConverters,
-    getConverterFactory,
-} from "./scripts/data";
+import { loadAllResources, loadAllConverters } from "./scripts/data";
 import { ResourceGraph } from "./scripts/resourceGraph";
-import { Rational } from "./scripts/rational";
 import { loadUnitGroups } from "./scripts/units";
 import { ConverterMenu } from "./scripts/converterMenu";
 import { ResourceMenu } from "./scripts/resourceMenu";

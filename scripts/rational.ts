@@ -5,6 +5,11 @@
 import { RationalNumber } from "./types";
 
 export class Rational {
+    // Split into "a b/c", "a", "a/b", "a.b" or "a.b c/d", or any negations of
+    // these. Also puts the parts into their respective groups
+    private static readonly patternMatcher =
+        /^ *(?<NEG>-)? *(?:(?<FULL>\d*?(?:\.\d*)?)) *(?:(?<NUM>\d+) *\/ *(?<DEN>\d+))? *$/;
+
     // These are just normal numbers atm, do I need bigint?
     public readonly numerator: number;
     public readonly denominator: number;
@@ -53,12 +58,8 @@ export class Rational {
         inputString: string,
         inputEl: HTMLInputElement | null,
     ): Rational | null {
-        // Split into "a b/c", "a", "a/b", "a.b" or "a.b c/d", or any negations of
-        // these. Also puts the parts into their respective groups
-        const matcher =
-            /^ *(?<NEG>-)? *(?:(?<FULL>\d*?(?:\.\d*)?)) *(?:(?<NUM>\d+) *\/ *(?<DEN>\d+))? *$/;
         // Need to padd with spaces atm to satisfy the bad matcher
-        const match = inputString.match(matcher);
+        const match = inputString.match(Rational.patternMatcher);
 
         if (!match || !match.groups) {
             inputEl?.classList.add("input-invalid-amount");

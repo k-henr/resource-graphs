@@ -21,6 +21,9 @@ Please report this as a bug!`);
 
   // scripts/rational.ts
   var Rational = class _Rational {
+    // Split into "a b/c", "a", "a/b", "a.b" or "a.b c/d", or any negations of
+    // these. Also puts the parts into their respective groups
+    static patternMatcher = /^ *(?<NEG>-)? *(?:(?<FULL>\d*?(?:\.\d*)?)) *(?:(?<NUM>\d+) *\/ *(?<DEN>\d+))? *$/;
     // These are just normal numbers atm, do I need bigint?
     numerator;
     denominator;
@@ -54,8 +57,7 @@ Please report this as a bug!`);
     // Parse the input from an input element into a rational, or make the input node
     // red if unparsable
     static fromInput(inputString, inputEl) {
-      const matcher = /^ *(?<NEG>-)? *(?:(?<FULL>\d*?(?:\.\d*)?)) *(?:(?<NUM>\d+) *\/ *(?<DEN>\d+))? *$/;
-      const match = inputString.match(matcher);
+      const match = inputString.match(_Rational.patternMatcher);
       if (!match || !match.groups) {
         inputEl?.classList.add("input-invalid-amount");
         return null;
@@ -419,6 +421,24 @@ Please report this as a bug!`);
     }
   };
 
+  // scripts/resource-tree/nothingNode.ts
+  var NothingNode = class _NothingNode {
+    static converterIngredientTemplate = document.querySelector(
+      "template#converter-ingredient-template"
+    );
+    getElement(_parent, _settings, _multiplier, _requestingConverter) {
+      const el = _NothingNode.converterIngredientTemplate.content.cloneNode(
+        true
+      ).firstElementChild;
+      el.querySelector(".converter-ingredient-name").innerText = `[Nothing]`;
+      el.querySelector(".converter-ingredient-image").remove();
+      return el;
+    }
+    addResourcesToList(output, _) {
+      return output;
+    }
+  };
+
   // scripts/intermediateConverter.ts
   var IntermediateConverter = class _IntermediateConverter {
     displayName;
@@ -483,17 +503,28 @@ Please report this as a bug!`);
       el.querySelector(".rc-info-image").src = this.getDisplayImage();
       this.entangledOrs = [];
       el.querySelector(".c-info-ingredients").appendChild(
-        this.ingredientTree.getElement(
-          null,
-          this.settings,
-          Rational.one,
-          this
-        ) ?? document.createElement("div")
+        this.getTreeElement(this.ingredientTree)
       );
       el.querySelector(".c-info-products").appendChild(
-        this.productTree.getElement(null, this.settings, Rational.one, this) ?? document.createElement("div")
+        this.getTreeElement(this.productTree)
       );
       _IntermediateConverter.infoPanel.appendChild(el);
+    }
+    getTreeElement(tree) {
+      const el = tree.getElement(null, this.settings, Rational.one, this);
+      if (el) return el;
+      const fallback = new NothingNode().getElement(
+        null,
+        this.settings,
+        Rational.one,
+        this
+      );
+      if (!fallback) {
+        throw new ProgramError(
+          "Failed to generate resource tree fallback element for empty resource tree!"
+        );
+      }
+      return fallback;
     }
     registerEntangledOr(id, node) {
       this.entangledOrs.push([id, node]);
@@ -587,28 +618,10 @@ Please report this as a bug!`);
         );
         if (cEl) andEl.appendChild(cEl);
       });
-      return andEl;
+      return andEl.childNodes.length !== 0 ? andEl : null;
     }
     addResourcesToList(output, settings, multiplier = Rational.one) {
       this.children.map((c) => c.addResourcesToList(output, settings, multiplier));
-      return output;
-    }
-  };
-
-  // scripts/resource-tree/nothingNode.ts
-  var NothingNode = class _NothingNode {
-    static converterIngredientTemplate = document.querySelector(
-      "template#converter-ingredient-template"
-    );
-    getElement(_parent, _settings, _multiplier, _requestingConverter) {
-      const el = _NothingNode.converterIngredientTemplate.content.cloneNode(
-        true
-      ).firstElementChild;
-      el.querySelector(".converter-ingredient-name").innerText = `[Nothing]`;
-      el.querySelector(".converter-ingredient-image").remove();
-      return el;
-    }
-    addResourcesToList(output, _) {
       return output;
     }
   };
@@ -634,6 +647,7 @@ Please report this as a bug!`);
         ".converter-select-children"
       );
       let encounteredEmptyNode = false;
+      let encounteredNonemptyNode = false;
       for (let i = 0; i < this.children.length; i++) {
         const el = this.addOptionElement(
           this.children[i],
@@ -647,9 +661,11 @@ Please report this as a bug!`);
         if (el === null) {
           encounteredEmptyNode = true;
         } else {
+          encounteredNonemptyNode = true;
           if (i !== this.children.length - 1) this.addOrElement(selectList);
         }
       }
+      if (!encounteredNonemptyNode) return null;
       if (encounteredEmptyNode) {
         if (true) this.addOrElement(selectList);
         const nothingNode = new NothingNode();
@@ -738,8 +754,15 @@ Please report this as a bug!`);
       this.optionIds = options.map(([id2]) => id2);
     }
     getElement(parent, settings, multiplier, requestingConverter) {
+      const el = super.getElement(
+        parent,
+        settings,
+        multiplier,
+        requestingConverter
+      );
+      if (!el) return null;
       requestingConverter.registerEntangledOr(this.id, this);
-      return super.getElement(parent, settings, multiplier, requestingConverter);
+      return el;
     }
     // When creating the onclick, also store it in a dictionary here
     getOnClickForOption(parent, option, selectEl, optionEl, requestingConverter) {
@@ -1395,24 +1418,20 @@ Please report this as a bug!`);
     }
     onSubmit() {
       if (!this.intermediateConverter) return;
-      try {
-        const converter = this.intermediateConverter.finalize();
-        const amount = this.getAmountToProduce(
-          converter,
-          this.submissionForm.querySelector(
-            "input[name=amount]"
-          )
+      const converter = this.intermediateConverter.finalize();
+      const amount = this.getAmountToProduce(
+        converter,
+        this.submissionForm.querySelector(
+          "input[name=amount]"
+        )
+      );
+      if (!amount) {
+        throw new UserError(
+          "Entered an invalid number! Please write a rational or floating-point number"
         );
-        if (!amount) {
-          throw new UserError(
-            "Entered an invalid number! Please write a rational or floating-point number"
-          );
-        }
-        if (!amount.equals(Rational.zero)) {
-          this.graph.addConverter(converter, amount);
-        }
-      } catch (e) {
-        displayErr(e);
+      }
+      if (!amount.equals(Rational.zero)) {
+        this.graph.addConverter(converter, amount);
       }
       this.close();
     }

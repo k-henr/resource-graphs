@@ -1,8 +1,9 @@
 import { Converter } from "./converter";
 import { ConverterSettings } from "./converterSettings";
-import { displayErr } from "./errors";
+import { displayErr, ProgramError } from "./errors";
 import { Rational } from "./rational";
 import { EntangledOrNode } from "./resource-tree/entangledOr";
+import { NothingNode } from "./resource-tree/nothingNode";
 import { ResourceTree } from "./resource-tree/resourceTree";
 import { ConverterSettingData } from "./types";
 
@@ -101,19 +102,30 @@ export class IntermediateConverter {
 
         // Set ingredient and product trees
         el.querySelector<Element>(".c-info-ingredients")!.appendChild(
-            this.ingredientTree.getElement(
-                null,
-                this.settings,
-                Rational.one,
-                this,
-            ) ?? document.createElement("div"),
+            this.getTreeElement(this.ingredientTree),
         );
         el.querySelector<Element>(".c-info-products")!.appendChild(
-            this.productTree.getElement(null, this.settings, Rational.one, this) ??
-                document.createElement("div"),
+            this.getTreeElement(this.productTree),
         );
 
         IntermediateConverter.infoPanel.appendChild(el);
+    }
+
+    private getTreeElement(tree: ResourceTree): HTMLElement {
+        const el = tree.getElement(null, this.settings, Rational.one, this);
+        if (el) return el;
+        const fallback = new NothingNode().getElement(
+            null,
+            this.settings,
+            Rational.one,
+            this,
+        );
+        if (!fallback) {
+            throw new ProgramError(
+                "Failed to generate resource tree fallback element for empty resource tree!",
+            );
+        }
+        return fallback;
     }
 
     public registerEntangledOr(id: string, node: EntangledOrNode) {
