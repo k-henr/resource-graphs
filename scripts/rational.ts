@@ -2,6 +2,7 @@
  * A class for representing rational numbers
  */
 
+import { GraphError, UserError } from "./errors";
 import { RationalNumber } from "./types";
 
 export class Rational {
@@ -98,10 +99,23 @@ export class Rational {
             );
         }
     }
+
     public div(v2: Rational) {
         return new Rational(
             this.numerator * v2.denominator,
             this.denominator * v2.numerator,
+        );
+    }
+
+    public pow(v2: Rational) {
+        if (v2.denominator !== 1)
+            throw new GraphError(
+                "There's currently no support for raising a number to a non-integer!",
+            );
+
+        return new Rational(
+            Math.pow(this.numerator, v2.numerator),
+            Math.pow(this.denominator, v2.denominator),
         );
     }
 

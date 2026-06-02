@@ -101,8 +101,9 @@ export class MultiplierNode implements ResourceTreeNode {
                 );
 
             case "POW":
-                // Hmmmmmm... need to think how to do this
-                throw new ProgramError("Powers aren't supported yet!");
+                return this.evaluateSettingsTree(treeNode.value1, settings).pow(
+                    this.evaluateSettingsTree(treeNode.value2, settings),
+                );
 
             default:
                 throw new GraphError(

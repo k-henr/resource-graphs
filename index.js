@@ -97,6 +97,16 @@ Please report this as a bug!`);
         this.denominator * v2.numerator
       );
     }
+    pow(v2) {
+      if (v2.denominator !== 1)
+        throw new GraphError(
+          "There's currently no support for raising a number to a non-integer!"
+        );
+      return new _Rational(
+        Math.pow(this.numerator, v2.numerator),
+        Math.pow(this.denominator, v2.denominator)
+      );
+    }
     negate() {
       return new _Rational(-this.numerator, this.denominator);
     }
@@ -881,7 +891,9 @@ Please report this as a bug!`);
             this.evaluateSettingsTree(treeNode.value2, settings)
           );
         case "POW":
-          throw new ProgramError("Powers aren't supported yet!");
+          return this.evaluateSettingsTree(treeNode.value1, settings).pow(
+            this.evaluateSettingsTree(treeNode.value2, settings)
+          );
         default:
           throw new GraphError(
             `Unknown settings AST node type: ${treeNode.type}!`
