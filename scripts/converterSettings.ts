@@ -10,6 +10,9 @@ import {
     SettingsTreeInputNode,
     SettingsTreeNode,
 } from "./types";
+/**
+ * A manager class for converter settings.
+ */
 
 export class ConverterSettings {
     private settingsLookup = new Map<string, ConverterSetting>();

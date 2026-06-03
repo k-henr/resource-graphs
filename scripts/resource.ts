@@ -1,8 +1,7 @@
-/**
- * A class representing a resource
- */
-
 import { Template } from "./template";
+/**
+ * A class representing a resource.
+ */
 
 export class Resource {
     private static infoTemplate = new Template("resource-info-template")!;

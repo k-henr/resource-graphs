@@ -1,11 +1,14 @@
 import { Converter } from "./converter";
 import { getConverterFactoriesWithFilters } from "./data";
-import { displayErr, UserError } from "./errors";
+import { UserError } from "./errors";
 import { IntermediateConverter } from "./intermediateConverter";
 import { Rational } from "./rational";
 import { Resource } from "./resource";
 import { ResourceGraph } from "./resourceGraph";
 import { SubmitMenu } from "./submitMenu";
+/**
+ * The menu used when adding converters.
+ */
 
 export class ConverterMenu extends SubmitMenu {
     private amountInput: HTMLElement;

@@ -1,7 +1,3 @@
-/**
- * The class for handling a resource graph. Contains a number of conversions, as well as a resource delta
- */
-
 import { ConverterMenu } from "./converterMenu";
 import { Converter } from "./converter";
 import { Resource } from "./resource";
@@ -9,6 +5,10 @@ import { Rational } from "./rational";
 import { getUnits } from "./units";
 import { displayErr } from "./errors";
 import { Template } from "./template";
+/**
+ * The class for handling a resource graph. Contains a number of finalized
+ * converters, and handles adding them together and visualizing them.
+ */
 
 export class NumberedSet<T> {
     private numberMap = new Map<T, Rational>();

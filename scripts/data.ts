@@ -1,7 +1,3 @@
-/**
- * File for handling loading and conversion of external resources
- */
-
 import { displayErr, GraphError } from "./errors";
 import { IntermediateConverter } from "./intermediateConverter";
 import { Rational } from "./rational";
@@ -20,6 +16,10 @@ import {
     RationalNumber,
 } from "./types";
 import { getDefaultUnitGroup } from "./units";
+/**
+ * Various helper functions for handling loading and parsing files into a usable
+ * format.
+ */
 
 // Note that resources are stored as the "proper" objects, since they don't have
 // settings. But converters need to be stored in an in-between state in order to

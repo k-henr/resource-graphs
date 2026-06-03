@@ -1,11 +1,12 @@
-/**
- * The class for a conversion which consumes and produces resources
- */
-
 import { Rational } from "./rational";
 import { Resource } from "./resource";
 import { NumberedSet } from "./resourceGraph";
 import { ConverterIngredient } from "./types";
+/**
+ * The class for a converter which consumes and produces resources. This is the
+ * finalized version, and only contains ingredients and products; no settings or
+ * trees.
+ */
 
 export class Converter {
     // All the inputs and outputs of this conversion

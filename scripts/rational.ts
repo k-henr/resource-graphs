@@ -1,9 +1,11 @@
-/**
- * A class for representing rational numbers
- */
-
-import { GraphError, UserError } from "./errors";
+import { GraphError } from "./errors";
 import { RationalNumber } from "./types";
+/**
+ * A class for representing rational numbers.
+ *
+ * Instances are semi-immutable, which allows passing by reference without risk of
+ * leakage.
+ */
 
 export class Rational {
     // Split into "a b/c", "a", "a/b", "a.b" or "a.b c/d", or any negations of

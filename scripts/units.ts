@@ -1,10 +1,9 @@
-/**
- * Handles unit conversions
- */
-
 import { GraphError } from "./errors";
 import { Rational } from "./rational";
 import { UnitGroup, UnitGroupData } from "./types";
+/**
+ * Functions for handling unit conversions.
+ */
 
 const unitGroups = new Map<string, UnitGroup>();
 let defaultUnitGroup: string = "UNINITIALIZED";

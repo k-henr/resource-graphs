@@ -7,6 +7,9 @@ import { ConverterIngredient } from "../types";
 import { getUnits } from "../units";
 import { ResourceTree } from "./resourceTree";
 import { ResourceTreeNode } from "./resourceTreeNode";
+/**
+ * A leaf node, containing a certain amount of a certain resource.
+ */
 
 export class ResourceNode implements ResourceTree {
     private id: string;

@@ -6,6 +6,9 @@ import {
     SettingsTreeNode,
 } from "../types";
 import { ConverterSetting } from "./converterSetting";
+/**
+ * A setting which generates a dropdown and a value for each of the options
+ */
 
 export class ConverterEnumerateSetting extends ConverterSetting {
     private selectElement: HTMLSelectElement;

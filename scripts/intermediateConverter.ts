@@ -7,11 +7,11 @@ import { NothingNode } from "./resource-tree/nothingNode";
 import { ResourceTree } from "./resource-tree/resourceTree";
 import { Template } from "./template";
 import { ConverterSettingData } from "./types";
-
 /**
- * A class for holding a converter currently being constructed, with ORs and settings
- * in-between beinng resolved and not
+ * The class for holding a converter currently being constructed, with ORs and
+ * settings. After being contructed in the factory, but before being fully finalized.
  */
+
 export class IntermediateConverter {
     private displayName: string; // Stored unformatted
     private thumbName: string;

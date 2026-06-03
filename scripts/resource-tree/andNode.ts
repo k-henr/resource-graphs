@@ -5,6 +5,10 @@ import { ConverterIngredient } from "../types";
 import { ResourceTree } from "./resourceTree";
 import { ResourceTreeBoolNode } from "./resourceTreeBoolNode";
 import { ResourceTreeNode } from "./resourceTreeNode";
+/**
+ * A node which contains a number of other nodes, all of which will be included in
+ * the tree
+ */
 
 export class AndNode extends ResourceTreeBoolNode {
     public constructor(children: ResourceTree[]) {

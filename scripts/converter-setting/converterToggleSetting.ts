@@ -6,6 +6,9 @@ import {
     SettingsTreeToggleInput,
 } from "../types";
 import { ConverterSetting } from "./converterSetting";
+/**
+ * A setting which generates a toggle that can be used to choose one of two branches
+ */
 
 export class ConverterToggleSetting extends ConverterSetting {
     private inputElement: HTMLInputElement;

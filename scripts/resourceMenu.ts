@@ -6,6 +6,9 @@ import { Resource } from "./resource";
 import { ResourceGraph } from "./resourceGraph";
 import { SubmitMenu } from "./submitMenu";
 import { convertUnit, populateUnitDropdown } from "./units";
+/**
+ * The menu used when adding resource deltas.
+ */
 
 export class ResourceMenu extends SubmitMenu {
     private searchString: string = "";

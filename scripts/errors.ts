@@ -1,4 +1,9 @@
 /**
+ * Contains a few different errors that are thrown when something goes wrong or is
+ * incorrectly handled.
+ */
+
+/**
  * When the user does something wrong, like finalizing a tree before all the ORs are
  * resolved
  */

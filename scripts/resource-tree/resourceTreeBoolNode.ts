@@ -5,6 +5,10 @@ import { Rational } from "../rational";
 import { ConverterIngredient } from "../types";
 import { ResourceTree } from "./resourceTree";
 import { ResourceTreeNode } from "./resourceTreeNode";
+/**
+ * An abtract class used by boolean nodes (AND, OR, ENTANGLED_OR), with some shared
+ * functionality.
+ */
 
 export abstract class ResourceTreeBoolNode implements ResourceTreeNode {
     protected children: ResourceTree[];

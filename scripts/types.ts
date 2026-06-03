@@ -1,9 +1,12 @@
 import { IntermediateConverter } from "./intermediateConverter";
 import { Rational } from "./rational";
 import { Resource } from "./resource";
-
 /**
- * Contains all types, even the ones that aren't from the data.
+ * Contains all types.
+ *
+ * Most of these are "json types" that are used in the data storage parts, and are
+ * pretty much only used in data.ts. But some are program types that I actually use
+ * inside of the shell
  */
 
 // = = = = = = = = CONFIG = = = = = = = =

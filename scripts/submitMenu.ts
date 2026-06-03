@@ -1,10 +1,9 @@
-/**
- * Takes care of listeners and things related to the "Add Resource"/"Add Converter" menu(s)
- */
-
 import { displayErr } from "./errors";
 import { ResourceGraph } from "./resourceGraph";
 import { Template } from "./template";
+/**
+ * Base class for ConverterMenu and ResourceMenu, providing shared functionality.
+ */
 
 export abstract class SubmitMenu {
     protected static tagListTemplate = new Template("tag-list-template");

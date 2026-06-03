@@ -2,6 +2,9 @@ import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
 import { SettingsTreeInputNode, SettingsTreeNode } from "../types";
 import { ConverterSetting } from "./converterSetting";
+/**
+ * A setting which generates a field accepting rational numbers
+ */
 
 export class ConverterNumberSetting extends ConverterSetting {
     private inputElement: HTMLInputElement;

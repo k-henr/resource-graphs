@@ -8,6 +8,12 @@ import { NothingNode } from "./nothingNode";
 import { ResourceTree } from "./resourceTree";
 import { ResourceTreeBoolNode } from "./resourceTreeBoolNode";
 import { ResourceTreeNode } from "./resourceTreeNode";
+/**
+ * A node which generates a number of options. The user then chooses one, which
+ * "collapses" this node into just that branch.
+ *
+ * All or nodes have to be resolved to finalize the tree.
+ */
 
 export class OrNode extends ResourceTreeBoolNode {
     constructor(options: ResourceTree[]) {

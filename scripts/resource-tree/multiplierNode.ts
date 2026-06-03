@@ -5,6 +5,9 @@ import { Rational } from "../rational";
 import { ConverterIngredient, SettingsTreeNode } from "../types";
 import { ResourceTree } from "./resourceTree";
 import { ResourceTreeNode } from "./resourceTreeNode";
+/**
+ * Multiplies its resource by the given settings AST
+ */
 
 export class MultiplierNode implements ResourceTreeNode {
     private multiplierAst: SettingsTreeNode;

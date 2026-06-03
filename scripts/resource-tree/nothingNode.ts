@@ -5,6 +5,10 @@ import { Template } from "../template";
 import { ConverterIngredient } from "../types";
 import { ResourceTree } from "./resourceTree";
 import { ResourceTreeNode } from "./resourceTreeNode";
+/**
+ * A node which does nothing. Used in cases where it's needed, such as for completely
+ * empty trees and ORs with an empty option
+ */
 
 export class NothingNode implements ResourceTree {
     private static converterIngredientTemplate = new Template(

@@ -1,4 +1,7 @@
 import { ProgramError } from "./errors";
+/**
+ * Class for handling and cloning template elements.
+ */
 
 export class Template {
     private el: HTMLTemplateElement;

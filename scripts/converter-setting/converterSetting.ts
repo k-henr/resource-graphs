@@ -5,6 +5,7 @@ import { SettingsTreeInputNode, SettingsTreeNode } from "../types";
 /**
  * Abstract class for handling a setting, with some static help functions on it
  */
+
 export abstract class ConverterSetting {
     protected element: Element;
 
