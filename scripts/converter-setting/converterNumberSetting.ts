@@ -27,7 +27,6 @@ export class ConverterNumberSetting extends ConverterSetting {
     }
 
     public override chooseBranch(_: SettingsTreeInputNode): SettingsTreeNode {
-        console.log("value of input:", JSON.stringify(this.inputElement.value)); // [object Object]
         return (
             Rational.fromInput(
                 this.inputElement.value,

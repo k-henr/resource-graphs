@@ -8,6 +8,7 @@ import { Resource } from "./resource";
 import { Rational } from "./rational";
 import { getUnits } from "./units";
 import { displayErr } from "./errors";
+import { Template } from "./template";
 
 export class NumberedSet<T> {
     private numberMap = new Map<T, Rational>();
@@ -45,14 +46,14 @@ export class ResourceGraph {
     // List elements to put the displays in
     private resourceDeltaList: HTMLElement;
     private converterList: HTMLElement;
-    private resourceDeltaTemplate: HTMLTemplateElement;
-    private converterTemplate: HTMLTemplateElement;
+    private resourceDeltaTemplate: Template;
+    private converterTemplate: Template;
 
     constructor(
         resourceDeltaList: HTMLElement,
         converterList: HTMLElement,
-        resourceDeltaTemplate: HTMLTemplateElement,
-        converterTemplate: HTMLTemplateElement,
+        resourceDeltaTemplate: Template,
+        converterTemplate: Template,
     ) {
         this.resourceDeltaList = resourceDeltaList;
         this.converterList = converterList;
@@ -89,9 +90,7 @@ export class ResourceGraph {
 
         // Add resource displays
         for (const [resource, amount] of resourceDeltas.getEntries()) {
-            const el = (
-                this.resourceDeltaTemplate.content.cloneNode(true) as HTMLElement
-            ).firstElementChild! as HTMLElement;
+            const el = this.resourceDeltaTemplate.cloneElement();
 
             el.querySelector<HTMLElement>(".resource-name")!.innerText =
                 resource.getDisplayName();
@@ -120,9 +119,7 @@ export class ResourceGraph {
 
         // Add converter displays
         for (const [converter, number] of this.converters.getEntries()) {
-            const el = (
-                this.converterTemplate.content.cloneNode(true) as HTMLElement
-            ).firstElementChild as HTMLElement;
+            const el = this.converterTemplate.clone();
 
             el.querySelector<HTMLElement>(".converter-name")!.innerText =
                 converter.getDisplayName();

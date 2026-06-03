@@ -9,6 +9,7 @@ import { ConverterMenu } from "./scripts/converterMenu";
 import { ResourceMenu } from "./scripts/resourceMenu";
 import { Config } from "./scripts/types";
 import { displayErr, GraphError } from "./scripts/errors";
+import { Template } from "./scripts/template";
 
 (async () => {
     // Forcibly reload when the hash changes since the loading needs to reset
@@ -23,12 +24,8 @@ import { displayErr, GraphError } from "./scripts/errors";
             "#resources",
         ) as HTMLElement;
         const converterList = document.querySelector("#converters") as HTMLElement;
-        const resourceDeltaTemplate = document.querySelector(
-            "template#resource-delta-template",
-        ) as HTMLTemplateElement;
-        const converterTemplate = document.querySelector(
-            "template#converter-template",
-        ) as HTMLTemplateElement;
+        const resourceDeltaTemplate = new Template("resource-delta-template");
+        const converterTemplate = new Template("converter-template");
 
         loadingText.innerText = "Loading files...";
 

@@ -219,14 +219,36 @@ Please report this as a bug!`);
     }
   };
 
+  // scripts/template.ts
+  var Template = class {
+    el;
+    constructor(id) {
+      const templateEl = document.querySelector(
+        `template#${id}`
+      );
+      if (!templateEl) throw new ProgramError(`Template "${id}" not found!`);
+      this.el = templateEl;
+    }
+    clone() {
+      if (!this.el.content) throw new ProgramError(`Template is empty!`);
+      return this.el.content.cloneNode(true);
+    }
+    cloneElement() {
+      const el = this.clone();
+      if (!el.firstElementChild)
+        throw new ProgramError(`Template contains no child!`);
+      return el.firstElementChild;
+    }
+  };
+
   // scripts/converter-setting/converterSetting.ts
   var ConverterSetting = class _ConverterSetting {
     element;
-    static settingInputTemplate = document.querySelector(
-      "#converter-setting-input-template"
+    static settingInputTemplate = new Template(
+      "converter-setting-input-template"
     );
-    static settingSelectTemplate = document.querySelector(
-      "#converter-setting-select-template"
+    static settingSelectTemplate = new Template(
+      "converter-setting-select-template"
     );
     constructor(element) {
       if (!element)
@@ -237,9 +259,7 @@ Please report this as a bug!`);
       return this.element;
     }
     static makeInputElement(name, unit, requestingConverter) {
-      const settingEl = _ConverterSetting.settingInputTemplate.content.cloneNode(
-        true
-      );
+      const settingEl = _ConverterSetting.settingInputTemplate.clone();
       const label = settingEl.querySelector("label");
       const input = settingEl.querySelector("input");
       const post = settingEl.querySelector("span");
@@ -251,9 +271,7 @@ Please report this as a bug!`);
       return [settingEl, label, input];
     }
     static makeSelectElement(name, requestingConverter) {
-      const settingEl = _ConverterSetting.settingSelectTemplate.content.cloneNode(
-        true
-      );
+      const settingEl = _ConverterSetting.settingSelectTemplate.clone();
       const label = settingEl.querySelector("label");
       const input = settingEl.querySelector("select");
       label.htmlFor = name;
@@ -326,7 +344,6 @@ Please report this as a bug!`);
       this.inputElement = input;
     }
     chooseBranch(_) {
-      console.log("value of input:", JSON.stringify(this.inputElement.value));
       return Rational.fromInput(
         this.inputElement.value,
         this.inputElement
@@ -438,13 +455,11 @@ Please report this as a bug!`);
 
   // scripts/resource-tree/nothingNode.ts
   var NothingNode = class _NothingNode {
-    static converterIngredientTemplate = document.querySelector(
-      "template#converter-ingredient-template"
+    static converterIngredientTemplate = new Template(
+      "converter-ingredient-template"
     );
     getElement(_parent, _settings, _multiplier, _requestingConverter) {
-      const el = _NothingNode.converterIngredientTemplate.content.cloneNode(
-        true
-      ).firstElementChild;
+      const el = _NothingNode.converterIngredientTemplate.cloneElement();
       el.querySelector(".converter-ingredient-name").innerText = `[Nothing]`;
       el.querySelector(".converter-ingredient-image").remove();
       return el;
@@ -465,9 +480,7 @@ Please report this as a bug!`);
     // Ingredients and products
     ingredientTree;
     productTree;
-    static infoTemplate = document.querySelector(
-      "#converter-info-template"
-    );
+    static infoTemplate = new Template("converter-info-template");
     static infoPanel = document.querySelector("#rc-info-panel");
     constructor(displayName, thumbName, displayImage, settingList, ingredientTree, productTree) {
       this.displayName = displayName;
@@ -511,9 +524,7 @@ Please report this as a bug!`);
     // Populate an info panel with information regarding this converter
     populateInfoPanel() {
       _IntermediateConverter.infoPanel.innerHTML = "";
-      const el = _IntermediateConverter.infoTemplate.content.cloneNode(
-        true
-      );
+      const el = _IntermediateConverter.infoTemplate.clone();
       el.querySelector(".rc-info-header").innerText = this.getDisplayName();
       el.querySelector(".rc-info-image").src = this.getDisplayImage();
       this.entangledOrs = [];
@@ -564,9 +575,7 @@ Please report this as a bug!`);
 
   // scripts/resource.ts
   var Resource = class _Resource {
-    static infoTemplate = document.querySelector(
-      "#resource-info-template"
-    );
+    static infoTemplate = new Template("resource-info-template");
     displayName;
     displayImage;
     tags;
@@ -591,7 +600,7 @@ Please report this as a bug!`);
     }
     // (assumes an empty info panel element)
     populateInfoPanel(panel) {
-      const el = _Resource.infoTemplate.content.cloneNode(true);
+      const el = _Resource.infoTemplate.clone();
       el.querySelector(".rc-info-header").innerText = this.getDisplayName();
       el.querySelector(".rc-info-image").src = this.getDisplayImage();
       panel.appendChild(el);
@@ -647,16 +656,14 @@ Please report this as a bug!`);
       super(options);
     }
     // Element representing an option
-    static converterSelectTemplate = document.querySelector(
-      "template#converter-select-template"
+    static converterSelectTemplate = new Template(
+      "converter-select-template"
     );
     // Element inbetween options that just says "OR"
-    static converterOrTemplate = document.querySelector(
-      "template#converter-or-template"
-    );
+    static converterOrTemplate = new Template("converter-or-template");
     getElement(parent, settings, multiplier, requestingConverter) {
       if (!parent) throw new GraphError("An OR node can't be a root node!");
-      const selectEl = _OrNode.converterSelectTemplate.content.cloneNode(true).firstElementChild;
+      const selectEl = _OrNode.converterSelectTemplate.cloneElement();
       selectEl.querySelector(".converter-select-count").innerText = String(this.children.length);
       const selectList = selectEl.querySelector(
         ".converter-select-children"
@@ -720,9 +727,7 @@ Please report this as a bug!`);
       return optionEl;
     }
     addOrElement(list) {
-      const orEl = _OrNode.converterOrTemplate.content.cloneNode(
-        true
-      );
+      const orEl = _OrNode.converterOrTemplate.clone();
       list.appendChild(orEl);
     }
     getOnClickForOption(parent, option, selectEl, optionEl, requestingConverter) {
@@ -959,8 +964,8 @@ Please report this as a bug!`);
     id;
     amount;
     // Template for a resource element
-    static converterIngredientTemplate = document.querySelector(
-      "template#converter-ingredient-template"
+    static converterIngredientTemplate = new Template(
+      "converter-ingredient-template"
     );
     constructor(id, amount) {
       this.id = id;
@@ -978,9 +983,7 @@ Please report this as a bug!`);
       return output;
     }
     createIngredientElement(multiplier) {
-      const el = _ResourceNode.converterIngredientTemplate.content.cloneNode(
-        true
-      ).firstElementChild;
+      const el = _ResourceNode.converterIngredientTemplate.cloneElement();
       const res = getResource(this.id);
       const unit = res.getUnitGroupName();
       el.querySelector(".converter-ingredient-name").innerText = res.getDisplayName();
@@ -1223,7 +1226,7 @@ Please report this as a bug!`);
       this.resourceDeltaList.innerHTML = "";
       this.converterList.innerHTML = "";
       for (const [resource, amount] of resourceDeltas.getEntries()) {
-        const el = this.resourceDeltaTemplate.content.cloneNode(true).firstElementChild;
+        const el = this.resourceDeltaTemplate.cloneElement();
         el.querySelector(".resource-name").innerText = resource.getDisplayName();
         el.querySelector(".resource-image").src = resource.getDisplayImage();
         el.querySelector(".resource-amount").innerText = (amount.greaterThan(Rational.zero) ? "+" : "") + amount.getDecimalString();
@@ -1240,7 +1243,7 @@ Please report this as a bug!`);
         this.resourceDeltaList.appendChild(el);
       }
       for (const [converter, number] of this.converters.getEntries()) {
-        const el = this.converterTemplate.content.cloneNode(true).firstElementChild;
+        const el = this.converterTemplate.clone();
         el.querySelector(".converter-name").innerText = converter.getDisplayName();
         el.querySelector(".converter-image").src = converter.getDisplayImage();
         el.querySelector(".converter-decimal-approx").innerText = number.getDecimalString();
@@ -1280,10 +1283,8 @@ Please report this as a bug!`);
 
   // scripts/submitMenu.ts
   var SubmitMenu = class _SubmitMenu {
-    static tagListTemplate = document.querySelector("#tag-list-template");
-    static thumbTemplate = document.querySelector(
-      "#item-converter-thumb"
-    );
+    static tagListTemplate = new Template("tag-list-template");
+    static thumbTemplate = new Template("item-converter-thumb");
     graph;
     menuElement;
     detailPopup;
@@ -1374,7 +1375,7 @@ Please report this as a bug!`);
     }
     static createTagListIfNotExists(map, name, tagListContainer) {
       if (map.has(name)) return map.get(name);
-      const tagList = _SubmitMenu.tagListTemplate.content.cloneNode(true).firstElementChild;
+      const tagList = _SubmitMenu.tagListTemplate.cloneElement();
       tagList.querySelector(".tag-list-name").innerText = name;
       tagList.querySelector("button").onclick = () => tagList.querySelector(".tag-list-content").classList.toggle("hidden");
       if (tagListContainer) {
@@ -1396,7 +1397,7 @@ Please report this as a bug!`);
       }
     }
     static createThumb(name, image, onclick) {
-      const thumb = _SubmitMenu.thumbTemplate.content.cloneNode(true).querySelector(".thumb");
+      const thumb = _SubmitMenu.thumbTemplate.cloneElement();
       thumb.querySelector(".thumb-name").innerText = name;
       thumb.querySelector("img.thumb-image").src = image;
       thumb.onclick = onclick;
@@ -1638,12 +1639,8 @@ Please report this as a bug!`);
         "#resources"
       );
       const converterList = document.querySelector("#converters");
-      const resourceDeltaTemplate = document.querySelector(
-        "template#resource-delta-template"
-      );
-      const converterTemplate = document.querySelector(
-        "template#converter-template"
-      );
+      const resourceDeltaTemplate = new Template("resource-delta-template");
+      const converterTemplate = new Template("converter-template");
       loadingText.innerText = "Loading files...";
       const confRes = await fetch(
         `/data/${window.location.hash.replace(/^#/, "")}/config.json`

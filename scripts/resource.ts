@@ -2,10 +2,10 @@
  * A class representing a resource
  */
 
+import { Template } from "./template";
+
 export class Resource {
-    private static infoTemplate = document.querySelector<HTMLTemplateElement>(
-        "#resource-info-template",
-    )!;
+    private static infoTemplate = new Template("resource-info-template")!;
 
     private displayName: string;
     private displayImage: string;
@@ -39,7 +39,7 @@ export class Resource {
 
     // (assumes an empty info panel element)
     public populateInfoPanel(panel: HTMLElement) {
-        const el = Resource.infoTemplate.content.cloneNode(true) as DocumentFragment;
+        const el = Resource.infoTemplate.clone();
 
         el.querySelector<HTMLElement>(".rc-info-header")!.innerText =
             this.getDisplayName();

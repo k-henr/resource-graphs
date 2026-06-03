@@ -1,5 +1,6 @@
 import { ProgramError } from "../errors";
 import { IntermediateConverter } from "../intermediateConverter";
+import { Template } from "../template";
 import { SettingsTreeInputNode, SettingsTreeNode } from "../types";
 /**
  * Abstract class for handling a setting, with some static help functions on it
@@ -7,14 +8,12 @@ import { SettingsTreeInputNode, SettingsTreeNode } from "../types";
 export abstract class ConverterSetting {
     protected element: Element;
 
-    private static settingInputTemplate =
-        document.querySelector<HTMLTemplateElement>(
-            "#converter-setting-input-template",
-        )!;
-    private static settingSelectTemplate =
-        document.querySelector<HTMLTemplateElement>(
-            "#converter-setting-select-template",
-        )!;
+    private static settingInputTemplate = new Template(
+        "converter-setting-input-template",
+    );
+    private static settingSelectTemplate = new Template(
+        "converter-setting-select-template",
+    );
 
     constructor(element: Element | null) {
         if (!element)
@@ -39,9 +38,7 @@ export abstract class ConverterSetting {
         unit: string | null,
         requestingConverter: IntermediateConverter,
     ): [DocumentFragment, HTMLLabelElement, HTMLInputElement] {
-        const settingEl = ConverterSetting.settingInputTemplate.content.cloneNode(
-            true,
-        ) as DocumentFragment;
+        const settingEl = ConverterSetting.settingInputTemplate.clone();
         const label = settingEl.querySelector<HTMLLabelElement>("label")!;
         const input = settingEl.querySelector<HTMLInputElement>("input")!;
         const post = settingEl.querySelector<HTMLElement>("span")!;
@@ -60,9 +57,7 @@ export abstract class ConverterSetting {
         name: string,
         requestingConverter: IntermediateConverter,
     ): [DocumentFragment, HTMLLabelElement, HTMLSelectElement] {
-        const settingEl = ConverterSetting.settingSelectTemplate.content.cloneNode(
-            true,
-        ) as DocumentFragment;
+        const settingEl = ConverterSetting.settingSelectTemplate.clone();
         const label = settingEl.querySelector<HTMLLabelElement>("label")!;
         const input = settingEl.querySelector<HTMLSelectElement>("select")!;
 

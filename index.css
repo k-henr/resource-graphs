@@ -154,11 +154,17 @@ main {
     border-style: solid;
 
     display: flex;
+    gap: 8px;
 
     & > div {
         display: flex;
         align-items: center;
         gap: 8px;
+        height: 100%;
+
+        &:last-child {
+            flex: 1;
+        }
     }
 }
 
@@ -459,6 +465,10 @@ input {
         grid-auto-flow: column;
         grid-template-rows: 96px 96px;
         overflow-x: auto;
+
+        & .thumb {
+            width: 96px;
+        }
     }
 
     #add-rc-menu {

@@ -4,13 +4,11 @@
 
 import { displayErr } from "./errors";
 import { ResourceGraph } from "./resourceGraph";
+import { Template } from "./template";
 
 export abstract class SubmitMenu {
-    protected static tagListTemplate =
-        document.querySelector<HTMLTemplateElement>("#tag-list-template")!;
-    protected static thumbTemplate = document.querySelector<HTMLTemplateElement>(
-        "#item-converter-thumb",
-    )!;
+    protected static tagListTemplate = new Template("tag-list-template");
+    protected static thumbTemplate = new Template("item-converter-thumb");
 
     protected graph: ResourceGraph;
     protected menuElement: HTMLElement;
@@ -151,9 +149,7 @@ export abstract class SubmitMenu {
     ): HTMLElement {
         if (map.has(name)) return map.get(name)!;
 
-        const tagList = (<HTMLElement>(
-            SubmitMenu.tagListTemplate.content.cloneNode(true)
-        )).firstElementChild! as HTMLElement;
+        const tagList = SubmitMenu.tagListTemplate.cloneElement();
         tagList.querySelector<HTMLElement>(".tag-list-name")!.innerText = name;
         tagList.querySelector<HTMLElement>("button")!.onclick = () =>
             tagList.querySelector(".tag-list-content")!.classList.toggle("hidden");
@@ -190,9 +186,7 @@ export abstract class SubmitMenu {
     }
 
     protected static createThumb(name: string, image: string, onclick: () => void) {
-        const thumb = (<HTMLElement>(
-            SubmitMenu.thumbTemplate.content.cloneNode(true)
-        )).querySelector<HTMLElement>(".thumb")!;
+        const thumb = SubmitMenu.thumbTemplate.cloneElement();
         thumb.querySelector<HTMLElement>(".thumb-name")!.innerText = name;
         thumb.querySelector<HTMLImageElement>("img.thumb-image")!.src = image;
         thumb.onclick = onclick;

@@ -1,15 +1,15 @@
 import { ConverterSettings } from "../converterSettings";
 import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
+import { Template } from "../template";
 import { ConverterIngredient } from "../types";
 import { ResourceTree } from "./resourceTree";
 import { ResourceTreeNode } from "./resourceTreeNode";
 
 export class NothingNode implements ResourceTree {
-    private static converterIngredientTemplate =
-        document.querySelector<HTMLTemplateElement>(
-            "template#converter-ingredient-template",
-        )!;
+    private static converterIngredientTemplate = new Template(
+        "converter-ingredient-template",
+    );
 
     public getElement(
         _parent: ResourceTreeNode | null,
@@ -17,11 +17,7 @@ export class NothingNode implements ResourceTree {
         _multiplier: Rational,
         _requestingConverter: IntermediateConverter,
     ): HTMLElement | null {
-        const el = (
-            NothingNode.converterIngredientTemplate.content.cloneNode(
-                true,
-            ) as DocumentFragment
-        ).firstElementChild! as HTMLElement;
+        const el = NothingNode.converterIngredientTemplate.cloneElement();
 
         el.querySelector<HTMLElement>(".converter-ingredient-name")!.innerText =
             `[Nothing]`;

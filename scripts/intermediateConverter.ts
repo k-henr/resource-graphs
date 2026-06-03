@@ -5,6 +5,7 @@ import { Rational } from "./rational";
 import { EntangledOrNode } from "./resource-tree/entangledOr";
 import { NothingNode } from "./resource-tree/nothingNode";
 import { ResourceTree } from "./resource-tree/resourceTree";
+import { Template } from "./template";
 import { ConverterSettingData } from "./types";
 
 /**
@@ -23,9 +24,7 @@ export class IntermediateConverter {
     private ingredientTree: ResourceTree;
     private productTree: ResourceTree;
 
-    private static infoTemplate = document.querySelector<HTMLTemplateElement>(
-        "#converter-info-template",
-    )!;
+    private static infoTemplate = new Template("converter-info-template");
 
     private static infoPanel =
         document.querySelector<HTMLElement>("#rc-info-panel")!;
@@ -88,9 +87,7 @@ export class IntermediateConverter {
     public populateInfoPanel() {
         IntermediateConverter.infoPanel.innerHTML = "";
 
-        const el = IntermediateConverter.infoTemplate.content.cloneNode(
-            true,
-        ) as DocumentFragment;
+        const el = IntermediateConverter.infoTemplate.clone();
 
         // Set name and image
         el.querySelector<HTMLElement>(".rc-info-header")!.innerText =

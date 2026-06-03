@@ -2,6 +2,7 @@ import { ConverterSettings } from "../converterSettings";
 import { displayErr, GraphError, UserError } from "../errors";
 import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
+import { Template } from "../template";
 import { ConverterIngredient } from "../types";
 import { NothingNode } from "./nothingNode";
 import { ResourceTree } from "./resourceTree";
@@ -14,15 +15,11 @@ export class OrNode extends ResourceTreeBoolNode {
     }
 
     // Element representing an option
-    protected static converterSelectTemplate =
-        document.querySelector<HTMLTemplateElement>(
-            "template#converter-select-template",
-        )!;
+    protected static converterSelectTemplate = new Template(
+        "converter-select-template",
+    );
     // Element inbetween options that just says "OR"
-    protected static converterOrTemplate =
-        document.querySelector<HTMLTemplateElement>(
-            "template#converter-or-template",
-        )!;
+    protected static converterOrTemplate = new Template("converter-or-template");
 
     public override getElement(
         parent: ResourceTreeNode | null,
@@ -37,9 +34,7 @@ export class OrNode extends ResourceTreeBoolNode {
         // Create a new OR element, add all the child nodes as children to it. Then
         // add a listener which modifies this part of the tree to replace the OR node
         // with the chosen branch when pressed
-        const selectEl = (
-            OrNode.converterSelectTemplate.content.cloneNode(true) as HTMLElement
-        ).firstElementChild! as HTMLElement; // #casting
+        const selectEl = OrNode.converterSelectTemplate.cloneElement();
 
         selectEl.querySelector<HTMLElement>(".converter-select-count")!.innerText =
             String(this.children.length);
@@ -127,9 +122,7 @@ export class OrNode extends ResourceTreeBoolNode {
     }
 
     private addOrElement(list: Element) {
-        const orEl = OrNode.converterOrTemplate.content.cloneNode(
-            true,
-        ) as DocumentFragment;
+        const orEl = OrNode.converterOrTemplate.clone();
         list.appendChild(orEl);
     }
 

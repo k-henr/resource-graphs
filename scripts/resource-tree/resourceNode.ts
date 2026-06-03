@@ -2,6 +2,7 @@ import { ConverterSettings } from "../converterSettings";
 import { getResource } from "../data";
 import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
+import { Template } from "../template";
 import { ConverterIngredient } from "../types";
 import { getUnits } from "../units";
 import { ResourceTree } from "./resourceTree";
@@ -12,10 +13,9 @@ export class ResourceNode implements ResourceTree {
     private amount: Rational;
 
     // Template for a resource element
-    private static converterIngredientTemplate =
-        document.querySelector<HTMLTemplateElement>(
-            "template#converter-ingredient-template",
-        )!;
+    private static converterIngredientTemplate = new Template(
+        "converter-ingredient-template",
+    );
 
     public constructor(id: string, amount: Rational) {
         this.id = id;
@@ -46,11 +46,7 @@ export class ResourceNode implements ResourceTree {
     }
 
     private createIngredientElement(multiplier: Rational) {
-        const el = (
-            ResourceNode.converterIngredientTemplate.content.cloneNode(
-                true,
-            ) as DocumentFragment
-        ).firstElementChild! as HTMLElement;
+        const el = ResourceNode.converterIngredientTemplate.cloneElement();
 
         const res = getResource(this.id);
         const unit = res.getUnitGroupName();
