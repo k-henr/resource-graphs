@@ -94,17 +94,10 @@ import { Template } from "./scripts/template";
             infoPanel,
             rSubmit, // For now, this only hides the submission form. If I for some
             // reason need to hide more, this is what to change
+            document.querySelector<HTMLElement>("#open-item-delta-menu-button")!,
+            document.querySelector<HTMLElement>("#close-resource-menu-button")!,
+            document.querySelector<HTMLElement>("#close-item-popup-button")!,
         );
-
-        // Add listeners for opening/closing the rc menu
-        // TODO: Move these into submitMenu
-        document.querySelector<HTMLElement>(
-            "#open-item-delta-menu-button",
-        )!.onclick = () => resourceMenu.open();
-        document.querySelector<HTMLElement>("#close-resource-menu-button")!.onclick =
-            () => resourceMenu.close();
-        document.querySelector<HTMLElement>("#close-item-popup-button")!.onclick =
-            () => resourceMenu.closeDetailPopup();
 
         const cHeader = addRcMenuWrapper.querySelector<HTMLElement>(
             "#add-converter-header",
@@ -137,6 +130,9 @@ import { Template } from "./scripts/template";
             cSubmitAmount,
             infoPanel,
             cFormWrapper,
+            document.querySelector<HTMLElement>("#open-converter-menu-button")!,
+            document.querySelector<HTMLElement>("#close-converter-menu-button")!,
+            document.querySelector<HTMLElement>("#close-converter-popup-button")!,
         );
 
         loadingText.innerText = "Setting event listeners...";
@@ -148,17 +144,6 @@ import { Template } from "./scripts/template";
                 resourceMenu.handleEscapePress();
             }
         };
-
-        // Open/close converter menu too
-        // TODO: Move these into submitMenu
-        document.querySelector<HTMLElement>("#open-converter-menu-button")!.onclick =
-            () => converterMenu.open();
-        document.querySelector<HTMLElement>(
-            "#close-converter-menu-button",
-        )!.onclick = () => converterMenu.close();
-        document.querySelector<HTMLElement>(
-            "#close-converter-popup-button",
-        )!.onclick = () => converterMenu.closeDetailPopup();
 
         // Set the graph's request target to the converter menu
         graph.setConverterRequestTarget(converterMenu);

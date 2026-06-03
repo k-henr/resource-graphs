@@ -1,6 +1,6 @@
 import { Converter } from "./converter";
 import { getResourcesWithFilter } from "./data";
-import { displayErr, UserError } from "./errors";
+import { UserError } from "./errors";
 import { Rational } from "./rational";
 import { Resource } from "./resource";
 import { ResourceGraph } from "./resourceGraph";
@@ -22,6 +22,9 @@ export class ResourceMenu extends SubmitMenu {
         unitDropdown: HTMLSelectElement,
         infoPanel: HTMLElement,
         showOnOpen: HTMLElement,
+        openButton: HTMLElement,
+        closeButton: HTMLElement,
+        closeDetailButton: HTMLElement,
     ) {
         super(
             graph,
@@ -33,6 +36,9 @@ export class ResourceMenu extends SubmitMenu {
             converterForm,
             infoPanel,
             showOnOpen,
+            openButton,
+            closeButton,
+            closeDetailButton,
         );
         this.unitDropdown = unitDropdown;
     }

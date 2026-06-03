@@ -33,6 +33,9 @@ export class ConverterMenu extends SubmitMenu {
         amountInput: HTMLElement,
         infoPanel: HTMLElement,
         showOnOpen: HTMLElement,
+        openButton: HTMLElement,
+        closeButton: HTMLElement,
+        closeDetailButton: HTMLElement,
     ) {
         super(
             graph,
@@ -44,6 +47,9 @@ export class ConverterMenu extends SubmitMenu {
             converterForm,
             infoPanel,
             showOnOpen,
+            openButton,
+            closeButton,
+            closeDetailButton,
         );
 
         this.amountInput = amountInput;

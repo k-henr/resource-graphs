@@ -944,18 +944,22 @@ Please report this as a bug!`);
   function getUnits(groupName) {
     const group = unitGroups.get(groupName);
     if (!group) throw new GraphError(`Unit group ${groupName} not found!`);
-    const output = group.conversions.map((el) => el[0]);
-    output.push(group.default);
+    const output = [group.default];
+    group.conversions.map((el) => output.push(el[0]));
     return [output, group.default];
   }
   function populateUnitDropdown(selectEl, groupName) {
     selectEl.innerHTML = "";
     const [units, defaultUnit] = getUnits(groupName);
-    for (const unit of units) {
+    for (let i = 0; i < units.length; i++) {
+      const unit = units[i];
       const optionEl = document.createElement("option");
       optionEl.innerText = unit;
       selectEl.appendChild(optionEl);
-      if (unit === defaultUnit) optionEl.selected = true;
+      if (unit === defaultUnit) {
+        optionEl.selected = true;
+        selectEl.selectedIndex = i;
+      }
     }
   }
 
@@ -1296,7 +1300,7 @@ Please report this as a bug!`);
     showOnOpen;
     isOpen = false;
     detailIsOpen = false;
-    constructor(graph, menuElement, detailPopup, headerElement, thumbList, filterForm, submissionForm, infoPanel, showOnOpen) {
+    constructor(graph, menuElement, detailPopup, headerElement, thumbList, filterForm, submissionForm, infoPanel, showOnOpen, openButton, closeButton, closeDetailButton) {
       this.graph = graph;
       this.menuElement = menuElement;
       this.detailPopup = detailPopup;
@@ -1324,6 +1328,9 @@ Please report this as a bug!`);
           filterForm.requestSubmit();
         };
       }
+      openButton.onclick = () => this.open();
+      closeButton.onclick = () => this.close();
+      closeDetailButton.onclick = () => this.closeDetailPopup();
       this.clearFilters();
     }
     open() {
@@ -1423,7 +1430,7 @@ Please report this as a bug!`);
     // intermediate converter storage is required
     intermediateConverter = null;
     converterSettingsForm;
-    constructor(graph, menuElement, detailPopup, headerElement, thumbList, filterForm, converterForm, converterSettingsForm, amountInput, infoPanel, showOnOpen) {
+    constructor(graph, menuElement, detailPopup, headerElement, thumbList, filterForm, converterForm, converterSettingsForm, amountInput, infoPanel, showOnOpen, openButton, closeButton, closeDetailButton) {
       super(
         graph,
         menuElement,
@@ -1433,7 +1440,10 @@ Please report this as a bug!`);
         filterForm,
         converterForm,
         infoPanel,
-        showOnOpen
+        showOnOpen,
+        openButton,
+        closeButton,
+        closeDetailButton
       );
       this.amountInput = amountInput;
       this.converterSettingsForm = converterSettingsForm;
@@ -1538,7 +1548,7 @@ Please report this as a bug!`);
   var ResourceMenu = class extends SubmitMenu {
     searchString = "";
     unitDropdown;
-    constructor(graph, menuElement, detailPopup, headerElement, thumbList, filterForm, converterForm, unitDropdown, infoPanel, showOnOpen) {
+    constructor(graph, menuElement, detailPopup, headerElement, thumbList, filterForm, converterForm, unitDropdown, infoPanel, showOnOpen, openButton, closeButton, closeDetailButton) {
       super(
         graph,
         menuElement,
@@ -1548,7 +1558,10 @@ Please report this as a bug!`);
         filterForm,
         converterForm,
         infoPanel,
-        showOnOpen
+        showOnOpen,
+        openButton,
+        closeButton,
+        closeDetailButton
       );
       this.unitDropdown = unitDropdown;
     }
@@ -1690,15 +1703,13 @@ Please report this as a bug!`);
         rSubmit,
         rUnitDropdown,
         infoPanel,
-        rSubmit
+        rSubmit,
         // For now, this only hides the submission form. If I for some
         // reason need to hide more, this is what to change
+        document.querySelector("#open-item-delta-menu-button"),
+        document.querySelector("#close-resource-menu-button"),
+        document.querySelector("#close-item-popup-button")
       );
-      document.querySelector(
-        "#open-item-delta-menu-button"
-      ).onclick = () => resourceMenu.open();
-      document.querySelector("#close-resource-menu-button").onclick = () => resourceMenu.close();
-      document.querySelector("#close-item-popup-button").onclick = () => resourceMenu.closeDetailPopup();
       const cHeader = addRcMenuWrapper.querySelector(
         "#add-converter-header"
       );
@@ -1728,7 +1739,10 @@ Please report this as a bug!`);
         cSettings,
         cSubmitAmount,
         infoPanel,
-        cFormWrapper
+        cFormWrapper,
+        document.querySelector("#open-converter-menu-button"),
+        document.querySelector("#close-converter-menu-button"),
+        document.querySelector("#close-converter-popup-button")
       );
       loadingText.innerText = "Setting event listeners...";
       document.onkeydown = (e) => {
@@ -1737,13 +1751,6 @@ Please report this as a bug!`);
           resourceMenu.handleEscapePress();
         }
       };
-      document.querySelector("#open-converter-menu-button").onclick = () => converterMenu.open();
-      document.querySelector(
-        "#close-converter-menu-button"
-      ).onclick = () => converterMenu.close();
-      document.querySelector(
-        "#close-converter-popup-button"
-      ).onclick = () => converterMenu.closeDetailPopup();
       graph.setConverterRequestTarget(converterMenu);
       loadingScreen.remove();
     } catch (e) {

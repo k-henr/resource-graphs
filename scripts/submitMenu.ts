@@ -33,6 +33,9 @@ export abstract class SubmitMenu {
         submissionForm: HTMLFormElement,
         infoPanel: HTMLElement,
         showOnOpen: HTMLElement,
+        openButton: HTMLElement,
+        closeButton: HTMLElement,
+        closeDetailButton: HTMLElement,
     ) {
         this.graph = graph;
         this.menuElement = menuElement;
@@ -67,6 +70,10 @@ export abstract class SubmitMenu {
                 filterForm.requestSubmit();
             };
         }
+
+        openButton.onclick = () => this.open();
+        closeButton.onclick = () => this.close();
+        closeDetailButton.onclick = () => this.closeDetailPopup();
 
         this.clearFilters();
     }
