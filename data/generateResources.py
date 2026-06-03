@@ -5,17 +5,17 @@ import os;
 import json;
 import re;
 
-projName = "oxygennotincluded"
-imageDir = "images/resources"
-output = "resources.json"
-capitalizeDisplayNames = True
-
 # Matches id_and_name.unitGroup.#tag1.tag2.tag3#.ext
 # The unit group and tag list are optional. Dots are used to separate parts of the
 # filename. The id_and_name part will be used to generate both the id and the name
 resourceMatcher = re.compile(r"^(?P<ID>[^\.]*)\.(?:(?P<UNIT>[^\.\+]+)\.)?(?:\+(?P<TAGS>.+)\+\.)?\w+$")
 
-def build():
+def build(
+    projName,
+    imageDir = "images/resources",
+    output = "resources.json",
+    capitalizeDisplayNames = True
+):
     # Go through a list of all files in the input directory
     allResources = []
     warnings = []

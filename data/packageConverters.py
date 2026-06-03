@@ -4,14 +4,14 @@
 import os;
 import json;
 
-projName = "oxygennotincluded"
-unpackedDir = "unpacked_converters"
-output = "converters.json"
-defaultImgPath = "images/converters"
-defaultImgExt = "png"
-capitalizeDisplayNames = True
-
-def build():
+def build(
+    projName,
+    unpackedDir = "unpacked_converters",
+    output = "converters.json",
+    defaultImgPath = "images/converters",
+    defaultImgExt = "png",
+    capitalizeDisplayNames = True
+):
     # Go through a list of all files in the input directory
     allConverters = []
     warnings = []
