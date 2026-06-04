@@ -1,0 +1,9 @@
+{
+    "tags": ["Factory"],
+    "consumes": [
+        { "type": "RESOURCE", "id": "thorium", "amount": 2 },
+        { "type": "RESOURCE", "id": "sand", "amount": 5 },
+        { "type": "RESOURCE", "id": "power", "amount": 300 }
+    ],
+    "produces": [{ "type": "RESOURCE", "id": "phase_fabric", "amount": 0.5 }]
+}

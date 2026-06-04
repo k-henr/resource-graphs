@@ -1,0 +1,13 @@
+{
+    "tags": ["Factory"],
+    "consumes": [
+        { "type": "RESOURCE", "id": "slag", "amount": 4 },
+        { "type": "RESOURCE", "id": "power", "amount": 66 }
+    ],
+    "produces": [
+        { "type": "RESOURCE", "id": "copper", "amount": 0.7 },
+        { "type": "RESOURCE", "id": "lead", "amount": 0.43 },
+        { "type": "RESOURCE", "id": "graphite", "amount": 0.27 },
+        { "type": "RESOURCE", "id": "titanium", "amount": 0.27 }
+    ]
+}

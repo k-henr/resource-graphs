@@ -1,0 +1,6 @@
+{
+    "tags": ["Generator"],
+    "displayName": "RTG Generator",
+    "consumes": [{ "type": "RESOURCE", "id": "thorium", "amount": [1, 14] }],
+    "produces": [{ "type": "RESOURCE", "id": "power", "amount": 270 }]
+}

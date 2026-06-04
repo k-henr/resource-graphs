@@ -1,0 +1,9 @@
+{
+    "tags": ["Generator"],
+    "consumes": [
+        { "type": "RESOURCE", "id": "blast_compound", "amount": [3, 7] },
+        { "type": "RESOURCE", "id": "cryofluid", "amount": 15 },
+        { "type": "RESOURCE", "id": "power", "amount": 1500 }
+    ],
+    "produces": [{ "type": "RESOURCE", "id": "power", "amount": 7800 }]
+}

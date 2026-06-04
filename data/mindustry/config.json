@@ -3,26 +3,26 @@
 
     "unitGroups": [
         [
-            "solid/time",
+            "solid",
             {
                 "default": "items/s",
                 "conversions": []
             }
         ],
         [
-            "liquid/time",
+            "liquid",
             {
                 "default": "units/s",
                 "conversions": []
             }
         ],
         [
-            "power/time",
+            "power",
             {
                 "default": "power units/s",
                 "conversions": []
             }
         ]
     ],
-    "defaultUnitGroup": "solid/time"
+    "defaultUnitGroup": "solid"
 }

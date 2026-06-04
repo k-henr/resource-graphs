@@ -1,0 +1,11 @@
+{
+    "tags": ["Factory"],
+    "consumes": [
+        { "type": "RESOURCE", "id": "copper", "amount": 2.4 },
+        { "type": "RESOURCE", "id": "lead", "amount": 3.2 },
+        { "type": "RESOURCE", "id": "titanium", "amount": 1.6 },
+        { "type": "RESOURCE", "id": "silicon", "amount": 1.6 },
+        { "type": "RESOURCE", "id": "power", "amount": 240 }
+    ],
+    "produces": [{ "type": "RESOURCE", "id": "surge_alloy", "amount": 0.8 }]
+}

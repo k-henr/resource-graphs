@@ -1,0 +1,8 @@
+{
+    "tags": ["Generator"],
+    "consumes": [
+        { "type": "RESOURCE", "id": "pyratite", "amount": [3, 11] },
+        { "type": "RESOURCE", "id": "cryofluid", "amount": 6 }
+    ],
+    "produces": [{ "type": "RESOURCE", "id": "power", "amount": 1060 }]
+}

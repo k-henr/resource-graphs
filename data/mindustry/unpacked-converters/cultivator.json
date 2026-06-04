@@ -1,0 +1,8 @@
+{
+    "tags": ["Factory"],
+    "consumes": [
+        { "type": "RESOURCE", "id": "water", "amount": 18 },
+        { "type": "RESOURCE", "id": "power", "amount": 80 }
+    ],
+    "produces": [{ "type": "RESOURCE", "id": "spore_pod", "amount": [3, 5] }]
+}

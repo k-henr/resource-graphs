@@ -6,7 +6,7 @@ import json;
 
 def build(
     projName,
-    unpackedDir = "unpacked_converters",
+    unpackedDir = "unpacked-converters",
     output = "converters.json",
     defaultImgPath = "images/converters",
     defaultImgExt = "png",

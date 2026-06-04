@@ -1,0 +1,10 @@
+{
+    "tags": ["Factory"],
+    "displayName": "Multi-Press",
+    "consumes": [
+        { "type": "RESOURCE", "id": "coal", "amount": 6 },
+        { "type": "RESOURCE", "id": "water", "amount": 6 },
+        { "type": "RESOURCE", "id": "power", "amount": 108 }
+    ],
+    "produces": [{ "type": "RESOURCE", "id": "graphite", "amount": 4 }]
+}

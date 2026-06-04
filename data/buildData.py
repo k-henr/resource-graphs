@@ -4,7 +4,7 @@
 import generateResources;
 import packageConverters;
 
-projNames = ["oxygennotincluded"]
+projNames = ["mindustry"]
 
 for name in projNames:
     packageConverters.build(name)

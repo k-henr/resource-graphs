@@ -1,0 +1,39 @@
+{
+    "tags": ["Generator"],
+    "consumes": [
+        {
+            "type": "ENTANGLED_OR",
+            "name": "material",
+            "resources": [
+                ["coal", { "type": "RESOURCE", "id": "coal", "amount": 0.5 }],
+                [
+                    "spore_pod",
+                    { "type": "RESOURCE", "id": "spore_pod", "amount": 0.5 }
+                ],
+                [
+                    "blast_compound",
+                    { "type": "RESOURCE", "id": "blast_compound", "amount": 0.5 }
+                ],
+                [
+                    "pyratite",
+                    { "type": "RESOURCE", "id": "pyratite", "amount": [1, 6] }
+                ]
+            ]
+        }
+    ],
+    "produces": [
+        {
+            "type": "ENTANGLED_OR",
+            "name": "material",
+            "resources": [
+                ["coal", { "type": "RESOURCE", "id": "power", "amount": 60 }],
+                ["spore_pod", { "type": "RESOURCE", "id": "power", "amount": 69 }],
+                [
+                    "blast_compound",
+                    { "type": "RESOURCE", "id": "power", "amount": 24 }
+                ],
+                ["pyratite", { "type": "RESOURCE", "id": "power", "amount": 84 }]
+            ]
+        }
+    ]
+}

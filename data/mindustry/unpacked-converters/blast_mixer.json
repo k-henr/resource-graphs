@@ -1,0 +1,9 @@
+{
+    "tags": ["Factory"],
+    "consumes": [
+        { "type": "RESOURCE", "id": "pyratite", "amount": 0.75 },
+        { "type": "RESOURCE", "id": "spore_pod", "amount": 0.75 },
+        { "type": "RESOURCE", "id": "power", "amount": 24 }
+    ],
+    "produces": [{ "type": "RESOURCE", "id": "blast_compound", "amount": 0.75 }]
+}

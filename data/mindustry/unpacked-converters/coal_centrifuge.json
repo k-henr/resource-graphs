@@ -1,0 +1,8 @@
+{
+    "tags": ["Factory"],
+    "consumes": [
+        { "type": "RESOURCE", "id": "oil", "amount": 6 },
+        { "type": "RESOURCE", "id": "power", "amount": 42 }
+    ],
+    "produces": [{ "type": "RESOURCE", "id": "coal", "amount": 2 }]
+}
