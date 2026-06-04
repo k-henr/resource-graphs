@@ -61,7 +61,7 @@ def build(
     # If no warnings were encountered, stringify the json and output to file
     else:
         print("Parsing successful, writing output...")
-        outputText = json.dumps(allResources, separators=[",",":"], ensure_ascii=False)
+        outputText = json.dumps(allResources, separators=(",",":"), ensure_ascii=False)
         with open(os.path.join(projPath, output), "w", encoding="utf-8") as outputFile:
             outputFile.write(outputText)
         print("Script finished successfully.")

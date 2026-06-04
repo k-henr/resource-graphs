@@ -1,0 +1,124 @@
+{
+    "tags": ["Ranching", "...TEMPLATE?:additionalTags"],
+    "displayName": "TEMPLATE:displayName",
+    "thumbName": "TEMPLATE:thumbName",
+    "settings": [
+        {
+            "type": "ENUMERATE",
+            "name": "Morph",
+            "options": "TEMPLATE:morphs",
+            "default": "TEMPLATE:defaultMorph"
+        },
+        { "type": "TOGGLE", "name": "Wild", "default": false },
+        { "type": "TOGGLE", "name": "Cramped", "default": false },
+        {
+            "type": "ENUMERATE",
+            "name": "Mood",
+            "options": ["Miserable", "Glum", "Satisfied", "Happy"],
+            "default": "Happy"
+        },
+        "...TEMPLATE?:additionalSettings"
+    ],
+    "consumes": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "SETTING",
+                "name": "Wild",
+                "true": 0,
+                "false": {
+                    "type": "SETTING",
+                    "name": "Mood",
+                    "options": [
+                        [["Miserable", "Glum"], 0.2],
+                        [["Satisfied", "Happy"], 1]
+                    ],
+                    "default": "Happy"
+                }
+            },
+            "resource": {
+                "type": "AND",
+                "resources": "TEMPLATE:consumeResource"
+            }
+        },
+        "...TEMPLATE?:additionalConsume",
+        {
+            "type": "RESOURCE",
+            "id": "TEMPLATE:egg",
+            "amount": [1, "TEMPLATE:adultLifespan"]
+        }
+    ],
+    "produces": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "SETTING",
+                "name": "Mood",
+                "options": [
+                    [
+                        ["Miserable", "Glum"],
+                        {
+                            "type": "SETTING",
+                            "name": "Wild",
+                            "true": 0.1,
+                            "false": 0.2
+                        }
+                    ],
+                    [
+                        ["Satisfied", "Happy"],
+                        {
+                            "type": "SETTING",
+                            "name": "Wild",
+                            "true": 0.25,
+                            "false": 1
+                        }
+                    ]
+                ],
+                "default": "Happy"
+            },
+            "resource": {
+                "type": "AND",
+                "resources": "TEMPLATE:produceResource"
+            }
+        },
+        "...TEMPLATE?:additionalProduce",
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "SETTING",
+                "name": "Cramped",
+                "true": 0,
+                "false": {
+                    "type": "SETTING",
+                    "name": "Wild",
+                    "true": [1, "TEMPLATE:adultLifespan"],
+                    "false": {
+                        "type": "SETTING",
+                        "name": "Mood",
+                        "options": [
+                            ["Miserable", 0],
+                            [
+                                "Happy",
+                                [
+                                    "TEMPLATE:eggsPerLifespan",
+                                    "TEMPLATE:adultLifespan"
+                                ]
+                            ],
+                            [
+                                ["Glum", "Satisfied"],
+                                [1, "TEMPLATE:adultLifespan"]
+                            ]
+                        ],
+                        "default": "Satisfied"
+                    }
+                }
+            },
+            "resource": { "type": "RESOURCE", "id": "TEMPLATE:egg", "amount": 1 }
+        },
+        {
+            "type": "RESOURCE",
+            "id": "meat",
+            "amount": ["TEMPLATE:caloriesDropped", "TEMPLATE:adultLifespan"]
+        }
+    ]
+}
