@@ -199,7 +199,7 @@ Please report this as a bug!`);
       }
       if (!total.greaterThan(Rational.zero)) {
         alert(
-          "The converter isn't producing any of the requested resoure due to the settings chosen. No converter will be added."
+          "The converter isn't producing any of the requested resource due to the settings chosen. No converter will be added."
         );
         return Rational.zero;
       }
@@ -1025,7 +1025,7 @@ Please report this as a bug!`);
   }
   function getResource(id) {
     const r = loadedResources.get(id);
-    if (!r) throw new GraphError(`Couldn't find resoure "${id}"!`);
+    if (!r) throw new GraphError(`Couldn't find resource "${id}"!`);
     return r;
   }
   function getResourcesWithTag(tag) {

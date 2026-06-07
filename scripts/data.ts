@@ -54,7 +54,7 @@ export async function loadAllResources() {
 
 export function getResource(id: string): Resource {
     const r = loadedResources.get(id);
-    if (!r) throw new GraphError(`Couldn't find resoure "${id}"!`);
+    if (!r) throw new GraphError(`Couldn't find resource "${id}"!`);
     return r;
 }
 

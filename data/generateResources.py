@@ -9,6 +9,8 @@ import re;
 # The unit group and tag list are optional. Dots are used to separate parts of the
 # filename. The id_and_name part will be used to generate both the id and the name
 resourceMatcher = re.compile(r"^(?P<ID>[^\.]*)\.(?:(?P<UNIT>[^\.\+]+)\.)?(?:\+(?P<TAGS>.+)\+\.)?\w+$")
+# Matches whole paths for unit groups and tags imparted by individual folders
+folderMatcher = re.compile(r"(?<=[\/\\])[^\\\/\.]*(?:\.(?P<UNIT>[^\\\/\.\+]+))?(?:\.\+(?P<TAGS>[^\/\.]+)\+)?")
 
 def build(
     projName,
@@ -23,7 +25,21 @@ def build(
     srcPath = os.path.join(projPath, sourceDir)
 
     for path, _, files in os.walk(srcPath):
+        # Get the relative path for the images in this folder
         imgPath = os.path.relpath(path, srcPath)
+
+        # look for any unit group defaults or tags imparted by the path
+        defaultUnitGroup = None
+        defaultTags = []
+        unit: str
+        tags:str
+        print(path)
+        for [unit, tags] in folderMatcher.findall(path):
+            if unit != "": defaultUnitGroup = unit
+            if tags != "":
+                for t in tags.split(","):
+                    defaultTags.append(t)
+
         for filename in files:
             print(f"Found resource image: {filename}")
 
@@ -36,20 +52,24 @@ def build(
             name = match.group("ID").replace("_", " ")
             if capitalizeDisplayNames: name = name.title()
 
-            # Make the resource structure
+            # Make the basic resource structure
             resource = {
                 "id": match.group("ID"),
                 "displayName": name,
-                "displayImage": f"{sourceDir}/{imgPath + "/" if imgPath != "." else ""}{filename}",
+                "displayImage": f"{sourceDir}/{imgPath + "/" if imgPath != "." else ""}{filename}".replace("\\","/"),
             }
 
             # Add unit group if exists
             if(group := match.group("UNIT")): resource["unitGroup"] = group
+            elif defaultUnitGroup: resource["unitGroup"] = defaultUnitGroup
 
             # Add tags if any
-            if(tags := match.group("TAGS")):
-                tagList = tags.split(".")
-                resource["tags"] = tagList
+            if((tags := match.group("TAGS")) or len(defaultTags) != 0):
+                if(tags == None):
+                    resource["tags"] = defaultTags
+                else:
+                    resource["tags"] = tags.split(".")
+                    resource["tags"].extend(defaultTags)
 
             # Add to list of all resources
             allResources.append(resource)
