@@ -42,12 +42,11 @@ export class OrNode extends ResourceTreeBoolNode {
         // with the chosen branch when pressed
         const selectEl = OrNode.converterSelectTemplate.cloneElement();
 
-        selectEl.querySelector<HTMLElement>(".converter-select-count")!.innerText =
-            String(this.children.length);
         const selectList = selectEl.querySelector<Element>(
             ".converter-select-children",
         )!;
 
+        let numOptions = 0;
         let encounteredEmptyNode = false;
         let encounteredNonemptyNode = false;
 
@@ -64,17 +63,21 @@ export class OrNode extends ResourceTreeBoolNode {
             if (el === null) {
                 encounteredEmptyNode = true;
             } else {
+                numOptions++;
                 encounteredNonemptyNode = true;
                 if (i !== this.children.length - 1) this.addOrElement(selectList);
             }
         }
 
         // If there were no filled nodes in this OR, return null
-        if (!encounteredNonemptyNode) return null;
+        // (temporarily removed until I've made ORs automatically collapse if they
+        // have no contents)
+        //if (!encounteredNonemptyNode) return null;
 
         // If there should be a "nothing" option, add it
-        if (encounteredEmptyNode) {
-            if (true) this.addOrElement(selectList); // If there were any previous options
+        if (encounteredEmptyNode || !encounteredNonemptyNode) {
+            if (numOptions != 0) this.addOrElement(selectList); // If there were any previous options
+            numOptions++;
             // Make a dummy "nothing" node
             const nothingNode = new NothingNode();
             this.addOptionElement(
@@ -87,6 +90,9 @@ export class OrNode extends ResourceTreeBoolNode {
                 requestingConverter,
             );
         }
+
+        selectEl.querySelector<HTMLElement>(".converter-select-count")!.innerText =
+            String(numOptions);
 
         // Return the finished element
         return selectEl;
