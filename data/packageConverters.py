@@ -27,24 +27,31 @@ def build(
     warnings = []
     projectPath = os.path.join(os.getcwd(), "data", projName)
     unpackedPath = os.path.join(projectPath, unpackedDir)
-    for filename in os.listdir(unpackedPath):
-        print(f"Found converter: {filename}")
-        with open(os.path.join(unpackedPath, filename), encoding="utf-8") as file:
-            # Parse file
-            converter = json.loads(file.read())
-            try:
-                allConverters.append(parseConverter(
-                    converter,
-                    filename,
-                    capitalizeDisplayNames,
-                    templateDir,
-                    defaultImgDir,
-                    defaultImgExt,
-                    projectPath
-                ))
-            except ParseException as e:
-                warnings.append(e.message)
+    templatePath = os.path.join(projectPath, templateDir)
 
+    try:
+        
+        # Recursively build all files in the directory
+        for path, _, files in os.walk(unpackedPath):
+            imgPath = os.path.relpath(path, unpackedPath)
+            # Build all files in this directory
+            for filename in files:
+                print(f"Found converter: {filename}")
+                with open(os.path.join(path, filename), encoding="utf-8") as file:
+                    # Parse file
+                    converter = json.loads(file.read())
+                    allConverters.append(parseConverter(
+                        converter,
+                        filename,
+                        capitalizeDisplayNames,
+                        templatePath,
+                        f"{defaultImgDir}/{imgPath + "/" if imgPath != "." else ""}",
+                        defaultImgExt
+                    ))
+
+    except ParseException as e:
+        warnings.append(e.message)
+    
     # If there are warnings, print them out and don't continue
     if(len(warnings) != 0):
         print("### WARNINGS ENCOUNTERED: ###")
@@ -64,10 +71,9 @@ def parseConverter(
     converter: jsonObject,
     filename: str,
     capitalizeDisplayNames: bool,
-    templateDir: str,
+    templatePath: str,
     defaultImgPath: str,
-    defaultImgExt: str,
-    projectPath: str
+    defaultImgExt: str
 ) -> jsonObject:
     if type(converter) is dict:
         
@@ -109,8 +115,6 @@ def parseConverter(
                             if(content == None):
                                 if match.group("OPTIONAL"): return None
                                 raise ParseException(f"Template replacer '{match.group("TEMPLATENAME")}' missing on implementation in '{filename}'!")
-                            
-                            print(f"Replacing {templateObject} with {content}")
 
                             return (content, bool(match.group("FLATTENLIST")))
                         else:
@@ -118,7 +122,7 @@ def parseConverter(
                 raise ParseException(f"Unknown json type {type(templateObject)}!")
                     
             # Load template file
-            with open(os.path.join(projectPath, templateDir, f"{converter["templateName"]}.json"), encoding="utf-8") as templateFile:
+            with open(os.path.join(templatePath, f"{converter["templateName"]}.json"), encoding="utf-8") as templateFile:
                 template: tuple[jsonObject, bool] | None = resolveTemplate(json.loads(templateFile.read()))
 
                 if(not template): raise ParseException("Template parsing resulted in None!")
@@ -128,10 +132,9 @@ def parseConverter(
                     template[0],
                     filename,
                     capitalizeDisplayNames,
-                    templateDir,
+                    templatePath,
                     defaultImgPath,
-                    defaultImgExt,
-                    projectPath
+                    defaultImgExt
                 )
 
         else:
@@ -148,7 +151,7 @@ def parseConverter(
 
             # If no image set, set image to the ID
             if(not "displayImage" in converter):
-                converter["displayImage"] = f"{defaultImgPath}/{converter["id"]}.{defaultImgExt}"
+                converter["displayImage"] = f"{defaultImgPath}{converter["id"]}.{defaultImgExt}"
 
             # If other fields are missing, add a warning to be printed out
             if(not ("consumes" in converter and "produces" in converter)):

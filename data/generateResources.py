@@ -12,7 +12,7 @@ resourceMatcher = re.compile(r"^(?P<ID>[^\.]*)\.(?:(?P<UNIT>[^\.\+]+)\.)?(?:\+(?
 
 def build(
     projName,
-    imageDir = "images/resources",
+    sourceDir = "images/resources",
     output = "resources.json",
     capitalizeDisplayNames = True
 ):
@@ -20,36 +20,39 @@ def build(
     allResources = []
     warnings = []
     projPath = os.path.join(os.getcwd(), "data", projName)
-    imagePath = os.path.join(projPath, imageDir)
-    for filename in os.listdir(imagePath):
-        print(f"Found resource image: {filename}")
+    srcPath = os.path.join(projPath, sourceDir)
 
-        # Regex the filename to get the different parts
-        match = resourceMatcher.search(filename)
-        if(match == None):
-            warnings.append(f"Filename '{filename}' failed the match!")
-            continue
+    for path, _, files in os.walk(srcPath):
+        imgPath = os.path.relpath(path, srcPath)
+        for filename in files:
+            print(f"Found resource image: {filename}")
 
-        name = match.group("ID").replace("_", " ")
-        if capitalizeDisplayNames: name = name.title()
+            # Regex the filename to get the different parts
+            match = resourceMatcher.search(filename)
+            if(match == None):
+                warnings.append(f"Filename '{filename}' failed the match!")
+                continue
 
-        # Make the resource structure
-        resource = {
-            "id": match.group("ID"),
-            "displayName": name,
-            "displayImage": f"{imageDir}/{filename}",
-        }
+            name = match.group("ID").replace("_", " ")
+            if capitalizeDisplayNames: name = name.title()
 
-        # Add unit group if exists
-        if(group := match.group("UNIT")): resource["unitGroup"] = group
+            # Make the resource structure
+            resource = {
+                "id": match.group("ID"),
+                "displayName": name,
+                "displayImage": f"{sourceDir}/{imgPath + "/" if imgPath != "." else ""}{filename}",
+            }
 
-        # Add tags if any
-        if(tags := match.group("TAGS")):
-            tagList = tags.split(".")
-            resource["tags"] = tagList
+            # Add unit group if exists
+            if(group := match.group("UNIT")): resource["unitGroup"] = group
 
-        # Add to list of all resources
-        allResources.append(resource)
+            # Add tags if any
+            if(tags := match.group("TAGS")):
+                tagList = tags.split(".")
+                resource["tags"] = tagList
+
+            # Add to list of all resources
+            allResources.append(resource)
 
     # If there are warnings, print them out and don't continue
     if(len(warnings) != 0):

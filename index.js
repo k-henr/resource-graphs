@@ -664,10 +664,10 @@ Please report this as a bug!`);
     getElement(parent, settings, multiplier, requestingConverter) {
       if (!parent) throw new GraphError("An OR node can't be a root node!");
       const selectEl = _OrNode.converterSelectTemplate.cloneElement();
-      selectEl.querySelector(".converter-select-count").innerText = String(this.children.length);
       const selectList = selectEl.querySelector(
         ".converter-select-children"
       );
+      let numOptions = 0;
       let encounteredEmptyNode = false;
       let encounteredNonemptyNode = false;
       for (let i = 0; i < this.children.length; i++) {
@@ -683,13 +683,14 @@ Please report this as a bug!`);
         if (el === null) {
           encounteredEmptyNode = true;
         } else {
+          numOptions++;
           encounteredNonemptyNode = true;
           if (i !== this.children.length - 1) this.addOrElement(selectList);
         }
       }
-      if (!encounteredNonemptyNode) return null;
-      if (encounteredEmptyNode) {
-        if (true) this.addOrElement(selectList);
+      if (encounteredEmptyNode || !encounteredNonemptyNode) {
+        if (numOptions != 0) this.addOrElement(selectList);
+        numOptions++;
         const nothingNode = new NothingNode();
         this.addOptionElement(
           nothingNode,
@@ -701,6 +702,7 @@ Please report this as a bug!`);
           requestingConverter
         );
       }
+      selectEl.querySelector(".converter-select-count").innerText = String(numOptions);
       return selectEl;
     }
     // Add an element for the given option

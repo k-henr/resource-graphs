@@ -1,7 +1,7 @@
 {
     "tags": ["Ranching"],
     "displayName": "Hatch evolution",
-    "displayImage": "images/converters/hatch.png",
+    "displayImage": "images/converters/critters/hatch.png",
     "consumes": [{ "type": "RESOURCE", "id": "hatch_egg", "amount": 1 }],
     "produces": [{ "type": "RESOURCE", "id": "meat", "amount": 3200 }]
 }
