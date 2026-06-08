@@ -58,11 +58,18 @@ export function getResource(id: string): Resource {
     return r;
 }
 
-export function getResourcesWithTag(tag: string) {
+export function getResourcesWithTags(tag: string | string[]) {
     const list = loadedResources.entries();
     const output: [string, Resource][] = [];
     for (const [id, r] of list) {
-        if (r.getTags().indexOf(tag) !== -1) output.push([id, r]);
+        if (typeof tag === "string") {
+            if (r.getTags().indexOf(tag) !== -1) output.push([id, r]);
+        } else {
+            let match = true;
+            const tags = r.getTags();
+            tag.forEach((el) => (match = match && tags.indexOf(el) !== -1));
+            if (match) output.push([id, r]);
+        }
     }
     return output;
 }
@@ -153,7 +160,7 @@ function resourceTreeDataToClass(data: ResourceTreeData): ResourceTree {
             // If this node is reached through "normal" means and not in
             // handleOrInput, it's always a standalone TAG and should therefore
             // create an OR
-            const resources = getResourcesWithTag(data.tagName);
+            const resources = getResourcesWithTags(data.tagName);
             const resourceData = resources.map(([id]) =>
                 makeResourceFromIdAndAmount(id, data.amount),
             );
@@ -177,7 +184,7 @@ function handleOrInput(tree: ResourceTreeData, output: ResourceTree[]) {
             break;
         case "TAG":
             const amount = Rational.fromData(tree.amount);
-            const resources = getResourcesWithTag(tree.tagName);
+            const resources = getResourcesWithTags(tree.tagName);
             // Create a dummy resource for every resource in the TAG and add as an
             // option
             for (const [id] of resources) {
@@ -213,7 +220,7 @@ function getAllPossibleResources(
         case "MULTIPLIER":
             return getAllPossibleResources(data.resource, output);
         case "TAG":
-            const resources = getResourcesWithTag(data.tagName);
+            const resources = getResourcesWithTags(data.tagName);
             for (const [, r] of resources) output.push(r);
             return output;
         case "ENTANGLED_OR":

@@ -104,7 +104,7 @@ export type ResourceTreeDataBooleanNode = {
 // automatically add all the resources to that OR. Otherwise, it'll create its own OR
 export type ResourceTreeDataTagNode = {
     type: "TAG";
-    tagName: string;
+    tagName: string | string[];
     amount: RationalNumber;
 };
 // Represents an entangled OR node, where a collapse will also collapse the other

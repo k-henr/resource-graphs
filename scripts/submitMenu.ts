@@ -127,6 +127,9 @@ export abstract class SubmitMenu {
         // is the first occurence of the tag, make a completely new element and
         // add it to the map
         for (const tagName of tags) {
+            // If the name starts with an &, this shouldn't create a tag list
+            if (tagName.startsWith("&")) return;
+
             // Get the tag list and create it if it doesn't exist yet
             const tagList = SubmitMenu.createTagListIfNotExists(
                 tagListMap,

@@ -1028,11 +1028,18 @@ Please report this as a bug!`);
     if (!r) throw new GraphError(`Couldn't find resource "${id}"!`);
     return r;
   }
-  function getResourcesWithTag(tag) {
+  function getResourcesWithTags(tag) {
     const list = loadedResources.entries();
     const output = [];
     for (const [id, r] of list) {
-      if (r.getTags().indexOf(tag) !== -1) output.push([id, r]);
+      if (typeof tag === "string") {
+        if (r.getTags().indexOf(tag) !== -1) output.push([id, r]);
+      } else {
+        let match = true;
+        const tags = r.getTags();
+        tag.forEach((el) => match = match && tags.indexOf(el) !== -1);
+        if (match) output.push([id, r]);
+      }
     }
     return output;
   }
@@ -1103,7 +1110,7 @@ Please report this as a bug!`);
           resourceTreeDataToClass(data.resource)
         );
       case "TAG":
-        const resources = getResourcesWithTag(data.tagName);
+        const resources = getResourcesWithTags(data.tagName);
         const resourceData = resources.map(
           ([id]) => makeResourceFromIdAndAmount(id, data.amount)
         );
@@ -1124,7 +1131,7 @@ Please report this as a bug!`);
         break;
       case "TAG":
         const amount = Rational.fromData(tree.amount);
-        const resources = getResourcesWithTag(tree.tagName);
+        const resources = getResourcesWithTags(tree.tagName);
         for (const [id] of resources) {
           output.push(new ResourceNode(id, amount));
         }
@@ -1149,7 +1156,7 @@ Please report this as a bug!`);
       case "MULTIPLIER":
         return getAllPossibleResources(data.resource, output);
       case "TAG":
-        const resources = getResourcesWithTag(data.tagName);
+        const resources = getResourcesWithTags(data.tagName);
         for (const [, r] of resources) output.push(r);
         return output;
       case "ENTANGLED_OR":
@@ -1365,6 +1372,7 @@ Please report this as a bug!`);
     }
     addThumbToTagLists(tags, tagListMap, thumbData) {
       for (const tagName of tags) {
+        if (tagName.startsWith("&")) return;
         const tagList = _SubmitMenu.createTagListIfNotExists(
           tagListMap,
           tagName,
