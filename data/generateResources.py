@@ -10,7 +10,7 @@ import re;
 # filename. The id_and_name part will be used to generate both the id and the name
 resourceMatcher = re.compile(r"^(?P<ID>[^\.]*)\.(?:(?P<UNIT>[^\.\+]+)\.)?(?:\+(?P<TAGS>.+)\+\.)?\w+$")
 # Matches whole paths for unit groups and tags imparted by individual folders
-folderMatcher = re.compile(r"(?<=[\/\\])[^\\\/\.]*(?:\.(?P<UNIT>[^\\\/\.\+]+))?(?:\.\+(?P<TAGS>[^\/\.]+)\+)?")
+folderMatcher = re.compile(r"(?<=[\/\\])[^\\\/\.]*(?:\.(?P<UNIT>[^\\\/\.\+]+))?(?:\.\+(?P<TAGS>[^\/\+]+)\+)?")
 
 def build(
     projName,
@@ -37,7 +37,7 @@ def build(
         for [unit, tags] in folderMatcher.findall(path):
             if unit != "": defaultUnitGroup = unit
             if tags != "":
-                for t in tags.split(","):
+                for t in tags.split("."):
                     defaultTags.append(t)
 
         for filename in files:
