@@ -13,22 +13,61 @@
                 "type": "SETTING",
                 "name": "Morph",
                 "options": [
-                    ["Stone Hatch", 1],
-                    [["Hatch", "Smooth Hatch", "Sage Hatch"], 0]
+                    ["Hatch", 1],
+                    [["Stone Hatch", "Smooth Hatch", "Sage Hatch"], 0]
                 ]
             },
             "resource": {
                 "type": "OR",
                 "resources": [
+                    { "type": "RESOURCE", "id": "crushed_rock", "amount": 140 },
+                    { "type": "RESOURCE", "id": "sandstone", "amount": 140 },
                     { "type": "RESOURCE", "id": "sedimentary_rock", "amount": 140 },
-                    { "type": "RESOURCE", "id": "igneous_rock", "amount": 140 },
-                    { "type": "RESOURCE", "id": "obsidian", "amount": 140 },
-                    { "type": "RESOURCE", "id": "granite", "amount": 140 },
+                    { "type": "RESOURCE", "id": "shale", "amount": 140 },
+                    { "type": "RESOURCE", "id": "clay", "amount": 140 },
+                    { "type": "RESOURCE", "id": "dirt", "amount": 140 },
+                    { "type": "RESOURCE", "id": "sand", "amount": 140 }
+                ]
+            }
+        },
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "SETTING",
+                "name": "Morph",
+                "options": [
+                    [["Stone Hatch"], 1],
+                    [["Hatch", "Sage Hatch", "Smooth Hatch"], 0]
+                ]
+            },
+            "resource": {
+                "type": "OR",
+                "resources": [
+                    { "type": "TAG", "tagName": ["&Solid", "&Rock"], "amount": 140 },
                     {
                         "type": "TAG",
                         "tagName": ["&Solid", "Metal Ore"],
                         "amount": 140
                     }
+                ]
+            }
+        },
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "SETTING",
+                "name": "Morph",
+                "options": [
+                    [["Sage Hatch"], 1],
+                    [["Hatch", "Stone Hatch", "Smooth Hatch"], 0]
+                ]
+            },
+            "resource": {
+                "type": "OR",
+                "resources": [
+                    { "type": "RESOURCE", "id": "polluted_dirt", "amount": 140 },
+                    { "type": "RESOURCE", "id": "slime", "amount": 140 },
+                    { "type": "RESOURCE", "id": "algae", "amount": 140 }
                 ]
             }
         },
@@ -90,8 +129,8 @@
                 "type": "SETTING",
                 "name": "Morph",
                 "options": [
-                    ["Stone Hatch", 1],
-                    [["Hatch", "Smooth Hatch", "Sage Hatch"], 0]
+                    [["Hatch", "Stone Hatch", "Sage Hatch"], 1],
+                    ["Smooth Hatch", 0]
                 ]
             },
             "resource": { "type": "RESOURCE", "id": "coal", "amount": 70 }
