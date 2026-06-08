@@ -1,5 +1,0 @@
-{
-    "tags": ["Oxygen"],
-    "consumes": [{ "type": "RESOURCE", "id": "water", "amount": 600 }],
-    "produces": [{ "type": "RESOURCE", "id": "oxygen", "amount": 532.8 }]
-}

@@ -1,0 +1,27 @@
+{
+    "settings": [
+        {
+            "type": "TOGGLE",
+            "name": "Light boost",
+            "default": false
+        }
+    ],
+    "consumes": [
+        { "type": "RESOURCE", "id": "algae", "amount": 18 },
+        { "type": "RESOURCE", "id": "water", "amount": 180 },
+        { "type": "RESOURCE", "id": "carbon_dioxide", "amount": 0.02 }
+    ],
+    "produces": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "SETTING",
+                "name": "Light boost",
+                "true": 26.4,
+                "false": 24
+            },
+            "resource": { "type": "RESOURCE", "id": "oxygen", "amount": 1 }
+        },
+        { "type": "RESOURCE", "id": "polluted_water", "amount": 174.2 }
+    ]
+}

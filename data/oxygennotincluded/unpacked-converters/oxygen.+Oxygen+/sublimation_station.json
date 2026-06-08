@@ -1,0 +1,7 @@
+{
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": 60 },
+        { "type": "RESOURCE", "id": "polluted_dirt", "amount": 600 }
+    ],
+    "produces": [{ "type": "RESOURCE", "id": "polluted_oxygen", "amount": 396 }]
+}

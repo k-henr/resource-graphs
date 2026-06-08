@@ -1,0 +1,10 @@
+{
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": 120 },
+        { "type": "RESOURCE", "id": "water", "amount": 600 }
+    ],
+    "produces": [
+        { "type": "RESOURCE", "id": "oxygen", "amount": 532.8 },
+        { "type": "RESOURCE", "id": "hydrogen", "amount": 67.2 }
+    ]
+}

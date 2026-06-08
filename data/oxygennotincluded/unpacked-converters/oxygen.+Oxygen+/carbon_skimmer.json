@@ -1,5 +1,4 @@
 {
-    "tags": ["Oxygen"],
     "consumes": [
         { "type": "RESOURCE", "id": "power", "amount": 120 },
         { "type": "RESOURCE", "id": "carbon_dioxide", "amount": 180 },

@@ -1,6 +1,0 @@
-{
-    "tags": ["Oxygen"],
-    "displayName": "Oxygen Diffuser",
-    "consumes": [],
-    "produces": [{ "type": "RESOURCE", "id": "oxygen", "amount": 300 }]
-}

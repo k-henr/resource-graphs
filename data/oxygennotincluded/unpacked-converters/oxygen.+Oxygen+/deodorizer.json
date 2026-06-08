@@ -1,0 +1,10 @@
+{
+    "consumes": [
+        { "type": "RESOURCE", "id": "polluted_oxygen", "amount": 60 },
+        { "type": "TAG", "tagName": "Filtration Medium", "amount": 80 }
+    ],
+    "produces": [
+        { "type": "RESOURCE", "id": "oxygen", "amount": 54 },
+        { "type": "RESOURCE", "id": "clay", "amount": 86 }
+    ]
+}

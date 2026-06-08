@@ -1,0 +1,8 @@
+{
+    "displayName": "Oxygen Diffuser",
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": 120 },
+        { "type": "RESOURCE", "id": "algae", "amount": 330 }
+    ],
+    "produces": [{ "type": "RESOURCE", "id": "oxygen", "amount": 300 }]
+}

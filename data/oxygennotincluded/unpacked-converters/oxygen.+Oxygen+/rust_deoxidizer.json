@@ -1,0 +1,12 @@
+{
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": 60 },
+        { "type": "RESOURCE", "id": "rust", "amount": 450 },
+        { "type": "RESOURCE", "id": "salt", "amount": 117 }
+    ],
+    "produces": [
+        { "type": "RESOURCE", "id": "oxygen", "amount": 342 },
+        { "type": "RESOURCE", "id": "chlorine", "amount": 18 },
+        { "type": "RESOURCE", "id": "iron_ore", "amount": 240 }
+    ]
+}
