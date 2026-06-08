@@ -9,5 +9,5 @@ projNames = ["oxygennotincluded"]
 for name in projNames:
     packageConverters.build(name)
     print("\n")
-    generateResources.build(name)
+    # generateResources.build(name)
     #todo: recap of all warnings

@@ -11,7 +11,15 @@ class ParseException(BaseException):
 
 type jsonObject = dict[str, jsonObject] | str | list[jsonObject] | float | int | bool
 
+# Matches "TEMPLATE:" strings in template files, as well as their "settings"
 templateStringMatcher = re.compile(r"^(?P<FLATTENLIST>\.\.\.)?TEMPLATE(?P<OPTIONAL>\?)?:(?P<TEMPLATENAME>\w+)$")
+
+# Matches whole paths tags imparted by individual folders
+folderMatcher = re.compile(r"(?<=[\/\\])[^\\\/\.]*(?:\.\+(?P<TAGS>[^\/\+]+)\+)?")
+
+# Matches parts of a path that should be removed when making the image path, so that
+# I don't need to write out tag names in those paths too
+folderDetailRemover = re.compile(r"\.\+[^\/\+]+\+")
 
 def build(
     projName,
@@ -34,19 +42,34 @@ def build(
         # Recursively build all files in the directory
         for path, _, files in os.walk(unpackedPath):
             imgPath = os.path.relpath(path, unpackedPath)
+            imgPath = folderDetailRemover.sub(
+                "",
+                f"{defaultImgDir}/{imgPath + "/" if imgPath != "." else ""}"
+            )
+            
+            # Check for extra tags added by the path
+            defaultTags = []
+            tags:str
+            for tags in folderMatcher.findall(path):
+                if tags != "":
+                    for t in tags.split("."):
+                        defaultTags.append(t)
+
             # Build all files in this directory
             for filename in files:
                 print(f"Found converter: {filename}")
                 with open(os.path.join(path, filename), encoding="utf-8") as file:
                     # Parse file
                     converter = json.loads(file.read())
+
                     allConverters.append(parseConverter(
                         converter,
                         filename,
                         capitalizeDisplayNames,
                         templatePath,
-                        f"{defaultImgDir}/{imgPath + "/" if imgPath != "." else ""}",
-                        defaultImgExt
+                        imgPath,
+                        defaultImgExt,
+                        defaultTags
                     ))
 
     except ParseException as e:
@@ -73,7 +96,8 @@ def parseConverter(
     capitalizeDisplayNames: bool,
     templatePath: str,
     defaultImgPath: str,
-    defaultImgExt: str
+    defaultImgExt: str,
+    defaultTags: list[str]
 ) -> jsonObject:
     if type(converter) is dict:
         
@@ -134,7 +158,8 @@ def parseConverter(
                     capitalizeDisplayNames,
                     templatePath,
                     defaultImgPath,
-                    defaultImgExt
+                    defaultImgExt,
+                    defaultTags
                 )
 
         else:
@@ -152,6 +177,13 @@ def parseConverter(
             # If no image set, set image to the ID
             if(not "displayImage" in converter):
                 converter["displayImage"] = f"{defaultImgPath}{converter["id"]}.{defaultImgExt}"
+
+            # Add default tags if any
+            if(len(defaultTags) != 0):
+                if(converter.get("tags") == None): converter["tags"] = []
+                tagList = converter["tags"]
+                if(type(tagList) != list): raise ParseException("Tag list formatted incorrectly!")
+                tagList.extend(defaultTags)
 
             # If other fields are missing, add a warning to be printed out
             if(not ("consumes" in converter and "produces" in converter)):
