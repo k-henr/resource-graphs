@@ -1,0 +1,4 @@
+{
+    "consumes": [{ "type": "TAG", "tagName": "&Compostable", "amount": 60 }],
+    "produces": [{ "type": "RESOURCE", "id": "dirt", "amount": 60 }]
+}

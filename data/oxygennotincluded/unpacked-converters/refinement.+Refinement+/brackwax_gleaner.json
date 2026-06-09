@@ -1,0 +1,11 @@
+{
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": 480 },
+        { "type": "RESOURCE", "id": "brackene", "amount": 600 }
+    ],
+    "produces": [
+        { "type": "RESOURCE", "id": "brackwax", "amount": 54 },
+        { "type": "RESOURCE", "id": "brine", "amount": 486 },
+        { "type": "RESOURCE", "id": "carbon_dioxide", "amount": 60 }
+    ]
+}

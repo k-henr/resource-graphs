@@ -115,9 +115,19 @@ export class ResourceMenu extends SubmitMenu {
         );
 
         for (const [, r] of resourceList) {
-            // Get tags
-            let tags = r.getTags();
-            tags = tags.length > 0 ? tags : ["Miscellaneous"];
+            // Get tags, add misc if no other visible tags exist
+            let tags = [...r.getTags()];
+            let shouldAddMisc = true;
+            for (const t of tags) {
+                if (!t.startsWith("&")) {
+                    shouldAddMisc = false;
+                    break;
+                }
+            }
+            if (shouldAddMisc) {
+                tags.push("Miscellaneous");
+                if (r.getDisplayName() === "Brackene") console.log(tags);
+            }
 
             // Set behaviour when thumb is clicked
             const onclickFn = () => {

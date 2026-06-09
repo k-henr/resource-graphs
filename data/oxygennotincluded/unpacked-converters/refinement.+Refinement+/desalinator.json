@@ -1,0 +1,44 @@
+{
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": 480 },
+        {
+            "type": "ENTANGLED_OR",
+            "name": "material",
+            "resources": [
+                [
+                    "salt_water",
+                    { "type": "RESOURCE", "id": "salt_water", "amount": 3000 }
+                ],
+                ["brine", { "type": "RESOURCE", "id": "brine", "amount": 3000 }]
+            ]
+        }
+    ],
+    "produces": [
+        {
+            "type": "ENTANGLED_OR",
+            "name": "material",
+            "resources": [
+                [
+                    "salt_water",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "water", "amount": 2790 },
+                            { "type": "RESOURCE", "id": "salt", "amount": 210 }
+                        ]
+                    }
+                ],
+                [
+                    "brine",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "water", "amount": 2100 },
+                            { "type": "RESOURCE", "id": "salt", "amount": 900 }
+                        ]
+                    }
+                ]
+            ]
+        }
+    ]
+}

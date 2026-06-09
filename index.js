@@ -113,6 +113,11 @@ Please report this as a bug!`);
     abs() {
       return new _Rational(Math.abs(this.numerator), Math.abs(this.denominator));
     }
+    clamp(lo, hi) {
+      if (this.lessThan(lo)) return lo;
+      if (this.greaterThan(hi)) return hi;
+      return this;
+    }
     equals(v2) {
       return this.numerator === v2.numerator && this.denominator === v2.denominator;
     }
@@ -716,7 +721,7 @@ Please report this as a bug!`);
       if (optionEl) {
         optionEl.classList.add("primary", "interactive");
         selectList.appendChild(optionEl);
-        optionEl.onclick = this.getOnClickForOption(
+        optionEl.onclick = this.getCollapseFnForOption(
           parent,
           option,
           selectEl,
@@ -732,7 +737,7 @@ Please report this as a bug!`);
       const orEl = _OrNode.converterOrTemplate.clone();
       list.appendChild(orEl);
     }
-    getOnClickForOption(parent, option, selectEl, optionEl, requestingConverter) {
+    getCollapseFnForOption(parent, option, selectEl, optionEl, requestingConverter) {
       return () => {
         try {
           this.collapseNode(
@@ -771,7 +776,7 @@ Please report this as a bug!`);
     optionIds;
     // The onclick functions that have been generated, to simulate choosing one when
     // collapsing
-    onclicks = /* @__PURE__ */ new Map();
+    collapseFns = /* @__PURE__ */ new Map();
     constructor(id, options) {
       super(options.map(([, r]) => r));
       this.id = id;
@@ -789,8 +794,8 @@ Please report this as a bug!`);
       return el;
     }
     // When creating the onclick, also store it in a dictionary here
-    getOnClickForOption(parent, option, selectEl, optionEl, requestingConverter) {
-      const onclickNoEntTrigger = () => {
+    getCollapseFnForOption(parent, option, selectEl, optionEl, requestingConverter) {
+      const collapseWithoutEntangledTrigger = () => {
         try {
           super.collapseNode(
             parent,
@@ -805,8 +810,8 @@ Please report this as a bug!`);
         }
       };
       const id = this.optionIds[this.children.indexOf(option)];
-      this.onclicks.set(id, onclickNoEntTrigger);
-      return super.getOnClickForOption(
+      this.collapseFns.set(id, collapseWithoutEntangledTrigger);
+      return super.getCollapseFnForOption(
         parent,
         option,
         selectEl,
@@ -815,17 +820,24 @@ Please report this as a bug!`);
       );
     }
     collapseNodeUsingId(id) {
-      const onclick = this.onclicks.get(id);
-      if (!onclick)
+      const collapseFn = this.collapseFns.get(id);
+      if (!collapseFn)
         throw new GraphError(
           `Option with id ${id} not present on this entangled OR!`
         );
-      onclick();
+      collapseFn();
     }
     // Override the collapseNode function so that when this node collapses, it also
     // collapses the others
     collapseNode(orParent, option, selectEl, optionEl, requestingConverter) {
-      const optionId = this.optionIds[this.children.indexOf(option)];
+      console.log([...this.optionIds]);
+      console.log([...this.children]);
+      console.log(option);
+      const optionIndex = this.children.indexOf(option);
+      console.log(optionIndex);
+      if (optionIndex === -1)
+        throw new ProgramError(`Option not present on entangled OR node!`);
+      const optionId = this.optionIds[optionIndex];
       super.collapseNode(
         orParent,
         option,
@@ -833,6 +845,7 @@ Please report this as a bug!`);
         optionEl,
         requestingConverter
       );
+      console.log(optionId);
       requestingConverter.unregisterEntangledOr(this);
       requestingConverter.collapseEntangledOrs(this.id, optionId);
     }
@@ -906,6 +919,11 @@ Please report this as a bug!`);
           return this.evaluateSettingsTree(treeNode.value1, settings).pow(
             this.evaluateSettingsTree(treeNode.value2, settings)
           );
+        case "CLAMP":
+          const lo = this.evaluateSettingsTree(treeNode.low, settings);
+          const hi = this.evaluateSettingsTree(treeNode.high, settings);
+          const v = this.evaluateSettingsTree(treeNode.value, settings);
+          return v.clamp(lo, hi);
         default:
           throw new GraphError(
             `Unknown settings AST node type: ${treeNode.type}!`
@@ -1110,6 +1128,10 @@ Please report this as a bug!`);
           resourceTreeDataToClass(data.resource)
         );
       case "TAG":
+        if (!data.tagName)
+          throw new ProgramError(
+            `A TAG node is missing its "tagName" attribute!`
+          );
         const resources = getResourcesWithTags(data.tagName);
         const resourceData = resources.map(
           ([id]) => makeResourceFromIdAndAmount(id, data.amount)
@@ -1156,6 +1178,8 @@ Please report this as a bug!`);
       case "MULTIPLIER":
         return getAllPossibleResources(data.resource, output);
       case "TAG":
+        if (!data.tagName)
+          throw new GraphError("A TAG node is missing its tagName attribute!");
         const resources = getResourcesWithTags(data.tagName);
         for (const [, r] of resources) output.push(r);
         return output;
@@ -1372,7 +1396,7 @@ Please report this as a bug!`);
     }
     addThumbToTagLists(tags, tagListMap, thumbData) {
       for (const tagName of tags) {
-        if (tagName.startsWith("&")) return;
+        if (tagName.startsWith("&")) continue;
         const tagList = _SubmitMenu.createTagListIfNotExists(
           tagListMap,
           tagName,
@@ -1626,8 +1650,18 @@ Please report this as a bug!`);
         null
       );
       for (const [, r] of resourceList) {
-        let tags = r.getTags();
-        tags = tags.length > 0 ? tags : ["Miscellaneous"];
+        let tags = [...r.getTags()];
+        let shouldAddMisc = true;
+        for (const t of tags) {
+          if (!t.startsWith("&")) {
+            shouldAddMisc = false;
+            break;
+          }
+        }
+        if (shouldAddMisc) {
+          tags.push("Miscellaneous");
+          if (r.getDisplayName() === "Brackene") console.log(tags);
+        }
         const onclickFn = () => {
           this.resourceToBeAdded = r;
           this.infoPanel.innerHTML = "";

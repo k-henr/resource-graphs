@@ -57,7 +57,7 @@ def build(
 
             # Build all files in this directory
             for filename in files:
-                print(f"Found converter: {filename}")
+                # print(f"Found converter: {filename}")
                 with open(os.path.join(path, filename), encoding="utf-8") as file:
                     # Parse file
                     converter = json.loads(file.read())

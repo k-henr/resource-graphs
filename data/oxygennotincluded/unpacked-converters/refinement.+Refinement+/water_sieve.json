@@ -1,5 +1,4 @@
 {
-    "tags": ["Refinement"],
     "consumes": [
         { "type": "RESOURCE", "id": "power", "amount": 120 },
         { "type": "RESOURCE", "id": "polluted_water", "amount": 3000 },

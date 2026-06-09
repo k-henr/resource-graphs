@@ -33,7 +33,6 @@ def build(
         defaultTags = []
         unit: str
         tags:str
-        print(path)
         for [unit, tags] in folderMatcher.findall(path):
             if unit != "": defaultUnitGroup = unit
             if tags != "":
@@ -41,7 +40,7 @@ def build(
                     defaultTags.append(t)
 
         for filename in files:
-            print(f"Found resource image: {filename}")
+            # print(f"Found resource image: {filename}")
 
             # Regex the filename to get the different parts
             match = resourceMatcher.search(filename)

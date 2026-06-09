@@ -1,0 +1,63 @@
+{
+    "consumes": [
+        {
+            "type": "ENTANGLED_OR",
+            "name": "recipe",
+            "resources": [
+                [
+                    "refined_carbon",
+                    {
+                        "type": "OR",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "coal", "amount": 1875 },
+                            { "type": "RESOURCE", "id": "wood", "amount": 3000 },
+                            { "type": "RESOURCE", "id": "peat", "amount": 4500 }
+                        ]
+                    }
+                ],
+                [
+                    "ceramic",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "clay", "amount": 1500 },
+                            {
+                                "type": "OR",
+                                "resources": [
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "coal",
+                                        "amount": 375
+                                    },
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "wood",
+                                        "amount": 375
+                                    },
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "peat",
+                                        "amount": 375
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            ]
+        }
+    ],
+    "produces": [
+        {
+            "type": "ENTANGLED_OR",
+            "name": "recipe",
+            "resources": [
+                [
+                    "refined_carbon",
+                    { "type": "RESOURCE", "id": "refined_carbon", "amount": 1500 }
+                ],
+                ["ceramic", { "type": "RESOURCE", "id": "ceramic", "amount": 1500 }]
+            ]
+        }
+    ]
+}

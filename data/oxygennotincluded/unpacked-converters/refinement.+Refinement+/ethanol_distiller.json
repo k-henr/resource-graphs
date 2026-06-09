@@ -1,5 +1,4 @@
 {
-    "tags": ["Refinement"],
     "consumes": [
         { "type": "RESOURCE", "id": "power", "amount": 240 },
         { "type": "RESOURCE", "id": "wood", "amount": 600 }

@@ -1,4 +1,4 @@
-import { displayErr, GraphError } from "./errors";
+import { displayErr, GraphError, ProgramError } from "./errors";
 import { IntermediateConverter } from "./intermediateConverter";
 import { Rational } from "./rational";
 import { Resource } from "./resource";
@@ -160,6 +160,10 @@ function resourceTreeDataToClass(data: ResourceTreeData): ResourceTree {
             // If this node is reached through "normal" means and not in
             // handleOrInput, it's always a standalone TAG and should therefore
             // create an OR
+            if (!data.tagName)
+                throw new ProgramError(
+                    `A TAG node is missing its "tagName" attribute!`,
+                );
             const resources = getResourcesWithTags(data.tagName);
             const resourceData = resources.map(([id]) =>
                 makeResourceFromIdAndAmount(id, data.amount),
@@ -220,6 +224,8 @@ function getAllPossibleResources(
         case "MULTIPLIER":
             return getAllPossibleResources(data.resource, output);
         case "TAG":
+            if (!data.tagName)
+                throw new GraphError("A TAG node is missing its tagName attribute!");
             const resources = getResourcesWithTags(data.tagName);
             for (const [, r] of resources) output.push(r);
             return output;

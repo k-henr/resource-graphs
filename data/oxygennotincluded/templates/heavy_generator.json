@@ -1,0 +1,39 @@
+{
+    "tags": ["...TEMPLATE?:additionalTags"],
+    "displayName": "TEMPLATE?:displayName",
+    "thumbName": "TEMPLATE?:thumbName",
+    "settings": [
+        {
+            "type": "TOGGLE",
+            "name": "Engie's tune-up",
+            "default": false
+        },
+        "...TEMPLATE?:additionalSettings"
+    ],
+    "consumes": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "SETTING",
+                "name": "Engie's tune-up",
+                "true": 1,
+                "false": 0
+            },
+            "resource": { "type": "RESOURCE", "id": "microchip", "amount": [1, 3] }
+        },
+        "...TEMPLATE?:consumes"
+    ],
+    "produces": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "SETTING",
+                "name": "Engie's tune-up",
+                "true": 1.5,
+                "false": 1
+            },
+            "resource": "TEMPLATE:tunedProduct"
+        },
+        "...TEMPLATE?:additionalProducts"
+    ]
+}

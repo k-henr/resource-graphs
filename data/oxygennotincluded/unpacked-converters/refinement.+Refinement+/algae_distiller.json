@@ -1,0 +1,10 @@
+{
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": 120 },
+        { "type": "RESOURCE", "id": "slime", "amount": 360 }
+    ],
+    "produces": [
+        { "type": "RESOURCE", "id": "algae", "amount": 120 },
+        { "type": "RESOURCE", "id": "polluted_water", "amount": 240 }
+    ]
+}

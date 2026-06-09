@@ -1,0 +1,4 @@
+{
+    "consumes": [],
+    "produces": [{ "type": "RESOURCE", "id": "power", "amount": 400 }]
+}

@@ -1,0 +1,8 @@
+{
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": 240 },
+        { "type": "RESOURCE", "id": "radbolt", "amount": 15000 },
+        { "type": "RESOURCE", "id": "refined_carbon", "amount": 1500 }
+    ],
+    "produces": [{ "type": "RESOURCE", "id": "diamond", "amount": 1500 }]
+}

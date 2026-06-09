@@ -108,6 +108,12 @@ export class MultiplierNode implements ResourceTreeNode {
                     this.evaluateSettingsTree(treeNode.value2, settings),
                 );
 
+            case "CLAMP":
+                const lo = this.evaluateSettingsTree(treeNode.low, settings);
+                const hi = this.evaluateSettingsTree(treeNode.high, settings);
+                const v = this.evaluateSettingsTree(treeNode.value, settings);
+                return v.clamp(lo, hi);
+
             default:
                 throw new GraphError(
                     `Unknown settings AST node type: ${(treeNode as any).type}!`,

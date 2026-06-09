@@ -46,7 +46,7 @@
                     { "type": "TAG", "tagName": ["&Solid", "&Rock"], "amount": 140 },
                     {
                         "type": "TAG",
-                        "tagName": ["&Solid", "Metal Ore"],
+                        "tagName": ["&Unrefined Ore"],
                         "amount": 140
                     }
                 ]

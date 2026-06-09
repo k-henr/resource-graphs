@@ -119,7 +119,7 @@ export class OrNode extends ResourceTreeBoolNode {
         if (optionEl) {
             optionEl.classList.add("primary", "interactive");
             selectList.appendChild(optionEl);
-            optionEl.onclick = this.getOnClickForOption(
+            optionEl.onclick = this.getCollapseFnForOption(
                 parent,
                 option,
                 selectEl,
@@ -138,7 +138,7 @@ export class OrNode extends ResourceTreeBoolNode {
         list.appendChild(orEl);
     }
 
-    protected getOnClickForOption(
+    protected getCollapseFnForOption(
         parent: ResourceTreeNode,
         option: ResourceTree,
         selectEl: HTMLElement,

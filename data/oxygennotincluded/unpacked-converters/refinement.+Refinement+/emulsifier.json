@@ -1,0 +1,84 @@
+{
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": 480 },
+        {
+            "type": "ENTANGLED_OR",
+            "name": "recipe",
+            "resources": [
+                [
+                    "visco_gel",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "isosap", "amount": 525 },
+                            { "type": "RESOURCE", "id": "petroleum", "amount": 975 }
+                        ]
+                    }
+                ],
+                [
+                    "super_coolant",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "fullerene", "amount": 15 },
+                            { "type": "RESOURCE", "id": "gold", "amount": 742.5 },
+                            {
+                                "type": "RESOURCE",
+                                "id": "petroleum",
+                                "amount": 742.5
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "biodiesel",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            {
+                                "type": "RESOURCE",
+                                "id": "bleach_stone",
+                                "amount": 600
+                            },
+                            { "type": "RESOURCE", "id": "phyto_oil", "amount": 2400 }
+                        ]
+                    }
+                ],
+                [
+                    "salt_water",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "salt", "amount": 105 },
+                            { "type": "RESOURCE", "id": "water", "amount": 1393 }
+                        ]
+                    }
+                ]
+            ]
+        }
+    ],
+    "produces": [
+        {
+            "type": "ENTANGLED_OR",
+            "name": "recipe",
+            "resources": [
+                [
+                    "visco_gel",
+                    { "type": "RESOURCE", "id": "visco_gel", "amount": 1500 }
+                ],
+                [
+                    "super_coolant",
+                    { "type": "RESOURCE", "id": "super_coolant", "amount": 1500 }
+                ],
+                [
+                    "biodiesel",
+                    { "type": "RESOURCE", "id": "biodiesel", "amount": 3000 }
+                ],
+                [
+                    "salt_water",
+                    { "type": "RESOURCE", "id": "salt_water", "amount": 1500 }
+                ]
+            ]
+        }
+    ]
+}

@@ -193,7 +193,8 @@ export type SettingsTreeMathNode =
     | SettingsTreeDivNode
     | SettingsTreeAddNode
     | SettingsTreeSubNode
-    | SettingsTreePowNode;
+    | SettingsTreePowNode
+    | SettingsTreeClampNode;
 // Mutliply the given nodes together
 export type SettingsTreeMulNode = {
     type: "MUL";
@@ -221,6 +222,13 @@ export type SettingsTreePowNode = {
     type: "POW";
     value1: SettingsTreeNode;
     value2: SettingsTreeNode;
+};
+
+export type SettingsTreeClampNode = {
+    type: "CLAMP";
+    value: SettingsTreeNode;
+    low: SettingsTreeNode;
+    high: SettingsTreeNode;
 };
 
 // = = = = = = = = RESOURCES = = = = = = = =

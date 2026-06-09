@@ -1,5 +1,5 @@
 import { ConverterSettings } from "../converterSettings";
-import { displayErr, GraphError } from "../errors";
+import { displayErr, GraphError, ProgramError } from "../errors";
 import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
 import { OrNode } from "./orNode";
@@ -19,7 +19,7 @@ export class EntangledOrNode extends OrNode {
 
     // The onclick functions that have been generated, to simulate choosing one when
     // collapsing
-    private onclicks = new Map<string, () => void>();
+    private collapseFns = new Map<string, () => void>();
 
     constructor(id: string, options: [string, ResourceTree][]) {
         super(options.map(([, r]) => r));
@@ -45,14 +45,14 @@ export class EntangledOrNode extends OrNode {
     }
 
     // When creating the onclick, also store it in a dictionary here
-    public override getOnClickForOption(
+    public override getCollapseFnForOption(
         parent: ResourceTreeNode,
         option: ResourceTree,
         selectEl: HTMLElement,
         optionEl: HTMLElement,
         requestingConverter: IntermediateConverter,
     ): () => void {
-        const onclickNoEntTrigger = () => {
+        const collapseWithoutEntangledTrigger = () => {
             try {
                 super.collapseNode(
                     parent,
@@ -68,9 +68,9 @@ export class EntangledOrNode extends OrNode {
         };
 
         const id = this.optionIds[this.children.indexOf(option)];
-        this.onclicks.set(id, onclickNoEntTrigger);
+        this.collapseFns.set(id, collapseWithoutEntangledTrigger);
 
-        return super.getOnClickForOption(
+        return super.getCollapseFnForOption(
             parent,
             option,
             selectEl,
@@ -80,14 +80,14 @@ export class EntangledOrNode extends OrNode {
     }
 
     public collapseNodeUsingId(id: string) {
-        const onclick = this.onclicks.get(id);
+        const collapseFn = this.collapseFns.get(id);
 
-        if (!onclick)
+        if (!collapseFn)
             throw new GraphError(
                 `Option with id ${id} not present on this entangled OR!`,
             );
 
-        onclick(); // Problem: this refers to EntangledOr.collapseNode, which triggers recursive collapses
+        collapseFn();
     }
 
     // Override the collapseNode function so that when this node collapses, it also
@@ -100,7 +100,14 @@ export class EntangledOrNode extends OrNode {
         requestingConverter: IntermediateConverter,
     ): void {
         // Get the ID of the chosen option
-        const optionId = this.optionIds[this.children.indexOf(option)];
+        console.log([...this.optionIds]);
+        console.log([...this.children]);
+        console.log(option);
+        const optionIndex = this.children.indexOf(option);
+        console.log(optionIndex);
+        if (optionIndex === -1)
+            throw new ProgramError(`Option not present on entangled OR node!`);
+        const optionId = this.optionIds[optionIndex];
 
         super.collapseNode(
             orParent,
@@ -110,6 +117,7 @@ export class EntangledOrNode extends OrNode {
             requestingConverter,
         );
 
+        console.log(optionId);
         // Send a message to the converter to also collapse the other entangled ORs
         requestingConverter.unregisterEntangledOr(this);
         requestingConverter.collapseEntangledOrs(this.id, optionId);

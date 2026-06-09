@@ -1,0 +1,4 @@
+{
+    "consumes": [{ "type": "RESOURCE", "id": "power", "amount": 480 }],
+    "produces": [{ "type": "RESOURCE", "id": "eco_power_bank", "amount": 480 }]
+}

@@ -1,0 +1,245 @@
+{
+    "consumes": [
+        {
+            "type": "ENTANGLED_OR",
+            "name": "egg",
+            "resources": [
+                [
+                    "shine_bug",
+                    { "type": "RESOURCE", "id": "shine_bug_egg", "amount": 1 }
+                ],
+                ["puft", { "type": "RESOURCE", "id": "puft_egg", "amount": 1 }],
+                ["hatch", { "type": "RESOURCE", "id": "hatch_egg", "amount": 1 }],
+                ["drecko", { "type": "RESOURCE", "id": "drecko_egg", "amount": 1 }],
+                [
+                    "slickster",
+                    { "type": "RESOURCE", "id": "slickster_egg", "amount": 1 }
+                ],
+                ["pip", { "type": "RESOURCE", "id": "pip_egg", "amount": 1 }],
+                [
+                    "pokeshell",
+                    { "type": "RESOURCE", "id": "pokeshell_roe", "amount": 1 }
+                ],
+                [
+                    "shove_vole",
+                    { "type": "RESOURCE", "id": "shove_vole_egg", "amount": 1 }
+                ],
+                [
+                    "plug_slug",
+                    { "type": "RESOURCE", "id": "plug_slug_egg", "amount": 1 }
+                ],
+                [
+                    "divergent",
+                    { "type": "RESOURCE", "id": "divergent_egg", "amount": 1 }
+                ],
+                ["flox", { "type": "RESOURCE", "id": "flox_egg", "amount": 1 }],
+                [
+                    "spigot_seal",
+                    { "type": "RESOURCE", "id": "spigot_seal_egg", "amount": 1 }
+                ],
+                ["dartle", { "type": "RESOURCE", "id": "dartle_egg", "amount": 1 }],
+                ["pacu", { "type": "RESOURCE", "id": "pacu_egg", "amount": 1 }],
+                ["jawbo", { "type": "RESOURCE", "id": "jawbo_egg", "amount": 1 }],
+                [
+                    "bammoth",
+                    { "type": "RESOURCE", "id": "bammoth_egg", "amount": 1 }
+                ],
+                ["lumb", { "type": "RESOURCE", "id": "lumb_egg", "amount": 1 }],
+                ["rhex", { "type": "RESOURCE", "id": "rhex_egg", "amount": 1 }]
+            ]
+        }
+    ],
+    "produces": [
+        {
+            "type": "ENTANGLED_OR",
+            "name": "egg",
+            "resources": [
+                [
+                    "shine_bug",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "raw_egg", "amount": 160 },
+                            {
+                                "type": "RESOURCE",
+                                "id": "egg_shell",
+                                "amount": 5000
+                            },
+                            { "type": "RESOURCE", "id": "resin", "amount": 5 }
+                        ]
+                    }
+                ],
+                [
+                    "puft",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "raw_egg", "amount": 400 },
+                            { "type": "RESOURCE", "id": "egg_shell", "amount": 0.25 }
+                        ]
+                    }
+                ],
+                [
+                    "hatch",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "raw_egg", "amount": 1600 },
+                            { "type": "RESOURCE", "id": "egg_shell", "amount": 1 }
+                        ]
+                    }
+                ],
+                [
+                    "drecko",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "raw_egg", "amount": 1600 },
+                            { "type": "RESOURCE", "id": "egg_shell", "amount": 1 }
+                        ]
+                    }
+                ],
+                [
+                    "slickster",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "raw_egg", "amount": 1600 },
+                            { "type": "RESOURCE", "id": "egg_shell", "amount": 1 }
+                        ]
+                    }
+                ],
+                [
+                    "pip",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "raw_egg", "amount": 1600 },
+                            { "type": "RESOURCE", "id": "egg_shell", "amount": 1 }
+                        ]
+                    }
+                ],
+                [
+                    "pokeshell",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "raw_egg", "amount": 1600 },
+                            { "type": "RESOURCE", "id": "egg_shell", "amount": 1 }
+                        ]
+                    }
+                ],
+                [
+                    "shove_vole",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "raw_egg", "amount": 1600 },
+                            { "type": "RESOURCE", "id": "egg_shell", "amount": 1 }
+                        ]
+                    }
+                ],
+                [
+                    "plug_slug",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "raw_egg", "amount": 1600 },
+                            { "type": "RESOURCE", "id": "egg_shell", "amount": 1 }
+                        ]
+                    }
+                ],
+                [
+                    "divergent",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "raw_egg", "amount": 1600 },
+                            { "type": "RESOURCE", "id": "egg_shell", "amount": 1 }
+                        ]
+                    }
+                ],
+                [
+                    "flox",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "raw_egg", "amount": 1600 },
+                            { "type": "RESOURCE", "id": "egg_shell", "amount": 1 }
+                        ]
+                    }
+                ],
+                [
+                    "spigot_seal",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "raw_egg", "amount": 1600 },
+                            { "type": "RESOURCE", "id": "egg_shell", "amount": 1 }
+                        ]
+                    }
+                ],
+                [
+                    "dartle",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "raw_egg", "amount": 1600 },
+                            { "type": "RESOURCE", "id": "egg_shell", "amount": 1 }
+                        ]
+                    }
+                ],
+                [
+                    "pacu",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "raw_egg", "amount": 3200 },
+                            { "type": "RESOURCE", "id": "egg_shell", "amount": 2000 }
+                        ]
+                    }
+                ],
+                [
+                    "jawbo",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "raw_egg", "amount": 3200 },
+                            { "type": "RESOURCE", "id": "egg_shell", "amount": 2000 }
+                        ]
+                    }
+                ],
+                [
+                    "bammoth",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "raw_egg", "amount": 6400 },
+                            { "type": "RESOURCE", "id": "egg_shell", "amount": 4000 }
+                        ]
+                    }
+                ],
+                [
+                    "lumb",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "raw_egg", "amount": 6400 },
+                            { "type": "RESOURCE", "id": "egg_shell", "amount": 4000 }
+                        ]
+                    }
+                ],
+                [
+                    "rhex",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "raw_egg", "amount": 6400 },
+                            { "type": "RESOURCE", "id": "egg_shell", "amount": 4000 }
+                        ]
+                    }
+                ]
+            ]
+        }
+    ]
+}

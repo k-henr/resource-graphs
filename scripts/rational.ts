@@ -129,6 +129,12 @@ export class Rational {
         return new Rational(Math.abs(this.numerator), Math.abs(this.denominator));
     }
 
+    public clamp(lo: Rational, hi: Rational) {
+        if (this.lessThan(lo)) return lo;
+        if (this.greaterThan(hi)) return hi;
+        return this;
+    }
+
     public equals(v2: Rational) {
         return (
             this.numerator === v2.numerator && this.denominator === v2.denominator

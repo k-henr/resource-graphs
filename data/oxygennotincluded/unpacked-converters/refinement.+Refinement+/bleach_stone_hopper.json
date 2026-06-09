@@ -1,0 +1,9 @@
+{
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": 480 },
+        { "type": "RESOURCE", "id": "salt", "amount": 450 },
+        { "type": "RESOURCE", "id": "gold", "amount": 7.5 },
+        { "type": "RESOURCE", "id": "sand", "amount": 300 }
+    ],
+    "produces": [{ "type": "RESOURCE", "id": "bleach_stone", "amount": 150 }]
+}

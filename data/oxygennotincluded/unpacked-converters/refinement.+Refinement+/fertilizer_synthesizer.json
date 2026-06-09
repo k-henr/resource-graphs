@@ -1,0 +1,12 @@
+{
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": 120 },
+        { "type": "RESOURCE", "id": "dirt", "amount": 39 },
+        { "type": "RESOURCE", "id": "phosphorite", "amount": 15.6 },
+        { "type": "RESOURCE", "id": "polluted_water", "amount": 23.4 }
+    ],
+    "produces": [
+        { "type": "RESOURCE", "id": "fertilizer", "amount": 72 },
+        { "type": "RESOURCE", "id": "natural_gas", "amount": 6 }
+    ]
+}

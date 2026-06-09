@@ -128,7 +128,7 @@ export abstract class SubmitMenu {
         // add it to the map
         for (const tagName of tags) {
             // If the name starts with an &, this shouldn't create a tag list
-            if (tagName.startsWith("&")) return;
+            if (tagName.startsWith("&")) continue;
 
             // Get the tag list and create it if it doesn't exist yet
             const tagList = SubmitMenu.createTagListIfNotExists(
@@ -160,6 +160,9 @@ export abstract class SubmitMenu {
 
         const tagList = SubmitMenu.tagListTemplate.cloneElement();
         tagList.querySelector<HTMLElement>(".tag-list-name")!.innerText = name;
+        // todo: collapse folders when not searching, to alleviate freezing for large
+        // nubmers of thumbs
+        // tagList.querySelector(".tag-list-content")!.classList.add("hidden");
         tagList.querySelector<HTMLElement>("button")!.onclick = () =>
             tagList.querySelector(".tag-list-content")!.classList.toggle("hidden");
 

@@ -1,0 +1,4 @@
+{
+    "consumes": [{ "type": "TAG", "tagName": "&Power Banks", "amount": 60 }],
+    "produces": [{ "type": "RESOURCE", "id": "power", "amount": 60 }]
+}

@@ -1,0 +1,10 @@
+{
+    "templateName": "heavy_generator",
+
+    "consumes": [{ "type": "RESOURCE", "id": "natural_gas", "amount": 54 }],
+    "tunedProduct": { "type": "RESOURCE", "id": "power", "amount": 800 },
+    "additionalProducts": [
+        { "type": "RESOURCE", "id": "carbon_dioxide", "amount": 13.5 },
+        { "type": "RESOURCE", "id": "polluted_water", "amount": 40.5 }
+    ]
+}

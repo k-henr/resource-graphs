@@ -1,0 +1,7 @@
+{
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": 1200 },
+        { "type": "RESOURCE", "id": "sand", "amount": 1500 }
+    ],
+    "produces": [{ "type": "RESOURCE", "id": "molten_glass", "amount": 375 }]
+}
