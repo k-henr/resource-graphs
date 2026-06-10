@@ -151,7 +151,8 @@ import { Template } from "./scripts/template";
         // Remove the loading screen
         loadingScreen.remove();
     } catch (e: any) {
+        loadingText.innerText = e.message;
         displayErr(e);
-        loadingText.innerText = "Error encountered during loading";
+        throw e;
     }
 })();

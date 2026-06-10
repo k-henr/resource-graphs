@@ -1798,8 +1798,9 @@ Please report this as a bug!`);
       graph.setConverterRequestTarget(converterMenu);
       loadingScreen.remove();
     } catch (e) {
+      loadingText.innerText = e.message;
       displayErr(e);
-      loadingText.innerText = "Error encountered during loading";
+      throw e;
     }
   })();
 })();
