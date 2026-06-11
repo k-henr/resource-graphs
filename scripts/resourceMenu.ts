@@ -60,7 +60,7 @@ export class ResourceMenu extends SubmitMenu {
             )!;
 
         const delta = convertUnit(
-            resource.getUnitGroupName(),
+            resource.unitGroupName,
             Rational.fromInput(el.value, el) ?? Rational.zero,
             this.unitDropdown.selectedOptions[0].innerText,
         );
@@ -76,8 +76,8 @@ export class ResourceMenu extends SubmitMenu {
             const itemList = [{ resource, amount: Rational.one }];
             const positiveDelta = delta.greaterThan(Rational.zero);
             const conv = new Converter(
-                `Resource ${positiveDelta ? "source" : "drain"}: ${resource.getDisplayName()}`,
-                resource.getDisplayImage(),
+                `Resource ${positiveDelta ? "source" : "drain"}: ${resource.displayName}`,
+                resource.displayImage,
                 // Put the item either as an ingredient or a product, depending on
                 // whether this is a producer or consumer
                 !positiveDelta ? itemList : [],
@@ -126,7 +126,6 @@ export class ResourceMenu extends SubmitMenu {
             }
             if (shouldAddMisc) {
                 tags.push("Miscellaneous");
-                if (r.getDisplayName() === "Brackene") console.log(tags);
             }
 
             // Set behaviour when thumb is clicked
@@ -136,13 +135,13 @@ export class ResourceMenu extends SubmitMenu {
                 this.infoPanel.innerHTML = "";
                 r.populateInfoPanel(this.infoPanel);
                 // Set the unit dropdown to contain the correct values
-                populateUnitDropdown(this.unitDropdown, r.getUnitGroupName());
+                populateUnitDropdown(this.unitDropdown, r.unitGroupName);
                 this.openDetailPopup();
             };
 
             this.addThumbToTagLists(tags, tagLists, {
-                name: r.getDisplayName(),
-                image: r.getDisplayImage(),
+                name: r.displayName,
+                image: r.displayImage,
                 onclick: onclickFn,
             });
         }

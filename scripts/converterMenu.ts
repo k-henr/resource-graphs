@@ -150,8 +150,7 @@ export class ConverterMenu extends SubmitMenu {
             // Create an onclick function that opens the details for this converter
             let onclickFn = () => {
                 this.intermediateConverter = cFact.factory();
-                this.infoPanel.innerHTML = "";
-                this.intermediateConverter.tryPopulateInfoPanel();
+                this.intermediateConverter.tryUpdateInfoPanel();
                 this.openDetailPopup();
             };
 

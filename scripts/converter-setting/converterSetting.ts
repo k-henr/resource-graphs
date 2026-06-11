@@ -49,7 +49,7 @@ export abstract class ConverterSetting {
         input.name = name;
         post.innerText = unit ?? "";
 
-        input.onchange = () => requestingConverter.tryPopulateInfoPanel();
+        input.onchange = () => requestingConverter.tryUpdateInfoPanel();
 
         return [settingEl, label, input];
     }
@@ -66,7 +66,7 @@ export abstract class ConverterSetting {
         label.innerText = name;
         input.name = name;
 
-        input.onchange = () => requestingConverter.tryPopulateInfoPanel();
+        input.onchange = () => requestingConverter.tryUpdateInfoPanel();
 
         return [settingEl, label, input];
     }

@@ -303,8 +303,6 @@ input {
 
 .converter-ingredient,
 .converter-select {
-    margin: 2px;
-
     border: 2px solid var(--muted-border);
     border-radius: 2px;
     background-color: var(--muted-background);
@@ -331,6 +329,10 @@ input {
 .converter-select-children {
     max-height: 250px;
     overflow-y: auto;
+
+    & > * {
+        margin: 2px;
+    }
 }
 
 .image-heading {
@@ -368,6 +370,10 @@ input {
 }
 .flex-3 {
     flex: 3;
+}
+
+.pad-4 {
+    padding: 4px;
 }
 
 .horiz-padding {

@@ -1,65 +1,63 @@
-import { ConverterSettings } from "../converterSettings";
-import { getResource } from "../data";
 import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
+import { Resource } from "../resource";
 import { Template } from "../template";
 import { ConverterIngredient } from "../types";
 import { getUnits } from "../units";
 import { ResourceTree } from "./resourceTree";
-import { ResourceTreeNode } from "./resourceTreeNode";
 /**
  * A leaf node, containing a certain amount of a certain resource.
  */
 
 export class ResourceNode implements ResourceTree {
-    private id: string;
-    private amount: Rational;
+    private readonly amount: Rational;
+    private readonly resource: Resource;
+
+    public readonly element: HTMLElement;
 
     // Template for a resource element
     private static converterIngredientTemplate = new Template(
         "converter-ingredient-template",
     );
 
-    public constructor(id: string, amount: Rational) {
-        this.id = id;
+    public constructor(resource: Resource, amount: Rational) {
         this.amount = amount;
+        this.resource = resource;
+        this.element = this.createIngredientElement();
     }
 
-    public getElement(
-        _: ResourceTreeNode | null,
-        __: ConverterSettings,
-        multiplier: Rational,
-        ___: IntermediateConverter,
-    ): HTMLElement | null {
-        // Just make a resource element
-        const resEl = this.createIngredientElement(multiplier);
-        return resEl;
+    public updateElement(multiplier: Rational, ___: IntermediateConverter) {
+        // Update the amount on the element
+        this.setAmount(this.amount.mul(multiplier));
+    }
+
+    private setAmount(amount: Rational) {
+        const unitGroupName = this.resource.unitGroupName;
+        this.element.querySelector<HTMLElement>(
+            ".converter-ingredient-amount",
+        )!.innerText =
+            `⨉ ${amount.getDecimalString()} ${getUnits(unitGroupName)[1]}`;
     }
 
     public addResourcesToList(
         output: ConverterIngredient[],
-        _: ConverterSettings,
+        _: IntermediateConverter,
         multiplier: Rational = Rational.one,
     ) {
         output.push({
-            resource: getResource(this.id),
+            resource: this.resource,
             amount: this.amount.mul(multiplier),
         });
         return output;
     }
 
-    private createIngredientElement(multiplier: Rational) {
+    private createIngredientElement() {
         const el = ResourceNode.converterIngredientTemplate.cloneElement();
 
-        const res = getResource(this.id);
-        const unit = res.getUnitGroupName();
-
         el.querySelector<HTMLElement>(".converter-ingredient-name")!.innerText =
-            res.getDisplayName();
-        el.querySelector<HTMLElement>(".converter-ingredient-amount")!.innerText =
-            `⨉ ${this.amount.mul(multiplier).getDecimalString()} ${getUnits(unit)[1]}`;
+            this.resource.displayName;
         el.querySelector<HTMLImageElement>(".converter-ingredient-image")!.src =
-            res.getDisplayImage();
+            this.resource.displayImage;
 
         return el;
     }

@@ -94,6 +94,8 @@ export class Rational {
     public mul(v: Rational | number) {
         if (typeof v === "number") {
             return new Rational(this.numerator * v, this.denominator);
+        } else if (v.equals(Rational.one)) {
+            return this;
         } else {
             return new Rational(
                 this.numerator * v.numerator,

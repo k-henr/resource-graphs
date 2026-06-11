@@ -243,14 +243,16 @@
 
         <!-- Template for the info panel's look when selecting a converter -->
         <template id="converter-info-template">
-            <div class="image-heading">
-                <img class="rc-info-image" />
-                <h2 class="rc-info-header"></h2>
-            </div>
-            <div class="resource-tree-container">
-                <div class="c-info-ingredients flex-1"></div>
-                <img src="icons/arrow_right.svg" />
-                <div class="c-info-products flex-1"></div>
+            <div>
+                <div class="image-heading">
+                    <img class="rc-info-image" />
+                    <h2 class="rc-info-header"></h2>
+                </div>
+                <div class="resource-tree-container">
+                    <div class="c-info-ingredients flex-1"></div>
+                    <img src="icons/arrow_right.svg" />
+                    <div class="c-info-products flex-1"></div>
+                </div>
             </div>
         </template>
 
@@ -293,6 +295,11 @@
                     <div class="converter-select-children flex-1"></div>
                 </div>
             </div>
+        </template>
+
+        <!-- Template for the different option "boxes" in ORs -->
+        <template id="converter-option-template">
+            <div class="pad-4 primary interactive"></div>
         </template>
 
         <!-- Another template for handling ORs, this one is inserted in between the options -->

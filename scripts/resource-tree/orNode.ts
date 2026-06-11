@@ -1,13 +1,10 @@
-import { ConverterSettings } from "../converterSettings";
-import { displayErr, GraphError, UserError } from "../errors";
+import { displayErr, ProgramError, UserError } from "../errors";
 import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
 import { Template } from "../template";
 import { ConverterIngredient } from "../types";
-import { NothingNode } from "./nothingNode";
 import { ResourceTree } from "./resourceTree";
 import { ResourceTreeBoolNode } from "./resourceTreeBoolNode";
-import { ResourceTreeNode } from "./resourceTreeNode";
 /**
  * A node which generates a number of options. The user then chooses one, which
  * "collapses" this node into just that branch.
@@ -16,172 +13,126 @@ import { ResourceTreeNode } from "./resourceTreeNode";
  */
 
 export class OrNode extends ResourceTreeBoolNode {
-    constructor(options: ResourceTree[]) {
-        super(options);
+    public readonly thisElement: HTMLElement;
+    get element(): HTMLElement {
+        // If an option has been chosen, this node just points to that element
+        if (this.chosenOption) return this.chosenOption.element;
+        return this.thisElement;
     }
 
+    private chosenOption: ResourceTree | null = null;
+
+    // Keeps a map of all the current options, to avoid having to redo the onclick
+    // for option divs when an option changes due to being collapsed
+    private readonly optionNameToTreeMap = new Map<string, ResourceTree>();
+
     // Element representing an option
-    protected static converterSelectTemplate = new Template(
+    private static converterSelectTemplate = new Template(
         "converter-select-template",
     );
+    // Element for containing an option
+    private static converterOptionTemplate = new Template(
+        "converter-option-template",
+    );
     // Element inbetween options that just says "OR"
-    protected static converterOrTemplate = new Template("converter-or-template");
+    private static converterOrTemplate = new Template("converter-or-template");
 
-    public override getElement(
-        parent: ResourceTreeNode | null,
-        settings: ConverterSettings,
-        multiplier: Rational,
-        requestingConverter: IntermediateConverter,
-    ): HTMLElement | null {
-        // (since I wrap everything in an AND node, this shouldn't happen so it's
-        // fine that I don't support it)
-        if (!parent) throw new GraphError("An OR node can't be a root node!");
+    // (the options list is a list of name/option pairs)
+    constructor(options: [string, ResourceTree][]) {
+        super(options.map(([, r]) => r));
 
-        // Create a new OR element, add all the child nodes as children to it. Then
-        // add a listener which modifies this part of the tree to replace the OR node
-        // with the chosen branch when pressed
-        const selectEl = OrNode.converterSelectTemplate.cloneElement();
+        // Make the OR element
+        this.thisElement = OrNode.converterSelectTemplate.cloneElement();
 
-        const selectList = selectEl.querySelector<Element>(
+        // Get the list where all the options go
+        const selectList = this.element.querySelector<Element>(
             ".converter-select-children",
         )!;
 
         let numOptions = 0;
-        let encounteredEmptyNode = false;
-        let encounteredNonemptyNode = false;
 
-        for (let i = 0; i < this.children.length; i++) {
-            const el = this.addOptionElement(
-                this.children[i],
-                settings,
-                multiplier,
-                parent,
-                selectEl,
-                selectList,
-                requestingConverter,
-            );
-            if (el === null) {
-                encounteredEmptyNode = true;
-            } else {
-                numOptions++;
-                encounteredNonemptyNode = true;
-                if (i !== this.children.length - 1) this.addOrElement(selectList);
+        // Loop over all possible options for this node
+        // (this.children is being set in the super constructor to be the class
+        // representations of the nodes)
+        for (let i = 0; i < options.length; i++) {
+            const optionName = options[i][0];
+            const option = this.children[i];
+            this.optionNameToTreeMap.set(optionName, option);
+            // Create a wrapper for the option. This wrapper is what's being accessed
+            // in the collapse function, which means that the content of the wrapper
+            // can change without having to make a new collapse function and re-set
+            // the onclick for that element
+            const optionWrapper = OrNode.converterOptionTemplate.cloneElement();
+            optionWrapper.appendChild(option.element);
+
+            // Set a listener for the option wrapper to collapse into it
+            optionWrapper.onclick = () => {
+                try {
+                    this.chooseOption(optionName);
+                } catch (e: any) {
+                    displayErr(e);
+                    throw e;
+                }
+            };
+
+            selectList.appendChild(optionWrapper);
+            numOptions++;
+
+            // Add display "OR"s in between the options
+            if (i !== options.length - 1) {
+                selectList.appendChild(OrNode.converterOrTemplate.clone());
             }
         }
-
-        // If there were no filled nodes in this OR, return null
-        // (temporarily removed until I've made ORs automatically collapse if they
-        // have no contents)
-        //if (!encounteredNonemptyNode) return null;
 
         // If there should be a "nothing" option, add it
-        if (encounteredEmptyNode || !encounteredNonemptyNode) {
-            if (numOptions != 0) this.addOrElement(selectList); // If there were any previous options
-            numOptions++;
-            // Make a dummy "nothing" node
-            const nothingNode = new NothingNode();
-            this.addOptionElement(
-                nothingNode,
-                settings,
-                multiplier,
-                parent,
-                selectEl,
-                selectList,
-                requestingConverter,
+        // (temporarily removed until after rework of the system. This'll probably
+        // have to always happen, and then just hiding it when it shouldn't be there.
+        // Which may mean adding a return value to updateNode)
+        //
+        // if (encounteredEmptyNode || !encounteredNonemptyNode) {
+        //     if (numOptions != 0) this.addOrElement(selectList); // If there were any previous options
+        //     numOptions++;
+        //     // Make a dummy "nothing" node
+        //     const nothingNode = new NothingNode();
+        //     this.makeOptionElement(
+        //         nothingNode,
+        //         multiplier,
+        //         parent,
+        //         selectEl,
+        //         selectList,
+        //         requestingConverter,
+        //     );
+        // }
+
+        // set the number of options
+        this.element.querySelector<HTMLElement>(
+            ".converter-select-count",
+        )!.innerText = String(numOptions);
+    }
+
+    // Choose the given option
+    public chooseOption(optionName: string) {
+        // Replace the parent with the option in the lookup
+        const chosenOption = this.optionNameToTreeMap.get(optionName);
+        if (!chosenOption)
+            throw new ProgramError(
+                `Option "${optionName}" not found in lookup when trying to collapse OR node!`,
             );
-        }
-
-        selectEl.querySelector<HTMLElement>(".converter-select-count")!.innerText =
-            String(numOptions);
-
-        // Return the finished element
-        return selectEl;
-    }
-
-    // Add an element for the given option
-    private addOptionElement(
-        option: ResourceTree,
-        settings: ConverterSettings,
-        multiplier: Rational,
-        parent: ResourceTreeNode,
-        selectEl: HTMLElement,
-        selectList: Element,
-        requestingConverter: IntermediateConverter,
-    ): HTMLElement | null {
-        const optionEl = option.getElement(
-            this,
-            settings,
-            multiplier,
-            requestingConverter,
-        );
-
-        // Add a listener for selecting an option
-        if (optionEl) {
-            optionEl.classList.add("primary", "interactive");
-            selectList.appendChild(optionEl);
-            optionEl.onclick = this.getCollapseFnForOption(
-                parent,
-                option,
-                selectEl,
-                optionEl,
-                requestingConverter,
-            );
-        } else {
-            return null;
-        }
-
-        return optionEl;
-    }
-
-    private addOrElement(list: Element) {
-        const orEl = OrNode.converterOrTemplate.clone();
-        list.appendChild(orEl);
-    }
-
-    protected getCollapseFnForOption(
-        parent: ResourceTreeNode,
-        option: ResourceTree,
-        selectEl: HTMLElement,
-        optionEl: HTMLElement,
-        requestingConverter: IntermediateConverter,
-    ) {
-        return () => {
-            try {
-                this.collapseNode(
-                    parent,
-                    option,
-                    selectEl,
-                    optionEl,
-                    requestingConverter,
-                );
-            } catch (e: any) {
-                displayErr(e);
-                throw e;
-            }
-        };
-    }
-
-    // Collapse this node with the given option
-    public collapseNode(
-        orParent: ResourceTreeNode,
-        option: ResourceTree,
-        selectEl: HTMLElement,
-        optionEl: HTMLElement,
-        _requestingConverter: IntermediateConverter,
-    ) {
-        orParent.replaceChild(this, option);
-        selectEl.replaceWith(optionEl);
-        optionEl.classList.remove("primary", "interactive");
-        optionEl.onclick = null;
+        // Set the chosen option
+        this.chosenOption = chosenOption;
+        // Collapse the tree display to the chosen option's element
+        this.thisElement.replaceWith(chosenOption.element);
     }
 
     public override addResourcesToList(
-        _: ConverterIngredient[],
-        __: ConverterSettings,
-        ___: Rational = Rational.one,
+        output: ConverterIngredient[],
+        converter: IntermediateConverter,
+        multiplier: Rational = Rational.one,
     ): ConverterIngredient[] {
-        throw new UserError(
-            "All OR nodes aren't resolved, please choose an option!",
-        );
+        if (!this.chosenOption)
+            throw new UserError(
+                "All OR nodes aren't resolved, please choose an option!",
+            );
+        return this.chosenOption.addResourcesToList(output, converter, multiplier);
     }
 }

@@ -1,70 +1,66 @@
 import { ConverterSettings } from "../converterSettings";
-import { GraphError, ProgramError } from "../errors";
+import { GraphError } from "../errors";
 import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
-import { ConverterIngredient, SettingsTreeNode } from "../types";
+import {
+    ConverterIngredient,
+    ResourceTreeDataMultiplierNode,
+    SettingsTreeNode,
+} from "../types";
 import { ResourceTree } from "./resourceTree";
-import { ResourceTreeNode } from "./resourceTreeNode";
 /**
  * Multiplies its resource by the given settings AST
  */
 
-export class MultiplierNode implements ResourceTreeNode {
-    private multiplierAst: SettingsTreeNode;
-    private resource: ResourceTree;
+export class MultiplierNode implements ResourceTree {
+    public readonly element: HTMLElement;
 
-    constructor(multiplierAst: SettingsTreeNode, resource: ResourceTree) {
-        this.multiplierAst = multiplierAst;
+    private resource: ResourceTree;
+    private multiplierAst: SettingsTreeNode;
+
+    constructor(resource: ResourceTree, multiplier: SettingsTreeNode) {
+        this.multiplierAst = multiplier;
         this.resource = resource;
+
+        this.element = document.createElement("div");
+        this.element.appendChild(this.resource.element);
     }
 
-    public getElement(
-        _: ResourceTreeNode | null,
-        settings: ConverterSettings,
+    public updateElement(
         multiplier: Rational,
         requestingConverter: IntermediateConverter,
-    ): HTMLElement | null {
+    ) {
         const newMultiplier = this.evaluateSettingsTree(
             this.multiplierAst,
-            settings,
+            requestingConverter.settings,
         );
         // Parse the settings to modify the multiplier
         multiplier = multiplier.mul(newMultiplier);
 
-        // If the multiplier is 0, don't continue
-        if (multiplier.equals(Rational.zero)) return null;
-
-        // Add the resource multiplied by the new multiplier
-        return this.resource.getElement(
-            this,
-            settings,
-            multiplier,
-            requestingConverter,
-        );
+        // If the multiplier is 0, hide the element, otherwise show it
+        if (multiplier.equals(Rational.zero)) {
+            this.element.classList.add("hidden");
+        } else {
+            this.element.classList.remove("hidden");
+            // Update the child resource with the new multiplier
+            this.resource.updateElement(multiplier, requestingConverter);
+        }
     }
 
     public addResourcesToList(
         output: ConverterIngredient[],
-        settings: ConverterSettings,
+        converter: IntermediateConverter,
         multiplier: Rational,
     ) {
         // Evaluate the settings tree
         multiplier = multiplier.mul(
-            this.evaluateSettingsTree(this.multiplierAst, settings),
+            this.evaluateSettingsTree(this.multiplierAst, converter.settings),
         );
         // If the multiplier is 0, don't continue
         if (multiplier.equals(Rational.zero)) return output;
 
-        this.resource.addResourcesToList(output, settings, multiplier);
+        this.resource.addResourcesToList(output, converter, multiplier);
         return output;
-    }
-
-    public replaceChild(oldChild: ResourceTree, newChild: ResourceTree): void {
-        if (this.resource !== oldChild)
-            throw new ProgramError(
-                "Tried to replace a resource on a MULTIPLIER that wasn't present on the node!",
-            );
-        this.resource = newChild;
     }
 
     private evaluateSettingsTree(

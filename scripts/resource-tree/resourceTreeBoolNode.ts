@@ -1,16 +1,16 @@
-import { ConverterSettings } from "../converterSettings";
 import { ProgramError } from "../errors";
 import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
 import { ConverterIngredient } from "../types";
 import { ResourceTree } from "./resourceTree";
-import { ResourceTreeNode } from "./resourceTreeNode";
 /**
  * An abtract class used by boolean nodes (AND, OR, ENTANGLED_OR), with some shared
  * functionality.
  */
 
-export abstract class ResourceTreeBoolNode implements ResourceTreeNode {
+export abstract class ResourceTreeBoolNode implements ResourceTree {
+    public abstract readonly element: HTMLElement;
+
     protected children: ResourceTree[];
 
     public constructor(children: ResourceTree[]) {
@@ -20,6 +20,7 @@ export abstract class ResourceTreeBoolNode implements ResourceTreeNode {
     public replaceChild(oldChild: ResourceTree, newChild: ResourceTree): void {
         for (const i in this.children) {
             if (this.children[i] === oldChild) {
+                this.children[i].element.replaceWith(newChild.element);
                 this.children[i] = newChild;
                 return;
             }
@@ -31,14 +32,17 @@ export abstract class ResourceTreeBoolNode implements ResourceTreeNode {
 
     public abstract addResourcesToList(
         output: ConverterIngredient[],
-        settings: ConverterSettings,
+        converter: IntermediateConverter,
         multiplier: Rational,
     ): ConverterIngredient[];
 
-    public abstract getElement(
-        parent: ResourceTreeNode | null,
-        settings: ConverterSettings,
+    public updateElement(
         multiplier: Rational,
         requestingConverter: IntermediateConverter,
-    ): HTMLElement | null;
+    ) {
+        // Update all the children
+        this.children.map((child) =>
+            child.updateElement(multiplier, requestingConverter),
+        );
+    }
 }

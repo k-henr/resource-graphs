@@ -1,47 +1,34 @@
-import { ConverterSettings } from "../converterSettings";
 import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
 import { ConverterIngredient } from "../types";
 import { ResourceTree } from "./resourceTree";
 import { ResourceTreeBoolNode } from "./resourceTreeBoolNode";
-import { ResourceTreeNode } from "./resourceTreeNode";
 /**
  * A node which contains a number of other nodes, all of which will be included in
  * the tree
  */
 
 export class AndNode extends ResourceTreeBoolNode {
+    public readonly element: HTMLElement;
+
     public constructor(children: ResourceTree[]) {
         super(children);
-    }
 
-    public override getElement(
-        _: ResourceTreeNode | null,
-        settings: ConverterSettings,
-        multiplier: Rational,
-        requestingConverter: IntermediateConverter,
-    ): HTMLElement | null {
         // Add all the children to the parent element
         const andEl = document.createElement("div");
-        this.children.map((child) => {
-            const cEl = child.getElement(
-                this,
-                settings,
-                multiplier,
-                requestingConverter,
-            );
-            if (cEl) andEl.appendChild(cEl);
-        });
-        // Don't create an element if the node contains no children
-        return andEl.childNodes.length !== 0 ? andEl : null;
+        this.children.map((child) => andEl.appendChild(child.element));
+
+        this.element = andEl;
     }
 
     public override addResourcesToList(
         output: ConverterIngredient[],
-        settings: ConverterSettings,
+        converter: IntermediateConverter,
         multiplier: Rational = Rational.one,
     ) {
-        this.children.map((c) => c.addResourcesToList(output, settings, multiplier));
+        this.children.map((c) =>
+            c.addResourcesToList(output, converter, multiplier),
+        );
         return output;
     }
 }

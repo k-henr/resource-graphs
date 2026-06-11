@@ -81,7 +81,7 @@ export function getResourcesWithFilter(searchString: string = "") {
     for (const [id, r] of list) {
         if (
             searchString &&
-            !r.getDisplayName().toLowerCase().includes(searchString.toLowerCase())
+            !r.displayName.toLowerCase().includes(searchString.toLowerCase())
         )
             continue;
 
@@ -120,8 +120,8 @@ export async function loadAllConverters() {
                         data.thumbName ?? data.displayName,
                         getSrc(data.displayImage),
                         data.settings ?? [],
-                        resourceTreeDataToClass(andWrap(data.consumes)),
-                        resourceTreeDataToClass(andWrap(data.produces)),
+                        andWrap(data.consumes),
+                        andWrap(data.produces),
                     );
                 } catch (e: any) {
                     displayErr(e);
@@ -132,30 +132,59 @@ export async function loadAllConverters() {
     }
 }
 
-function resourceTreeDataToClass(data: ResourceTreeData): ResourceTree {
+export function resourceTreeDataToClass(
+    converter: IntermediateConverter,
+    data: ResourceTreeData,
+): ResourceTree {
     switch (data.type) {
         case "RESOURCE":
-            return new ResourceNode(data.id, Rational.fromData(data.amount));
+            return new ResourceNode(
+                getResource(data.id),
+                Rational.fromData(data.amount),
+            );
+
         case "AND":
             return new AndNode(
-                data.resources.map((el) => resourceTreeDataToClass(el)),
+                data.resources.map((c) => resourceTreeDataToClass(converter, c)),
             );
+
         case "OR":
-            // Needs special handling in case there's a TAG child
-            const options: ResourceTree[] = [];
-            for (const c of data.resources) handleOrInput(c, options);
-            return new OrNode(options);
+            // (since I wrap everything in an AND node, this shouldn't happen so it's
+            // fine that I don't support it)
+            if (!parent)
+                throw new ProgramError(
+                    "An OR node can't be a root node, and something failed with the AND wrapping!",
+                );
+            const options: ResourceTreeData[] = [];
+            data.resources.map((childData) => preprocessOrInput(childData, options));
+            return new OrNode(
+                options.map((cData, cIndex) => [
+                    String(cIndex),
+                    resourceTreeDataToClass(converter, cData),
+                ]),
+            );
+
         case "ENTANGLED_OR":
+            if (!parent)
+                throw new ProgramError(
+                    "An OR node can't be a root node, and something failed with the AND wrapping!",
+                );
             // Does not support TAGs for now, probably won't ever do
             return new EntangledOrNode(
+                converter,
                 data.id,
-                data.resources.map(([id, rD]) => [id, resourceTreeDataToClass(rD)]),
+                data.resources.map(([cName, cData]) => [
+                    cName,
+                    resourceTreeDataToClass(converter, cData),
+                ]),
             );
+
         case "MULTIPLIER":
             return new MultiplierNode(
+                resourceTreeDataToClass(converter, data.resource),
                 data.multiplier,
-                resourceTreeDataToClass(data.resource),
             );
+
         case "TAG":
             // If this node is reached through "normal" means and not in
             // handleOrInput, it's always a standalone TAG and should therefore
@@ -172,27 +201,30 @@ function resourceTreeDataToClass(data: ResourceTreeData): ResourceTree {
                 type: "OR",
                 resources: resourceData,
             };
-            return resourceTreeDataToClass(orNode);
+            return resourceTreeDataToClass(converter, orNode);
     }
 }
 
-// ORs collapse TAGs in case TAGs are children of ORs, so they need special recursive
-// handling
-function handleOrInput(tree: ResourceTreeData, output: ResourceTree[]) {
+// Process the given input tree, in case it's a TAG, add all the elements to the
+// option list
+function preprocessOrInput(tree: ResourceTreeData, output: ResourceTreeData[]) {
     switch (tree.type) {
         case "RESOURCE":
         case "AND":
         case "OR":
         case "MULTIPLIER":
-            output.push(resourceTreeDataToClass(tree));
+            output.push(tree);
             break;
         case "TAG":
-            const amount = Rational.fromData(tree.amount);
             const resources = getResourcesWithTags(tree.tagName);
             // Create a dummy resource for every resource in the TAG and add as an
             // option
             for (const [id] of resources) {
-                output.push(new ResourceNode(id, amount));
+                output.push({
+                    type: "RESOURCE",
+                    id,
+                    amount: tree.amount,
+                });
             }
             break;
     }

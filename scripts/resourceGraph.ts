@@ -93,14 +93,14 @@ export class ResourceGraph {
             const el = this.resourceDeltaTemplate.cloneElement();
 
             el.querySelector<HTMLElement>(".resource-name")!.innerText =
-                resource.getDisplayName();
+                resource.displayName;
             el.querySelector<HTMLImageElement>(".resource-image")!.src =
-                resource.getDisplayImage();
+                resource.displayImage;
             el.querySelector<HTMLElement>(".resource-amount")!.innerText =
                 (amount.greaterThan(Rational.zero) ? "+" : "") +
                 amount.getDecimalString();
             el.querySelector<HTMLElement>(".resource-delta-unit")!.innerText =
-                getUnits(resource.getUnitGroupName())[1];
+                getUnits(resource.unitGroupName)[1];
 
             // If there's a negative delta for this resource, highlight it and add a listener for opening the converter menu with that as a filter
             if (amount.lessThan(Rational.zero)) {
