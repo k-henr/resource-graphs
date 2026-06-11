@@ -1,0 +1,61 @@
+{
+    "settings": [
+        {
+            "type": "NUMBER",
+            "name": "Water temperature",
+            "default": 20,
+            "unit": "°C"
+        }
+    ],
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": 240 },
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "DIV",
+                "value1": 600,
+                "value2": {
+                    "type": "ADD",
+                    "values": [
+                        3.5,
+                        [20, 0.32],
+                        {
+                            "type": "DIV",
+                            "value1": {
+                                "type": "SETTING",
+                                "name": "Water temperature"
+                            },
+                            "value2": 0.32
+                        }
+                    ]
+                }
+            },
+            "resource": { "type": "RESOURCE", "id": "water", "amount": 60 }
+        }
+    ],
+    "produces": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "DIV",
+                "value1": 600,
+                "value2": {
+                    "type": "ADD",
+                    "values": [
+                        3.5,
+                        [20, 0.32],
+                        {
+                            "type": "DIV",
+                            "value1": {
+                                "type": "SETTING",
+                                "name": "Water temperature"
+                            },
+                            "value2": 0.32
+                        }
+                    ]
+                }
+            },
+            "resource": { "type": "RESOURCE", "id": "ice", "amount": 60 }
+        }
+    ]
+}

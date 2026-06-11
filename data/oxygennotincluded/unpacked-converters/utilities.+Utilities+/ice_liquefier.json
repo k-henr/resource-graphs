@@ -1,0 +1,32 @@
+{
+    "settings": [
+        { "type": "NUMBER", "name": "Ice temperatue", "default": -20, "unit": "°C" }
+    ],
+    "consumes": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "SUB",
+                "value1": 25,
+                "value2": { "type": "SETTING", "name": "Ice temperatue" }
+            },
+            "resource": {
+                "type": "TAG",
+                "tagName": "&Wood",
+                "amount": 6.15
+            }
+        },
+        {
+            "type": "RESOURCE",
+            "id": "ice",
+            "amount": 12000
+        }
+    ],
+    "produces": [
+        {
+            "type": "RESOURCE",
+            "id": "water",
+            "amount": 12000
+        }
+    ]
+}
