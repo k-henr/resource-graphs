@@ -113,6 +113,9 @@ main {
     padding: 4px;
     gap: 4px;
 
+    /* Doesn't look great, but better than the alternative for now */
+    word-break: break-word;
+
     & img {
         flex: 1;
         max-width: 100%;

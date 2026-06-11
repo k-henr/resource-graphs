@@ -1,0 +1,7 @@
+{
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": 60 },
+        { "type": "RESOURCE", "id": "plastic", "amount": [3000, 33] }
+    ],
+    "produces": [{ "type": "RESOURCE", "id": "data_bank", "amount": [600, 33] }]
+}

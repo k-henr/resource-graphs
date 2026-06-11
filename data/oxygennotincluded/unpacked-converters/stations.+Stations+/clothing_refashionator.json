@@ -1,0 +1,8 @@
+{
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": 240 },
+        { "type": "RESOURCE", "id": "snazzy_suit", "amount": 15 },
+        { "type": "TAG", "tagName": "&Fiber", "amount": 45 }
+    ],
+    "produces": [{ "type": "RESOURCE", "id": "primo_garb", "amount": 15 }]
+}

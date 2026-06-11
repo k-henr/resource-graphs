@@ -1,0 +1,102 @@
+{
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": 480 },
+        {
+            "type": "ENTANGLED_OR",
+            "id": "recipe",
+            "resources": [
+                [
+                    "atmo_suit",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "TAG", "tagName": "&Fiber", "amount": 30 },
+                            {
+                                "type": "OR",
+                                "resources": [
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "aluminum",
+                                        "amount": 4500
+                                    },
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "copper",
+                                        "amount": 4500
+                                    },
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "iron",
+                                        "amount": 4500
+                                    },
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "cobalt",
+                                        "amount": 4500
+                                    },
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "nickel",
+                                        "amount": 4500
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "jet_suit",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "TAG", "tagName": "&Fiber", "amount": 30 },
+                            { "type": "RESOURCE", "id": "steel", "amount": 3000 }
+                        ]
+                    }
+                ],
+                [
+                    "lead_suit",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "lead", "amount": 3000 },
+                            { "type": "RESOURCE", "id": "glass", "amount": 30 }
+                        ]
+                    }
+                ]
+            ]
+        }
+    ],
+    "produces": [
+        {
+            "type": "ENTANGLED_OR",
+            "id": "recipe",
+            "resources": [
+                [
+                    "atmo_suit",
+                    {
+                        "type": "RESOURCE",
+                        "id": "atmo_suit",
+                        "amount": 15
+                    }
+                ],
+                [
+                    "jet_suit",
+                    {
+                        "type": "RESOURCE",
+                        "id": "jet_suit",
+                        "amount": 15
+                    }
+                ],
+                [
+                    "lead_suit",
+                    {
+                        "type": "RESOURCE",
+                        "id": "lead_suit",
+                        "amount": 15
+                    }
+                ]
+            ]
+        }
+    ]
+}

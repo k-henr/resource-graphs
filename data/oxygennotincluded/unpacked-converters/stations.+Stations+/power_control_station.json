@@ -1,0 +1,6 @@
+{
+    "consumes": [
+        { "type": "TAG", "tagName": ["&Solid", "Refined Metal"], "amount": [75, 4] }
+    ],
+    "produces": [{ "type": "RESOURCE", "id": "microchip", "amount": [600, 160] }]
+}

@@ -1,0 +1,51 @@
+{
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": 60 },
+        {
+            "type": "ENTANGLED_OR",
+            "id": "recipe",
+            "resources": [
+                [
+                    "oxygen_mask",
+                    { "type": "TAG", "tagName": "&Unrefined Ore", "amount": 750 }
+                ],
+                [
+                    "metal_power_bank",
+                    { "type": "TAG", "tagName": "&Unrefined Ore", "amount": 3000 }
+                ],
+                [
+                    "uranium_power_bank",
+                    { "type": "RESOURCE", "id": "uranium_ore", "amount": 150 }
+                ]
+            ]
+        }
+    ],
+    "produces": [
+        {
+            "type": "ENTANGLED_OR",
+            "id": "recipe",
+            "resources": [
+                [
+                    "oxygen_mask",
+                    { "type": "RESOURCE", "id": "oxygen_mask", "amount": 15 }
+                ],
+                [
+                    "metal_power_bank",
+                    {
+                        "type": "RESOURCE",
+                        "id": "metal_power_bank",
+                        "amount": 1800000
+                    }
+                ],
+                [
+                    "uranium_power_bank",
+                    {
+                        "type": "RESOURCE",
+                        "id": "uranium_ore_power_bank",
+                        "amount": 1800000
+                    }
+                ]
+            ]
+        }
+    ]
+}

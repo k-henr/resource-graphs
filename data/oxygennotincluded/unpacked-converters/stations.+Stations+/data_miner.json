@@ -1,0 +1,43 @@
+{
+    "thumbName": "Data Miner",
+    "displayName": "Data Miner ({Temperature} °C)",
+    "settings": [
+        {
+            "type": "NUMBER",
+            "name": "Temperature",
+            "default": 25,
+            "unit": "°C"
+        }
+    ],
+    "consumes": [{ "type": "RESOURCE", "id": "power", "amount": 1000 }],
+    "produces": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "CLAMP",
+                "value": {
+                    "type": "SUB",
+                    "value1": [
+                        130327,
+                        94500,
+                        "derived from the formula on the wiki, guaranteed perfection"
+                    ],
+                    "value2": {
+                        "type": "MUL",
+                        "values": [
+                            [71, 4725],
+                            { "type": "SETTING", "name": "Temperature" }
+                        ]
+                    }
+                },
+                "low": 0.6,
+                "high": [1600, 3]
+            },
+            "resource": {
+                "type": "RESOURCE",
+                "id": "data_bank",
+                "amount": 3
+            }
+        }
+    ]
+}

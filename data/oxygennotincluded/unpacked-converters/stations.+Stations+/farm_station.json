@@ -1,0 +1,6 @@
+{
+    "consumes": [{ "type": "RESOURCE", "id": "fertilizer", "amount": 75 }],
+    "produces": [
+        { "type": "RESOURCE", "id": "micronutrient_fertilizer", "amount": 15 }
+    ]
+}
