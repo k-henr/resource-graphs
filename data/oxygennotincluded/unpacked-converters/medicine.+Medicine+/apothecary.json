@@ -1,0 +1,158 @@
+{
+    "consumes": [
+        {
+            "type": "ENTANGLED_OR",
+            "id": "recipe",
+            "resources": [
+                [
+                    "vitamin_chews",
+                    { "type": "RESOURCE", "id": "coal", "amount": 15 }
+                ],
+                [
+                    "immuno_booster",
+                    { "type": "RESOURCE", "id": "pincha_peppernut", "amount": 15 }
+                ],
+                [
+                    "basic_rad_pill",
+                    { "type": "RESOURCE", "id": "coal", "amount": 15 }
+                ],
+                [
+                    "curative_tablet",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "coal", "amount": 15 },
+                            { "type": "RESOURCE", "id": "water", "amount": 15 }
+                        ]
+                    }
+                ],
+                [
+                    "allergy_medication",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "dirt", "amount": 15 },
+                            {
+                                "type": "OR",
+                                "resources": [
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "blossom_seed",
+                                        "amount": 15
+                                    },
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "seakomb_leaf",
+                                        "amount": 150
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "medical_pack",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            {
+                                "type": "RESOURCE",
+                                "id": "balm_lily_flower",
+                                "amount": 15
+                            },
+                            { "type": "RESOURCE", "id": "phosphorite", "amount": 15 }
+                        ]
+                    }
+                ],
+                [
+                    "serum_vial",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "steel", "amount": 15 },
+                            {
+                                "type": "RESOURCE",
+                                "id": "shine_bug_egg",
+                                "amount": 15
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "gear_balm",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "water", "amount": 3000 },
+                            { "type": "RESOURCE", "id": "gunk", "amount": 1200 }
+                        ]
+                    }
+                ],
+                [
+                    "tallow_gear_balm",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "water", "amount": 1050 },
+                            { "type": "RESOURCE", "id": "tallow", "amount": 150 }
+                        ]
+                    }
+                ]
+            ]
+        }
+    ],
+    "produces": [
+        {
+            "type": "ENTANGLED_OR",
+            "id": "recipe",
+            "resources": [
+                [
+                    "vitamin_chews",
+                    { "type": "RESOURCE", "id": "vitamin_chews", "amount": 15 }
+                ],
+                [
+                    "immuno_booster",
+                    { "type": "RESOURCE", "id": "immuno_booster", "amount": 15 }
+                ],
+                [
+                    "basic_rad_pill",
+                    { "type": "RESOURCE", "id": "basic_rad_pill", "amount": 15 }
+                ],
+                [
+                    "curative_tablet",
+                    { "type": "RESOURCE", "id": "curative_tablet", "amount": 15 }
+                ],
+                [
+                    "allergy_medication",
+                    { "type": "RESOURCE", "id": "allergy_medication", "amount": 15 }
+                ],
+                [
+                    "medical_pack",
+                    { "type": "RESOURCE", "id": "medical_pack", "amount": 15 }
+                ],
+                [
+                    "serum_vial",
+                    { "type": "RESOURCE", "id": "serum_vial", "amount": 15 }
+                ],
+                [
+                    "gear_balm",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "gear_balm", "amount": 15 },
+                            {
+                                "type": "RESOURCE",
+                                "id": "polluted_water",
+                                "amount": 3000
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "tallow_gear_balm",
+                    { "type": "RESOURCE", "id": "tallow_gear_balm", "amount": 15 }
+                ]
+            ]
+        }
+    ]
+}
