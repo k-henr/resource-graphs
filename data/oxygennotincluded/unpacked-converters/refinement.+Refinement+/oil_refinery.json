@@ -1,0 +1,10 @@
+{
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": 480 },
+        { "type": "RESOURCE", "id": "crude_oil", "amount": 6000 }
+    ],
+    "produces": [
+        { "type": "RESOURCE", "id": "petroleum", "amount": 3000 },
+        { "type": "RESOURCE", "id": "natural_gas", "amount": 54 }
+    ]
+}

@@ -1,0 +1,25 @@
+{
+    "consumes": [
+        {
+            "type": "ENTANGLED_OR",
+            "id": "recipe",
+            "resources": [
+                ["ore", { "type": "RESOURCE", "id": "uranium_ore", "amount": 15 }],
+                [
+                    "refined",
+                    { "type": "RESOURCE", "id": "enriched_uranium", "amount": 15 }
+                ]
+            ]
+        }
+    ],
+    "produces": [
+        {
+            "type": "ENTANGLED_OR",
+            "id": "recipe",
+            "resources": [
+                ["ore", { "type": "RESOURCE", "id": "radbolt", "amount": 75 }],
+                ["refined", { "type": "RESOURCE", "id": "radbolt", "amount": 375 }]
+            ]
+        }
+    ]
+}

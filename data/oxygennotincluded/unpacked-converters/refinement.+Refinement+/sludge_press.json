@@ -1,0 +1,51 @@
+{
+    "consumes": [
+        {
+            "type": "ENTANGLED_OR",
+            "id": "recipe",
+            "resources": [
+                ["mud", { "type": "RESOURCE", "id": "mud", "amount": 4500 }],
+                [
+                    "polluted_mud",
+                    { "type": "RESOURCE", "id": "polluted_mud", "amount": 4500 }
+                ]
+            ]
+        }
+    ],
+    "produces": [
+        {
+            "type": "ENTANGLED_OR",
+            "id": "recipe",
+            "resources": [
+                [
+                    "mud",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "dirt", "amount": 1800 },
+                            { "type": "RESOURCE", "id": "water", "amount": 2700 }
+                        ]
+                    }
+                ],
+                [
+                    "polluted_mud",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            {
+                                "type": "RESOURCE",
+                                "id": "polluted_dirt",
+                                "amount": 1800
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "polluted_water",
+                                "amount": 2700
+                            }
+                        ]
+                    }
+                ]
+            ]
+        }
+    ]
+}

@@ -15,6 +15,10 @@
       alert(`INTERNAL ERROR: ${e.message}
 
 Please report this as a bug!`);
+    } else {
+      alert(`SCRIPT ERROR: ${e.message}
+
+Please report this as a bug!`);
     }
     throw e;
   }
@@ -274,7 +278,10 @@ Please report this as a bug!`);
       label.innerText = name;
       input.name = name;
       post.innerText = unit ?? "";
-      input.onchange = () => requestingConverter.tryUpdateInfoPanel();
+      input.onchange = (event) => {
+        event.preventDefault();
+        requestingConverter.tryUpdateInfoPanel();
+      };
       return [settingEl, label, input];
     }
     static makeSelectElement(name, requestingConverter) {
@@ -604,6 +611,7 @@ Please report this as a bug!`);
     constructor(children) {
       super(children);
       const andEl = document.createElement("div");
+      andEl.classList.add("converter-child-list");
       this.children.map((child) => andEl.appendChild(child.element));
       this.element = andEl;
     }
@@ -756,6 +764,12 @@ Please report this as a bug!`);
             p = p.mul(this.evaluateSettingsTree(child, settings));
           return p;
         case "DIV":
+          console.log(
+            "Value 1:",
+            treeNode.value1,
+            "| Value 2:",
+            treeNode.value2
+          );
           return this.evaluateSettingsTree(treeNode.value1, settings).div(
             this.evaluateSettingsTree(treeNode.value2, settings)
           );

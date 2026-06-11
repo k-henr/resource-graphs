@@ -1,0 +1,8 @@
+{
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": 480 },
+        { "type": "RESOURCE", "id": "plant_husk", "amount": 1350 },
+        { "type": "RESOURCE", "id": "resin", "amount": 150 }
+    ],
+    "produces": [{ "type": "RESOURCE", "id": "plywood", "amount": 1500 }]
+}

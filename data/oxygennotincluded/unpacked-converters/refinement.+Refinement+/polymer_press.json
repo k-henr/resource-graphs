@@ -1,0 +1,11 @@
+{
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": 240 },
+        { "type": "TAG", "tagName": "Plastic Monomer", "amount": 500 }
+    ],
+    "produces": [
+        { "type": "RESOURCE", "id": "plastic", "amount": 300 },
+        { "type": "RESOURCE", "id": "steam", "amount": 5 },
+        { "type": "RESOURCE", "id": "carbon_dioxide", "amount": 5 }
+    ]
+}

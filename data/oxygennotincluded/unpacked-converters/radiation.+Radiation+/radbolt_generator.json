@@ -1,0 +1,44 @@
+{
+    "thumbName": "Radbolt Generator",
+    "displayName": "Radbolt generator ({Rads per cycle in tile} rads)",
+    "settings": [
+        {
+            "type": "NUMBER",
+            "name": "Rads per cycle in tile",
+            "default": 100
+        }
+    ],
+    "consumes": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "CLAMP",
+                "value": {
+                    "type": "DIV",
+                    "value1": {
+                        "type": "SETTING",
+                        "name": "Rads per cycle in tile"
+                    },
+                    "value2": 100
+                },
+                "low": [1, 8],
+                "high": 1
+            },
+            "resource": { "type": "RESOURCE", "id": "power", "amount": 480 }
+        }
+    ],
+    "produces": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "DIV",
+                "value1": {
+                    "type": "SETTING",
+                    "name": "Rads per cycle in tile"
+                },
+                "value2": 10
+            },
+            "resource": { "type": "RESOURCE", "id": "radbolt", "amount": 1 }
+        }
+    ]
+}

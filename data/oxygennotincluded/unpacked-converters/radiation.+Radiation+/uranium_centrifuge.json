@@ -1,0 +1,10 @@
+{
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": 480 },
+        { "type": "RESOURCE", "id": "uranium_ore", "amount": 150 }
+    ],
+    "produces": [
+        { "type": "RESOURCE", "id": "enriched_uranium", "amount": 30 },
+        { "type": "RESOURCE", "id": "liquid_uranium", "amount": 120 }
+    ]
+}

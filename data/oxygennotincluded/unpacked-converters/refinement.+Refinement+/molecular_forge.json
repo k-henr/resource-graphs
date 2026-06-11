@@ -1,0 +1,98 @@
+{
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": 1600 },
+        {
+            "type": "ENTANGLED_OR",
+            "id": "recipe",
+            "resources": [
+                [
+                    "thermium",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "niobium", "amount": 75 },
+                            { "type": "RESOURCE", "id": "tungsten", "amount": 1425 }
+                        ]
+                    }
+                ],
+                [
+                    "insulite",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "isosap", "amount": 225 },
+                            {
+                                "type": "RESOURCE",
+                                "id": "abyssalite",
+                                "amount": 1200
+                            },
+                            {
+                                "type": "TAG",
+                                "tagName": "&Fiber",
+                                "amount": 75
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "plastium",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "thermium", "amount": 225 },
+                            { "type": "RESOURCE", "id": "plastic", "amount": 1050 },
+                            { "type": "RESOURCE", "id": "brackwax", "amount": 225 }
+                        ]
+                    }
+                ],
+                [
+                    "fullerene",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "graphite", "amount": 1350 },
+                            { "type": "RESOURCE", "id": "sulfur", "amount": 75 },
+                            { "type": "RESOURCE", "id": "aluminum", "amount": 75 }
+                        ]
+                    }
+                ],
+                [
+                    "atomic_power_bank",
+                    { "type": "RESOURCE", "id": "enriched_uranium", "amount": 150 }
+                ]
+            ]
+        }
+    ],
+    "produces": [
+        {
+            "type": "ENTANGLED_OR",
+            "id": "recipe",
+            "resources": [
+                [
+                    "thermium",
+                    { "type": "RESOURCE", "id": "thermium", "amount": 1500 }
+                ],
+                [
+                    "insulite",
+                    { "type": "RESOURCE", "id": "insulite", "amount": 1500 }
+                ],
+                [
+                    "plastium",
+                    { "type": "RESOURCE", "id": "plastium", "amount": 1500 }
+                ],
+                [
+                    "fullerene",
+                    { "type": "RESOURCE", "id": "fullerene", "amount": 1500 }
+                ],
+                [
+                    "atomic_power_bank",
+                    {
+                        "type": "RESOURCE",
+                        "id": "atomic_power_bank",
+                        "amount": 82800000
+                    }
+                ]
+            ]
+        }
+    ]
+}

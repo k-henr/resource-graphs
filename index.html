@@ -94,7 +94,11 @@
             <div id="rc-detail-popup" class="hidden">
                 <div id="rc-info-panel" class="flex-2"></div>
                 <div class="flex-1">
-                    <form id="resource-submission-form" class="popup-form hidden">
+                    <form
+                        id="resource-submission-form"
+                        class="popup-form hidden"
+                        onsubmit="event.preventDefault()"
+                    >
                         <div class="rc-form-option">
                             <label for="delta">Rate of change</label>
                             <input
@@ -129,7 +133,11 @@
                         </div>
                     </form>
                     <div id="converter-specific-footer">
-                        <form id="converter-settings-form" class="popup-form"></form>
+                        <form
+                            id="converter-settings-form"
+                            class="popup-form"
+                            onsubmit="event.preventDefault()"
+                        ></form>
                         <form
                             id="converter-submission-form"
                             class="popup-form hidden"
@@ -299,7 +307,7 @@
 
         <!-- Template for the different option "boxes" in ORs -->
         <template id="converter-option-template">
-            <div class="pad-4 primary interactive"></div>
+            <div class="primary interactive"></div>
         </template>
 
         <!-- Another template for handling ORs, this one is inserted in between the options -->

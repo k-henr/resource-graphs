@@ -1,7 +1,7 @@
 {
     "consumes": [
         { "type": "RESOURCE", "id": "power", "amount": 240 },
-        { "type": "RESOURCE", "id": "wood", "amount": 600 }
+        { "type": "TAG", "tagName": "&Wood", "amount": 600 }
     ],
     "produces": [
         { "type": "RESOURCE", "id": "ethanol", "amount": 300 },

@@ -1,0 +1,91 @@
+{
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": 1200 },
+        {
+            "type": "ENTANGLED_OR",
+            "id": "recipe",
+            "resources": [
+                [
+                    "gold",
+                    { "type": "RESOURCE", "id": "gold_amalgam", "amount": 1500 }
+                ],
+                [
+                    "mercury",
+                    { "type": "RESOURCE", "id": "cinnabar_ore", "amount": 1500 }
+                ],
+                [
+                    "copper",
+                    { "type": "RESOURCE", "id": "copper_ore", "amount": 1500 }
+                ],
+                [
+                    "tungsten",
+                    { "type": "RESOURCE", "id": "wolframite", "amount": 1500 }
+                ],
+                [
+                    "aluminum",
+                    { "type": "RESOURCE", "id": "aluminum_ore", "amount": 1500 }
+                ],
+                [
+                    "cobalt",
+                    { "type": "RESOURCE", "id": "cobalt_ore", "amount": 1500 }
+                ],
+                [
+                    "nickel",
+                    { "type": "RESOURCE", "id": "nickel_ore", "amount": 1500 }
+                ],
+                [
+                    "niobium",
+                    { "type": "RESOURCE", "id": "thermium", "amount": 1500 }
+                ],
+                [
+                    "iron_pyrite",
+                    { "type": "RESOURCE", "id": "pyrite", "amount": 1500 }
+                ],
+                ["iron", { "type": "RESOURCE", "id": "iron_ore", "amount": 1500 }],
+                [
+                    "steel",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "iron", "amount": 1050 },
+                            {
+                                "type": "RESOURCE",
+                                "id": "refined_carbon",
+                                "amount": 300
+                            },
+                            { "type": "RESOURCE", "id": "lime", "amount": 150 }
+                        ]
+                    }
+                ]
+            ]
+        }
+    ],
+    "produces": [
+        {
+            "type": "ENTANGLED_OR",
+            "id": "recipe",
+            "resources": [
+                ["gold", { "type": "RESOURCE", "id": "gold", "amount": 1500 }],
+                ["mercury", { "type": "RESOURCE", "id": "mercury", "amount": 1500 }],
+                ["copper", { "type": "RESOURCE", "id": "copper", "amount": 1500 }],
+                [
+                    "tungsten",
+                    { "type": "RESOURCE", "id": "tungsten", "amount": 1500 }
+                ],
+                [
+                    "aluminum",
+                    { "type": "RESOURCE", "id": "aluminum", "amount": 1500 }
+                ],
+                ["cobalt", { "type": "RESOURCE", "id": "cobalt", "amount": 1500 }],
+                ["nickel", { "type": "RESOURCE", "id": "nickel", "amount": 1500 }],
+                ["niobium", { "type": "RESOURCE", "id": "niobium", "amount": 1500 }],
+                [
+                    "iron_pyrite",
+                    { "type": "RESOURCE", "id": "iron", "amount": 1500 }
+                ],
+                ["iron", { "type": "RESOURCE", "id": "iron", "amount": 1500 }],
+                ["steel", { "type": "RESOURCE", "id": "steel", "amount": 1500 }]
+            ]
+        }
+    ]
+}

@@ -84,6 +84,12 @@ export class MultiplierNode implements ResourceTree {
                 return p;
 
             case "DIV":
+                console.log(
+                    "Value 1:",
+                    treeNode.value1,
+                    "| Value 2:",
+                    treeNode.value2,
+                );
                 return this.evaluateSettingsTree(treeNode.value1, settings).div(
                     this.evaluateSettingsTree(treeNode.value2, settings),
                 );

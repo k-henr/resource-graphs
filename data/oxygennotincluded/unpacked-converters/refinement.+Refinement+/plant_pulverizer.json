@@ -1,0 +1,124 @@
+{
+    "consumes": [
+        {
+            "type": "ENTANGLED_OR",
+            "id": "recipe",
+            "resources": [
+                [
+                    "brackene",
+                    {
+                        "type": "OR",
+                        "resources": [
+                            {
+                                "type": "AND",
+                                "resources": [
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "nosh_bean",
+                                        "amount": 30
+                                    },
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "water",
+                                        "amount": 270
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "AND",
+                                "resources": [
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "sleet_wheat_grain",
+                                        "amount": 150
+                                    },
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "water",
+                                        "amount": 225
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "AND",
+                                "resources": [
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "pincha_peppernut",
+                                        "amount": 45
+                                    },
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "water",
+                                        "amount": 255
+                                    }
+                                ]
+                            },
+                            { "type": "RESOURCE", "id": "dewdrip", "amount": 30 }
+                        ]
+                    }
+                ],
+                [
+                    "phyto_oil_slime",
+                    { "type": "RESOURCE", "id": "slime", "amount": 1500 }
+                ],
+                [
+                    "phyto_oil_seakomb",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            {
+                                "type": "RESOURCE",
+                                "id": "seakomb_leaf",
+                                "amount": 375
+                            },
+                            { "type": "RESOURCE", "id": "water", "amount": 1125 }
+                        ]
+                    }
+                ],
+                ["resin", { "type": "RESOURCE", "id": "amber", "amount": 1500 }]
+            ]
+        }
+    ],
+    "produces": [
+        {
+            "type": "ENTANGLED_OR",
+            "id": "recipe",
+            "resources": [
+                [
+                    "brackene",
+                    { "type": "RESOURCE", "id": "brackene", "amount": 300 }
+                ],
+                [
+                    "phyto_oil_slime",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            {
+                                "type": "RESOURCE",
+                                "id": "phyto_oil",
+                                "amount": 1050
+                            },
+                            { "type": "RESOURCE", "id": "dirt", "amount": 450 }
+                        ]
+                    }
+                ],
+                [
+                    "phyto_oil_seakomb",
+                    { "type": "RESOURCE", "id": "phyto_oil", "amount": 1500 }
+                ],
+                [
+                    "resin",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "resin", "amount": 1500 },
+                            { "type": "RESOURCE", "id": "fossil", "amount": 375 },
+                            { "type": "RESOURCE", "id": "sand", "amount": 375 }
+                        ]
+                    }
+                ]
+            ]
+        }
+    ]
+}

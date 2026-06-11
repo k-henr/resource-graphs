@@ -16,6 +16,7 @@ export class AndNode extends ResourceTreeBoolNode {
 
         // Add all the children to the parent element
         const andEl = document.createElement("div");
+        andEl.classList.add("converter-child-list"); // todo: template?
         this.children.map((child) => andEl.appendChild(child.element));
 
         this.element = andEl;

@@ -1,5 +1,4 @@
 {
-    "tags": ["Refinement"],
     "consumes": [
         { "type": "RESOURCE", "id": "power", "amount": 960 },
         { "type": "RESOURCE", "id": "iron", "amount": 187.5 },

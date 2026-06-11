@@ -1,0 +1,8 @@
+{
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": 1200 },
+        { "type": "RESOURCE", "id": "oxygen", "amount": 360 },
+        { "type": "RESOURCE", "id": "gold", "amount": 1.8 }
+    ],
+    "produces": [{ "type": "RESOURCE", "id": "oxylite", "amount": 360 }]
+}

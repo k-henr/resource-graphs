@@ -1,0 +1,354 @@
+{
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": 240 },
+        {
+            "type": "ENTANGLED_OR",
+            "id": "recipe",
+            "resources": [
+                [
+                    "sand",
+                    {
+                        "type": "OR",
+                        "resources": [
+                            {
+                                "type": "TAG",
+                                "tagName": "&Rock",
+                                "amount": 1500
+                            },
+                            { "type": "RESOURCE", "id": "ceramic", "amount": 1500 },
+                            { "type": "RESOURCE", "id": "insulite", "amount": 1500 }
+                        ]
+                    }
+                ],
+                [
+                    "salt",
+                    {
+                        "type": "RESOURCE",
+                        "id": "salt",
+                        "amount": 1500
+                    }
+                ],
+                [
+                    "crush_fossil",
+                    {
+                        "type": "RESOURCE",
+                        "id": "fossil",
+                        "amount": 1500
+                    }
+                ],
+                [
+                    "crush_egg_shell",
+                    {
+                        "type": "RESOURCE",
+                        "id": "egg_shell",
+                        "amount": 75
+                    }
+                ],
+                [
+                    "crush_poke_molt",
+                    {
+                        "type": "RESOURCE",
+                        "id": "pokeshell_molt",
+                        "amount": 150
+                    }
+                ],
+                [
+                    "crush_oak_molt",
+                    {
+                        "type": "RESOURCE",
+                        "id": "oakshell_molt",
+                        "amount": 7500
+                    }
+                ],
+                [
+                    "bammoth_patty",
+                    { "type": "RESOURCE", "id": "bammoth_patty", "amount": 1800 }
+                ],
+                [
+                    "bammoth_crest",
+                    {
+                        "type": "RESOURCE",
+                        "id": "regal_bammoth_crest",
+                        "amount": 15
+                    }
+                ],
+                [
+                    "ore",
+                    {
+                        "type": "ENTANGLED_OR",
+                        "id": "ore",
+                        "resources": [
+                            [
+                                "tungsten",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "wolframite",
+                                    "amount": 1500
+                                }
+                            ],
+                            [
+                                "aluminum",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "aluminum_ore",
+                                    "amount": 1500
+                                }
+                            ],
+                            [
+                                "copper",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "copper_ore",
+                                    "amount": 1500
+                                }
+                            ],
+                            [
+                                "iron",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "iron_ore",
+                                    "amount": 1500
+                                }
+                            ],
+                            [
+                                "gold",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "gold_amalgam",
+                                    "amount": 1500
+                                }
+                            ],
+                            [
+                                "niobium",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "thermium",
+                                    "amount": 1500
+                                }
+                            ],
+                            [
+                                "cobalt",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "cobalt_ore",
+                                    "amount": 1500
+                                }
+                            ],
+                            [
+                                "mercury",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "cinnabar_ore",
+                                    "amount": 1500
+                                }
+                            ],
+                            [
+                                "nickel",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "nickel_ore",
+                                    "amount": 1500
+                                }
+                            ]
+                        ]
+                    }
+                ],
+                [
+                    "graphite",
+                    {
+                        "type": "RESOURCE",
+                        "id": "fullerene",
+                        "amount": 1350
+                    }
+                ]
+            ]
+        }
+    ],
+    "produces": [
+        {
+            "type": "ENTANGLED_OR",
+            "id": "recipe",
+            "resources": [
+                [
+                    "sand",
+                    {
+                        "type": "RESOURCE",
+                        "id": "sand",
+                        "amount": 1500
+                    }
+                ],
+                [
+                    "salt",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "sand", "amount": 1500 },
+                            {
+                                "type": "RESOURCE",
+                                "id": "table_salt",
+                                "amount": 0.075
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "crush_fossil",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            {
+                                "type": "RESOURCE",
+                                "id": "sedimentary_rock",
+                                "amount": 1425
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "lime",
+                                "amount": 75
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "crush_egg_shell",
+                    {
+                        "type": "RESOURCE",
+                        "id": "lime",
+                        "amount": 75
+                    }
+                ],
+                [
+                    "crush_poke_molt",
+                    {
+                        "type": "RESOURCE",
+                        "id": "lime",
+                        "amount": 150
+                    }
+                ],
+                [
+                    "crush_oak_molt",
+                    {
+                        "type": "RESOURCE",
+                        "id": "wood",
+                        "amount": 7500
+                    }
+                ],
+                [
+                    "bammoth_patty",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            {
+                                "type": "RESOURCE",
+                                "id": "phosphorite",
+                                "amount": 480
+                            },
+                            { "type": "RESOURCE", "id": "clay", "amount": 1320 }
+                        ]
+                    }
+                ],
+                [
+                    "bammoth_crest",
+                    { "type": "RESOURCE", "id": "gold", "amount": 3750 }
+                ],
+                [
+                    "ore",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "sand", "amount": 750 },
+                            {
+                                "type": "ENTANGLED_OR",
+                                "id": "ore",
+                                "resources": [
+                                    [
+                                        "tungsten",
+                                        {
+                                            "type": "RESOURCE",
+                                            "id": "tungsten",
+                                            "amount": 750
+                                        }
+                                    ],
+                                    [
+                                        "aluminum",
+                                        {
+                                            "type": "RESOURCE",
+                                            "id": "aluminum",
+                                            "amount": 1500
+                                        }
+                                    ],
+                                    [
+                                        "copper",
+                                        {
+                                            "type": "RESOURCE",
+                                            "id": "copper",
+                                            "amount": 1500
+                                        }
+                                    ],
+                                    [
+                                        "iron",
+                                        {
+                                            "type": "RESOURCE",
+                                            "id": "iron",
+                                            "amount": 1500
+                                        }
+                                    ],
+                                    [
+                                        "gold",
+                                        {
+                                            "type": "RESOURCE",
+                                            "id": "gold",
+                                            "amount": 1500
+                                        }
+                                    ],
+                                    [
+                                        "niobium",
+                                        {
+                                            "type": "RESOURCE",
+                                            "id": "niobium",
+                                            "amount": 1500
+                                        }
+                                    ],
+                                    [
+                                        "cobalt",
+                                        {
+                                            "type": "RESOURCE",
+                                            "id": "cobalt",
+                                            "amount": 1500
+                                        }
+                                    ],
+                                    [
+                                        "mercury",
+                                        {
+                                            "type": "RESOURCE",
+                                            "id": "mercury",
+                                            "amount": 1500
+                                        }
+                                    ],
+                                    [
+                                        "nickel",
+                                        {
+                                            "type": "RESOURCE",
+                                            "id": "nickel",
+                                            "amount": 1500
+                                        }
+                                    ]
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "graphite",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "graphite", "amount": 1350 },
+                            { "type": "RESOURCE", "id": "sand", "amount": 150 }
+                        ]
+                    }
+                ]
+            ]
+        }
+    ]
+}

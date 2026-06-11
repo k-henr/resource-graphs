@@ -27,6 +27,8 @@ export function displayErr(e: Error) {
         alert(`Configuration error: ${e.message}`);
     } else if (e instanceof ProgramError) {
         alert(`INTERNAL ERROR: ${e.message}\n\nPlease report this as a bug!`);
+    } else {
+        alert(`SCRIPT ERROR: ${e.message}\n\nPlease report this as a bug!`);
     }
     throw e;
 }

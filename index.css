@@ -312,6 +312,14 @@ input {
     align-items: center;
 }
 
+.converter-ingredient,
+.converter-select-children,
+.converter-child-list {
+    & > *:not(:last-child) {
+        margin-bottom: 4px;
+    }
+}
+
 .converter-ingredient {
     height: 32px;
     padding: 4px;
@@ -327,12 +335,11 @@ input {
     height: 12px;
 }
 .converter-select-children {
-    max-height: 250px;
     overflow-y: auto;
+}
 
-    & > * {
-        margin: 2px;
-    }
+.converter-select-children > * {
+    padding: 4px;
 }
 
 .image-heading {
@@ -342,6 +349,7 @@ input {
 
 .converter-ingredient-image {
     min-height: 0px;
+    max-width: 32px;
     height: 100%;
     object-fit: contain;
 }
@@ -370,10 +378,6 @@ input {
 }
 .flex-3 {
     flex: 3;
-}
-
-.pad-4 {
-    padding: 4px;
 }
 
 .horiz-padding {
