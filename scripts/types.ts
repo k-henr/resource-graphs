@@ -112,7 +112,7 @@ export type ResourceTreeDataTagNode = {
 export type ResourceTreeDataEntangledOrNode = {
     type: "ENTANGLED_OR";
     id: string;
-    resources: [string, ResourceTreeData][];
+    resources: [string | string[], ResourceTreeData][];
 };
 // Represents a multiplier applied to the child tree, depending on the value that the
 // settings AST takes on. See below.

@@ -17,7 +17,7 @@ export class EntangledOrNode extends OrNode {
     constructor(
         converter: IntermediateConverter,
         name: string,
-        options: [string, ResourceTree][],
+        options: [string | string[], ResourceTree][],
     ) {
         super(options);
         this.name = name;

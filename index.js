@@ -654,22 +654,25 @@ Please report this as a bug!`);
       let numOptions = 0;
       for (let i = 0; i < options.length; i++) {
         const optionName = options[i][0];
+        const optionList = typeof optionName === "string" ? [optionName] : optionName;
         const option = this.children[i];
-        this.optionNameToTreeMap.set(optionName, option);
-        const optionWrapper = _OrNode.converterOptionTemplate.cloneElement();
-        optionWrapper.appendChild(option.element);
-        optionWrapper.onclick = () => {
-          try {
-            this.chooseOption(optionName);
-          } catch (e) {
-            displayErr(e);
-            throw e;
+        for (const name of optionList) {
+          this.optionNameToTreeMap.set(name, option);
+          const optionWrapper = _OrNode.converterOptionTemplate.cloneElement();
+          optionWrapper.appendChild(option.element);
+          optionWrapper.onclick = () => {
+            try {
+              this.chooseOption(name);
+            } catch (e) {
+              displayErr(e);
+              throw e;
+            }
+          };
+          selectList.appendChild(optionWrapper);
+          numOptions++;
+          if (i !== options.length - 1) {
+            selectList.appendChild(_OrNode.converterOrTemplate.clone());
           }
-        };
-        selectList.appendChild(optionWrapper);
-        numOptions++;
-        if (i !== options.length - 1) {
-          selectList.appendChild(_OrNode.converterOrTemplate.clone());
         }
       }
       this.element.querySelector(

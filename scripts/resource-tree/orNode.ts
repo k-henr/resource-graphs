@@ -38,7 +38,7 @@ export class OrNode extends ResourceTreeBoolNode {
     private static converterOrTemplate = new Template("converter-or-template");
 
     // (the options list is a list of name/option pairs)
-    constructor(options: [string, ResourceTree][]) {
+    constructor(options: [string | string[], ResourceTree][]) {
         super(options.map(([, r]) => r));
 
         // Make the OR element
@@ -56,31 +56,36 @@ export class OrNode extends ResourceTreeBoolNode {
         // representations of the nodes)
         for (let i = 0; i < options.length; i++) {
             const optionName = options[i][0];
+            const optionList =
+                typeof optionName === "string" ? [optionName] : optionName;
             const option = this.children[i];
-            this.optionNameToTreeMap.set(optionName, option);
-            // Create a wrapper for the option. This wrapper is what's being accessed
-            // in the collapse function, which means that the content of the wrapper
-            // can change without having to make a new collapse function and re-set
-            // the onclick for that element
-            const optionWrapper = OrNode.converterOptionTemplate.cloneElement();
-            optionWrapper.appendChild(option.element);
 
-            // Set a listener for the option wrapper to collapse into it
-            optionWrapper.onclick = () => {
-                try {
-                    this.chooseOption(optionName);
-                } catch (e: any) {
-                    displayErr(e);
-                    throw e;
+            for (const name of optionList) {
+                this.optionNameToTreeMap.set(name, option);
+                // Create a wrapper for the option. This wrapper is what's being accessed
+                // in the collapse function, which means that the content of the wrapper
+                // can change without having to make a new collapse function and re-set
+                // the onclick for that element
+                const optionWrapper = OrNode.converterOptionTemplate.cloneElement();
+                optionWrapper.appendChild(option.element);
+
+                // Set a listener for the option wrapper to collapse into it
+                optionWrapper.onclick = () => {
+                    try {
+                        this.chooseOption(name);
+                    } catch (e: any) {
+                        displayErr(e);
+                        throw e;
+                    }
+                };
+
+                selectList.appendChild(optionWrapper);
+                numOptions++;
+
+                // Add display "OR"s in between the options
+                if (i !== options.length - 1) {
+                    selectList.appendChild(OrNode.converterOrTemplate.clone());
                 }
-            };
-
-            selectList.appendChild(optionWrapper);
-            numOptions++;
-
-            // Add display "OR"s in between the options
-            if (i !== options.length - 1) {
-                selectList.appendChild(OrNode.converterOrTemplate.clone());
             }
         }
 
