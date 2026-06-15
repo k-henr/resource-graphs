@@ -657,9 +657,17 @@ Please report this as a bug!`);
         const optionList = typeof optionName === "string" ? [optionName] : optionName;
         const option = this.children[i];
         for (const name of optionList) {
+          console.log("Name: ", name, "| Option:", option);
           this.optionNameToTreeMap.set(name, option);
           const optionWrapper = _OrNode.converterOptionTemplate.cloneElement();
-          optionWrapper.appendChild(option.element);
+          console.log(
+            option.element.querySelector(".converter-ingredient-amount").innerHTML
+          );
+          const clone = option.element.cloneNode(true);
+          console.log(
+            clone.querySelector(".converter-ingredient-amount").innerHTML
+          );
+          optionWrapper.appendChild(clone);
           optionWrapper.onclick = () => {
             try {
               this.chooseOption(name);
@@ -670,11 +678,10 @@ Please report this as a bug!`);
           };
           selectList.appendChild(optionWrapper);
           numOptions++;
-          if (i !== options.length - 1) {
-            selectList.appendChild(_OrNode.converterOrTemplate.clone());
-          }
+          selectList.appendChild(_OrNode.converterOrTemplate.clone());
         }
       }
+      selectList.removeChild(selectList.children[selectList.children.length - 1]);
       this.element.querySelector(
         ".converter-select-count"
       ).innerText = String(numOptions);
@@ -866,6 +873,7 @@ Please report this as a bug!`);
       this.amount = amount;
       this.resource = resource;
       this.element = this.createIngredientElement();
+      this.setAmount(amount);
     }
     updateElement(multiplier, ___) {
       this.setAmount(this.amount.mul(multiplier));
@@ -874,7 +882,7 @@ Please report this as a bug!`);
       const unitGroupName = this.resource.unitGroupName;
       this.element.querySelector(
         ".converter-ingredient-amount"
-      ).innerText = `\u2A09 ${amount.getDecimalString()} ${getUnits(unitGroupName)[1]}`;
+      ).innerText = `${amount.getDecimalString()} ${getUnits(unitGroupName)[1]}`;
     }
     addResourcesToList(output, _, multiplier = Rational.one) {
       output.push({

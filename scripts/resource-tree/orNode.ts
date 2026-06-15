@@ -61,13 +61,22 @@ export class OrNode extends ResourceTreeBoolNode {
             const option = this.children[i];
 
             for (const name of optionList) {
+                console.log("Name: ", name, "| Option:", option);
                 this.optionNameToTreeMap.set(name, option);
                 // Create a wrapper for the option. This wrapper is what's being accessed
                 // in the collapse function, which means that the content of the wrapper
                 // can change without having to make a new collapse function and re-set
                 // the onclick for that element
                 const optionWrapper = OrNode.converterOptionTemplate.cloneElement();
-                optionWrapper.appendChild(option.element);
+                console.log(
+                    option.element.querySelector(".converter-ingredient-amount")!
+                        .innerHTML,
+                );
+                const clone = option.element.cloneNode(true) as HTMLElement;
+                console.log(
+                    clone.querySelector(".converter-ingredient-amount")!.innerHTML,
+                );
+                optionWrapper.appendChild(clone);
 
                 // Set a listener for the option wrapper to collapse into it
                 optionWrapper.onclick = () => {
@@ -83,9 +92,7 @@ export class OrNode extends ResourceTreeBoolNode {
                 numOptions++;
 
                 // Add display "OR"s in between the options
-                if (i !== options.length - 1) {
-                    selectList.appendChild(OrNode.converterOrTemplate.clone());
-                }
+                selectList.appendChild(OrNode.converterOrTemplate.clone());
             }
         }
 
@@ -108,6 +115,10 @@ export class OrNode extends ResourceTreeBoolNode {
         //         requestingConverter,
         //     );
         // }
+
+        // Remove the last OR
+        // (todo: don't do this if there was a nothing node added)
+        selectList.removeChild(selectList.children[selectList.children.length - 1]);
 
         // set the number of options
         this.element.querySelector<HTMLElement>(

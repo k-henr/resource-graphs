@@ -9,6 +9,9 @@
                     { "type": "RESOURCE", "id": "shine_bug_egg", "amount": 1 }
                 ],
                 ["puft", { "type": "RESOURCE", "id": "puft_egg", "amount": 1 }],
+                ["pacu", { "type": "RESOURCE", "id": "pacu_egg", "amount": 1 }],
+                ["beakon", { "type": "RESOURCE", "id": "beakon_egg", "amount": 1 }],
+                ["slogo", { "type": "RESOURCE", "id": "slogo_egg", "amount": 1 }],
                 ["hatch", { "type": "RESOURCE", "id": "hatch_egg", "amount": 1 }],
                 ["drecko", { "type": "RESOURCE", "id": "drecko_egg", "amount": 1 }],
                 [
@@ -38,8 +41,23 @@
                     { "type": "RESOURCE", "id": "spigot_seal_egg", "amount": 1 }
                 ],
                 ["dartle", { "type": "RESOURCE", "id": "dartle_egg", "amount": 1 }],
-                ["pacu", { "type": "RESOURCE", "id": "pacu_egg", "amount": 1 }],
+                [
+                    "blowter",
+                    { "type": "RESOURCE", "id": "blowter_egg", "amount": 1 }
+                ],
+                [
+                    "seaquine",
+                    { "type": "RESOURCE", "id": "seaquine_egg", "amount": 1 }
+                ],
                 ["jawbo", { "type": "RESOURCE", "id": "jawbo_egg", "amount": 1 }],
+                [
+                    "orehull",
+                    { "type": "RESOURCE", "id": "orehull_egg", "amount": 1 }
+                ],
+                [
+                    "glo_squid",
+                    { "type": "RESOURCE", "id": "glo_squid_egg", "amount": 1 }
+                ],
                 [
                     "bammoth",
                     { "type": "RESOURCE", "id": "bammoth_egg", "amount": 1 }
@@ -63,7 +81,7 @@
                             {
                                 "type": "RESOURCE",
                                 "id": "egg_shell",
-                                "amount": 5000
+                                "amount": 0.1
                             },
                             { "type": "RESOURCE", "id": "resin", "amount": 5 }
                         ]
@@ -79,8 +97,27 @@
                         ]
                     }
                 ],
+                ["slogo", { "type": "RESOURCE", "id": "raw_egg", "amount": 800 }],
                 [
-                    "hatch",
+                    ["pacu", "beakon"],
+                    { "type": "RESOURCE", "id": "raw_egg", "amount": 1200 }
+                ],
+                [
+                    [
+                        "hatch",
+                        "drecko",
+                        "slickster",
+                        "pip",
+                        "pokeshell",
+                        "shove_vole",
+                        "plug_slug",
+                        "divergent",
+                        "flox",
+                        "spigot_seal",
+                        "dartle",
+                        "blowter",
+                        "seaquine"
+                    ],
                     {
                         "type": "AND",
                         "resources": [
@@ -90,147 +127,21 @@
                     }
                 ],
                 [
-                    "drecko",
-                    {
-                        "type": "AND",
-                        "resources": [
-                            { "type": "RESOURCE", "id": "raw_egg", "amount": 1600 },
-                            { "type": "RESOURCE", "id": "egg_shell", "amount": 1 }
-                        ]
-                    }
+                    "glo_squid",
+                    { "type": "RESOURCE", "id": "raw_egg", "amount": 3200 }
                 ],
                 [
-                    "slickster",
-                    {
-                        "type": "AND",
-                        "resources": [
-                            { "type": "RESOURCE", "id": "raw_egg", "amount": 1600 },
-                            { "type": "RESOURCE", "id": "egg_shell", "amount": 1 }
-                        ]
-                    }
-                ],
-                [
-                    "pip",
-                    {
-                        "type": "AND",
-                        "resources": [
-                            { "type": "RESOURCE", "id": "raw_egg", "amount": 1600 },
-                            { "type": "RESOURCE", "id": "egg_shell", "amount": 1 }
-                        ]
-                    }
-                ],
-                [
-                    "pokeshell",
-                    {
-                        "type": "AND",
-                        "resources": [
-                            { "type": "RESOURCE", "id": "raw_egg", "amount": 1600 },
-                            { "type": "RESOURCE", "id": "egg_shell", "amount": 1 }
-                        ]
-                    }
-                ],
-                [
-                    "shove_vole",
-                    {
-                        "type": "AND",
-                        "resources": [
-                            { "type": "RESOURCE", "id": "raw_egg", "amount": 1600 },
-                            { "type": "RESOURCE", "id": "egg_shell", "amount": 1 }
-                        ]
-                    }
-                ],
-                [
-                    "plug_slug",
-                    {
-                        "type": "AND",
-                        "resources": [
-                            { "type": "RESOURCE", "id": "raw_egg", "amount": 1600 },
-                            { "type": "RESOURCE", "id": "egg_shell", "amount": 1 }
-                        ]
-                    }
-                ],
-                [
-                    "divergent",
-                    {
-                        "type": "AND",
-                        "resources": [
-                            { "type": "RESOURCE", "id": "raw_egg", "amount": 1600 },
-                            { "type": "RESOURCE", "id": "egg_shell", "amount": 1 }
-                        ]
-                    }
-                ],
-                [
-                    "flox",
-                    {
-                        "type": "AND",
-                        "resources": [
-                            { "type": "RESOURCE", "id": "raw_egg", "amount": 1600 },
-                            { "type": "RESOURCE", "id": "egg_shell", "amount": 1 }
-                        ]
-                    }
-                ],
-                [
-                    "spigot_seal",
-                    {
-                        "type": "AND",
-                        "resources": [
-                            { "type": "RESOURCE", "id": "raw_egg", "amount": 1600 },
-                            { "type": "RESOURCE", "id": "egg_shell", "amount": 1 }
-                        ]
-                    }
-                ],
-                [
-                    "dartle",
-                    {
-                        "type": "AND",
-                        "resources": [
-                            { "type": "RESOURCE", "id": "raw_egg", "amount": 1600 },
-                            { "type": "RESOURCE", "id": "egg_shell", "amount": 1 }
-                        ]
-                    }
-                ],
-                [
-                    "pacu",
+                    ["jawbo", "orehull"],
                     {
                         "type": "AND",
                         "resources": [
                             { "type": "RESOURCE", "id": "raw_egg", "amount": 3200 },
-                            { "type": "RESOURCE", "id": "egg_shell", "amount": 2000 }
+                            { "type": "RESOURCE", "id": "egg_shell", "amount": 1000 }
                         ]
                     }
                 ],
                 [
-                    "jawbo",
-                    {
-                        "type": "AND",
-                        "resources": [
-                            { "type": "RESOURCE", "id": "raw_egg", "amount": 3200 },
-                            { "type": "RESOURCE", "id": "egg_shell", "amount": 2000 }
-                        ]
-                    }
-                ],
-                [
-                    "bammoth",
-                    {
-                        "type": "AND",
-                        "resources": [
-                            { "type": "RESOURCE", "id": "raw_egg", "amount": 6400 },
-                            { "type": "RESOURCE", "id": "egg_shell", "amount": 4000 }
-                        ]
-                    }
-                ],
-                [
-                    "lumb",
-                    {
-                        "type": "AND",
-                        "resources": [
-                            { "type": "RESOURCE", "id": "raw_egg", "amount": 6400 },
-                            { "type": "RESOURCE", "id": "egg_shell", "amount": 4000 }
-                        ]
-                    }
-                ],
-                [
-                    "rhex",
+                    ["bammoth", "lumb", "rhex"],
                     {
                         "type": "AND",
                         "resources": [

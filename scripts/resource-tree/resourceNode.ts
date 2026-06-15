@@ -24,6 +24,7 @@ export class ResourceNode implements ResourceTree {
         this.amount = amount;
         this.resource = resource;
         this.element = this.createIngredientElement();
+        this.setAmount(amount);
     }
 
     public updateElement(multiplier: Rational, ___: IntermediateConverter) {
@@ -35,8 +36,7 @@ export class ResourceNode implements ResourceTree {
         const unitGroupName = this.resource.unitGroupName;
         this.element.querySelector<HTMLElement>(
             ".converter-ingredient-amount",
-        )!.innerText =
-            `⨉ ${amount.getDecimalString()} ${getUnits(unitGroupName)[1]}`;
+        )!.innerText = `${amount.getDecimalString()} ${getUnits(unitGroupName)[1]}`;
     }
 
     public addResourcesToList(
