@@ -1,6 +1,6 @@
 {
     "templateName": "critter",
-    "displayName": "{Cramped|Cramped }{Mood} {Wild|Wild }{Morph}",
+    "displayName": "{Cramped|Cramped }{Wild|Wild }{Morph} (happiness {Happiness})",
     "thumbName": "Hatch",
     "adultLifespan": 95,
     "morphs": ["Hatch", "Stone Hatch", "Smooth Hatch", "Sage Hatch"],
@@ -58,7 +58,7 @@
                 "type": "SETTING",
                 "name": "Morph",
                 "options": [
-                    [["Sage Hatch"], 1],
+                    ["Sage Hatch", 1],
                     [["Hatch", "Stone Hatch", "Smooth Hatch"], 0]
                 ]
             },
@@ -67,7 +67,10 @@
                 "resources": [
                     { "type": "RESOURCE", "id": "polluted_dirt", "amount": 140 },
                     { "type": "RESOURCE", "id": "slime", "amount": 140 },
-                    { "type": "RESOURCE", "id": "algae", "amount": 140 }
+                    { "type": "RESOURCE", "id": "algae", "amount": 140 },
+                    { "type": "RESOURCE", "id": "corallium", "amount": 140 },
+                    { "type": "RESOURCE", "id": "dirt", "amount": 140 },
+                    { "type": "RESOURCE", "id": "fertilizer", "amount": 140 }
                 ]
             }
         },
@@ -117,7 +120,12 @@
                     [
                         "tungsten",
                         { "type": "RESOURCE", "id": "wolframite", "amount": 100 }
-                    ]
+                    ],
+                    [
+                        "zinc",
+                        { "type": "RESOURCE", "id": "zinc_ore", "amount": 100 }
+                    ],
+                    ["lead", { "type": "RESOURCE", "id": "galena", "amount": 100 }]
                 ]
             }
         }
@@ -129,11 +137,23 @@
                 "type": "SETTING",
                 "name": "Morph",
                 "options": [
-                    [["Hatch", "Stone Hatch", "Sage Hatch"], 1],
-                    ["Smooth Hatch", 0]
+                    [["Hatch", "Stone Hatch"], 1],
+                    [["Smooth Hatch", "Sage Hatch"], 0]
                 ]
             },
             "resource": { "type": "RESOURCE", "id": "coal", "amount": 70 }
+        },
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "SETTING",
+                "name": "Morph",
+                "options": [
+                    ["Sage Hatch", 1],
+                    [["Hatch", "Stone hatch", "Smooth Hatch"], 0]
+                ]
+            },
+            "resource": { "type": "RESOURCE", "id": "coal", "amount": 140 }
         },
         {
             "type": "MULTIPLIER",
@@ -166,11 +186,12 @@
                     [
                         "tungsten",
                         { "type": "RESOURCE", "id": "tungsten", "amount": 75 }
-                    ]
+                    ],
+                    ["zinc", { "type": "RESOURCE", "id": "zinc", "amount": 75 }],
+                    ["lead", { "type": "RESOURCE", "id": "lead", "amount": 75 }]
                 ]
             }
         }
     ],
-    "egg": "hatch_egg",
-    "eggsPerLifespan": 15
+    "egg": "hatch_egg"
 }

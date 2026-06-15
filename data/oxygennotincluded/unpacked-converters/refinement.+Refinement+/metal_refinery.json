@@ -43,6 +43,22 @@
                 ],
                 ["iron", { "type": "RESOURCE", "id": "iron_ore", "amount": 1500 }],
                 [
+                    "zinc",
+                    {
+                        "type": "RESOURCE",
+                        "id": "zinc_ore",
+                        "amount": 1500
+                    }
+                ],
+                [
+                    "lead",
+                    {
+                        "type": "RESOURCE",
+                        "id": "galena",
+                        "amount": 1500
+                    }
+                ],
+                [
                     "steel",
                     {
                         "type": "AND",
@@ -84,6 +100,22 @@
                     { "type": "RESOURCE", "id": "iron", "amount": 1500 }
                 ],
                 ["iron", { "type": "RESOURCE", "id": "iron", "amount": 1500 }],
+                [
+                    "zinc",
+                    {
+                        "type": "RESOURCE",
+                        "id": "zinc",
+                        "amount": 1500
+                    }
+                ],
+                [
+                    "lead",
+                    {
+                        "type": "RESOURCE",
+                        "id": "lead",
+                        "amount": 1500
+                    }
+                ],
                 ["steel", { "type": "RESOURCE", "id": "steel", "amount": 1500 }]
             ]
         }

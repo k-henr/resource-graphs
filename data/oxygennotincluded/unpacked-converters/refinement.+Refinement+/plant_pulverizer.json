@@ -18,9 +18,19 @@
                                         "amount": 30
                                     },
                                     {
-                                        "type": "RESOURCE",
-                                        "id": "water",
-                                        "amount": 270
+                                        "type": "OR",
+                                        "resources": [
+                                            {
+                                                "type": "RESOURCE",
+                                                "id": "water",
+                                                "amount": 270
+                                            },
+                                            {
+                                                "type": "RESOURCE",
+                                                "id": "mucin",
+                                                "amount": 270
+                                            }
+                                        ]
                                     }
                                 ]
                             },
@@ -33,9 +43,19 @@
                                         "amount": 150
                                     },
                                     {
-                                        "type": "RESOURCE",
-                                        "id": "water",
-                                        "amount": 225
+                                        "type": "OR",
+                                        "resources": [
+                                            {
+                                                "type": "RESOURCE",
+                                                "id": "water",
+                                                "amount": 225
+                                            },
+                                            {
+                                                "type": "RESOURCE",
+                                                "id": "mucin",
+                                                "amount": 225
+                                            }
+                                        ]
                                     }
                                 ]
                             },
@@ -48,9 +68,19 @@
                                         "amount": 45
                                     },
                                     {
-                                        "type": "RESOURCE",
-                                        "id": "water",
-                                        "amount": 255
+                                        "type": "OR",
+                                        "resources": [
+                                            {
+                                                "type": "RESOURCE",
+                                                "id": "water",
+                                                "amount": 255
+                                            },
+                                            {
+                                                "type": "RESOURCE",
+                                                "id": "mucin",
+                                                "amount": 255
+                                            }
+                                        ]
                                     }
                                 ]
                             },

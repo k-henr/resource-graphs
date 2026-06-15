@@ -9,7 +9,11 @@
                     "salt_water",
                     { "type": "RESOURCE", "id": "salt_water", "amount": 3000 }
                 ],
-                ["brine", { "type": "RESOURCE", "id": "brine", "amount": 3000 }]
+                ["brine", { "type": "RESOURCE", "id": "brine", "amount": 3000 }],
+                [
+                    "polluted_brine",
+                    { "type": "RESOURCE", "id": "polluted_brine", "amount": 3000 }
+                ]
             ]
         }
     ],
@@ -34,6 +38,20 @@
                         "type": "AND",
                         "resources": [
                             { "type": "RESOURCE", "id": "water", "amount": 2100 },
+                            { "type": "RESOURCE", "id": "salt", "amount": 900 }
+                        ]
+                    }
+                ],
+                [
+                    "polluted_brine",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            {
+                                "type": "RESOURCE",
+                                "id": "polluted_water",
+                                "amount": 2100
+                            },
                             { "type": "RESOURCE", "id": "salt", "amount": 900 }
                         ]
                     }

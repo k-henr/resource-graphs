@@ -16,6 +16,14 @@
                 [
                     "uranium_power_bank",
                     { "type": "RESOURCE", "id": "uranium_ore", "amount": 150 }
+                ],
+                [
+                    "rubber_gasket",
+                    { "type": "RESOURCE", "id": "rubber", "amount": 750 }
+                ],
+                [
+                    "plastic_gasket",
+                    { "type": "RESOURCE", "id": "plastic", "amount": 750 }
                 ]
             ]
         }
@@ -44,6 +52,14 @@
                         "id": "uranium_ore_power_bank",
                         "amount": 1800000
                     }
+                ],
+                [
+                    "rubber_gasket",
+                    { "type": "RESOURCE", "id": "rubber_gasket", "amount": 15 }
+                ],
+                [
+                    "plastic_gasket",
+                    { "type": "RESOURCE", "id": "plastic_gasket", "amount": 15 }
                 ]
             ]
         }

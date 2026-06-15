@@ -12,10 +12,9 @@
         { "type": "TOGGLE", "name": "Wild", "default": false },
         { "type": "TOGGLE", "name": "Cramped", "default": false },
         {
-            "type": "ENUMERATE",
-            "name": "Mood",
-            "options": ["Miserable", "Glum", "Satisfied", "Happy"],
-            "default": "Happy"
+            "type": "NUMBER",
+            "name": "Happiness",
+            "default": 4
         },
         "...TEMPLATE?:additionalSettings"
     ],
@@ -27,13 +26,11 @@
                 "name": "Wild",
                 "true": 0,
                 "false": {
-                    "type": "SETTING",
-                    "name": "Mood",
-                    "options": [
-                        [["Miserable", "Glum"], 0.2],
-                        [["Satisfied", "Happy"], 1]
-                    ],
-                    "default": "Happy"
+                    "type": "THRESHOLD",
+                    "value": { "type": "SETTING", "name": "Happiness" },
+                    "threshold": 0,
+                    "higherOrEqual": 1,
+                    "lower": 0.2
                 }
             },
             "resource": {
@@ -52,29 +49,21 @@
         {
             "type": "MULTIPLIER",
             "multiplier": {
-                "type": "SETTING",
-                "name": "Mood",
-                "options": [
-                    [
-                        ["Miserable", "Glum"],
-                        {
-                            "type": "SETTING",
-                            "name": "Wild",
-                            "true": 0.1,
-                            "false": 0.2
-                        }
-                    ],
-                    [
-                        ["Satisfied", "Happy"],
-                        {
-                            "type": "SETTING",
-                            "name": "Wild",
-                            "true": 0.25,
-                            "false": 1
-                        }
-                    ]
-                ],
-                "default": "Happy"
+                "type": "THRESHOLD",
+                "value": { "type": "SETTING", "name": "Happiness" },
+                "threshold": 0,
+                "higherOrEqual": {
+                    "type": "SETTING",
+                    "name": "Wild",
+                    "true": 0.25,
+                    "false": 1
+                },
+                "lower": {
+                    "type": "SETTING",
+                    "name": "Wild",
+                    "true": 0.1,
+                    "false": 0.2
+                }
             },
             "resource": {
                 "type": "AND",
@@ -93,23 +82,24 @@
                     "name": "Wild",
                     "true": [1, "TEMPLATE:adultLifespan"],
                     "false": {
-                        "type": "SETTING",
-                        "name": "Mood",
-                        "options": [
-                            ["Miserable", 0],
-                            [
-                                "Happy",
-                                [
-                                    "TEMPLATE:eggsPerLifespan",
-                                    "TEMPLATE:adultLifespan"
-                                ]
-                            ],
-                            [
-                                ["Glum", "Satisfied"],
-                                [1, "TEMPLATE:adultLifespan"]
+                        "type": "THRESHOLD",
+                        "value": { "type": "SETTING", "name": "Happiness" },
+                        "threshold": 1,
+                        "lower": [1, "TEMPLATE:adultLifespan"],
+                        "higherOrEqual": {
+                            "type": "ADD",
+                            "values": [
+                                [1, "TEMPLATE:adultLifespan"],
+                                {
+                                    "type": "MUL",
+                                    "values": [
+                                        [1, "TEMPLATE:adultLifespan"],
+                                        2.25,
+                                        { "type": "SETTING", "name": "Happiness" }
+                                    ]
+                                }
                             ]
-                        ],
-                        "default": "Satisfied"
+                        }
                     }
                 }
             },

@@ -762,6 +762,7 @@ Please report this as a bug!`);
     evaluateSettingsTree(treeNode, settings) {
       if (typeof treeNode === "number" || Array.isArray(treeNode))
         return Rational.fromData(treeNode);
+      console.log(treeNode);
       switch (treeNode.type) {
         case "SETTING":
           return this.evaluateSettingsTree(
@@ -796,11 +797,24 @@ Please report this as a bug!`);
           return this.evaluateSettingsTree(treeNode.value1, settings).pow(
             this.evaluateSettingsTree(treeNode.value2, settings)
           );
-        case "CLAMP":
+        case "CLAMP": {
           const lo = this.evaluateSettingsTree(treeNode.low, settings);
           const hi = this.evaluateSettingsTree(treeNode.high, settings);
           const v = this.evaluateSettingsTree(treeNode.value, settings);
           return v.clamp(lo, hi);
+        }
+        case "THRESHOLD": {
+          const v = this.evaluateSettingsTree(treeNode.value, settings);
+          const comp = this.evaluateSettingsTree(treeNode.threshold, settings);
+          if (v.lessThan(comp)) {
+            return this.evaluateSettingsTree(treeNode.lower, settings);
+          } else {
+            return this.evaluateSettingsTree(
+              treeNode.higherOrEqual,
+              settings
+            );
+          }
+        }
         default:
           throw new GraphError(
             `Unknown settings AST node type: ${treeNode.type}!`

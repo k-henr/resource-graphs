@@ -194,7 +194,8 @@ export type SettingsTreeMathNode =
     | SettingsTreeAddNode
     | SettingsTreeSubNode
     | SettingsTreePowNode
-    | SettingsTreeClampNode;
+    | SettingsTreeClampNode
+    | SettingsTreeThresholdNode;
 // Mutliply the given nodes together
 export type SettingsTreeMulNode = {
     type: "MUL";
@@ -223,12 +224,20 @@ export type SettingsTreePowNode = {
     value1: SettingsTreeNode;
     value2: SettingsTreeNode;
 };
-
+// Clamp a node between two other nodes
 export type SettingsTreeClampNode = {
     type: "CLAMP";
     value: SettingsTreeNode;
     low: SettingsTreeNode;
     high: SettingsTreeNode;
+};
+// Choose a branch depending on if the node is higher or lower than another branch
+export type SettingsTreeThresholdNode = {
+    type: "THRESHOLD";
+    value: SettingsTreeNode;
+    threshold: SettingsTreeNode;
+    higherOrEqual: SettingsTreeNode;
+    lower: SettingsTreeNode;
 };
 
 // = = = = = = = = RESOURCES = = = = = = = =
