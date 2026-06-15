@@ -1,0 +1,4 @@
+{
+    "consumes": [{ "type": "RESOURCE", "id": "food", "amount": 92903.23 }],
+    "produces": [{ "type": "RESOURCE", "id": "sap", "amount": 464.52 }]
+}
