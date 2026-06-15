@@ -341,6 +341,9 @@ Please report this as a bug!`);
     getFormattedString(_) {
       return this.selectElement.value;
     }
+    getChosenOption() {
+      return this.selectElement.value;
+    }
   };
 
   // scripts/converter-setting/converterNumberSetting.ts
@@ -445,8 +448,8 @@ Please report this as a bug!`);
       if (!setting) throw new GraphError(`Setting ${node.name} doesn't exist!`);
       return setting.chooseBranch(node);
     }
-    getAllSettings() {
-      throw new ProgramError("Not implemented!");
+    getSetting(name) {
+      return this.settingsLookup.get(name) ?? null;
     }
     parseFormattedString(input) {
       return input.replaceAll(
@@ -620,6 +623,58 @@ Please report this as a bug!`);
         (c) => c.addResourcesToList(output, converter, multiplier)
       );
       return output;
+    }
+  };
+
+  // scripts/resource-tree/branchNode.ts
+  var BranchNode = class {
+    element;
+    settingName;
+    childMap = /* @__PURE__ */ new Map();
+    currentBranch = null;
+    constructor(settingName, children) {
+      this.element = document.createElement("div");
+      this.element.classList.toggle("test-class");
+      this.settingName = settingName;
+      children.map(([name, child]) => {
+        this.element.appendChild(child.element);
+        child.element.classList.add("hidden");
+        if (typeof name === "string") this.childMap.set(name, child);
+        else name.map((n) => this.childMap.set(n, child));
+      });
+    }
+    addResourcesToList(output, converter, multiplier = Rational.one) {
+      const branch = this.getBranch(converter);
+      return branch.addResourcesToList(output, converter, multiplier);
+    }
+    updateElement(multiplier, requestingConverter) {
+      for (const [, value] of this.childMap.entries()) {
+        value.updateElement(multiplier, requestingConverter);
+      }
+      this.currentBranch?.element.classList.add("hidden");
+      const branch = this.getBranch(requestingConverter);
+      branch.element.classList.remove("hidden");
+      this.currentBranch = branch;
+    }
+    getBranch(converter) {
+      const setting = converter.settings.getSetting(this.settingName);
+      if (!setting)
+        throw new GraphError(
+          `Setting "${this.settingName}" not found on converter!`
+        );
+      if (!(setting instanceof ConverterEnumerateSetting)) {
+        throw new GraphError(
+          `The setting "${this.settingName}" isn't of type ENUMERATE, and can't be used in BRANCH nodes!`
+        );
+      }
+      const chosenBranchName = setting.getChosenOption();
+      const branch = this.childMap.get(chosenBranchName);
+      if (!branch) {
+        throw new GraphError(
+          `A BRANCH node is missing a branch associated with the string "${chosenBranchName}"!`
+        );
+      }
+      return branch;
     }
   };
 
@@ -1043,6 +1098,14 @@ Please report this as a bug!`);
           resourceTreeDataToClass(converter, data.resource),
           data.multiplier
         );
+      case "BRANCH":
+        return new BranchNode(
+          data.settingName,
+          data.branches.map(([name, branch]) => [
+            name,
+            resourceTreeDataToClass(converter, branch)
+          ])
+        );
       case "TAG":
         if (!data.tagName)
           throw new ProgramError(
@@ -1104,6 +1167,9 @@ Please report this as a bug!`);
         return output;
       case "ENTANGLED_OR":
         data.resources.map(([, r]) => getAllPossibleResources(r, output));
+        return output;
+      case "BRANCH":
+        data.branches.map(([, r]) => getAllPossibleResources(r, output));
         return output;
     }
   }

@@ -78,4 +78,8 @@ export class ConverterEnumerateSetting extends ConverterSetting {
         // second alternative
         return this.selectElement.value;
     }
+
+    public getChosenOption() {
+        return this.selectElement.value;
+    }
 }

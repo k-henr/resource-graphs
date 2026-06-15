@@ -3,6 +3,7 @@ import { IntermediateConverter } from "./intermediateConverter";
 import { Rational } from "./rational";
 import { Resource } from "./resource";
 import { AndNode } from "./resource-tree/andNode";
+import { BranchNode } from "./resource-tree/branchNode";
 import { EntangledOrNode } from "./resource-tree/entangledOr";
 import { MultiplierNode } from "./resource-tree/multiplierNode";
 import { OrNode } from "./resource-tree/orNode";
@@ -185,6 +186,15 @@ export function resourceTreeDataToClass(
                 data.multiplier,
             );
 
+        case "BRANCH":
+            return new BranchNode(
+                data.settingName,
+                data.branches.map(([name, branch]) => [
+                    name,
+                    resourceTreeDataToClass(converter, branch),
+                ]),
+            );
+
         case "TAG":
             // If this node is reached through "normal" means and not in
             // handleOrInput, it's always a standalone TAG and should therefore
@@ -263,6 +273,9 @@ function getAllPossibleResources(
             return output;
         case "ENTANGLED_OR":
             data.resources.map(([, r]) => getAllPossibleResources(r, output));
+            return output;
+        case "BRANCH":
+            data.branches.map(([, r]) => getAllPossibleResources(r, output));
             return output;
     }
 }

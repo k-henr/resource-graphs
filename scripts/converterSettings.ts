@@ -73,8 +73,8 @@ export class ConverterSettings {
         return setting.chooseBranch(node);
     }
 
-    public getAllSettings(): ConverterSetting[] {
-        throw new ProgramError("Not implemented!");
+    public getSetting(name: string): ConverterSetting | null {
+        return this.settingsLookup.get(name) ?? null;
     }
 
     public parseFormattedString(input: string): string {

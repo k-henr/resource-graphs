@@ -315,7 +315,6 @@ input {
     align-items: center;
 }
 
-.converter-ingredient,
 .converter-select-children,
 .converter-child-list {
     & > *:not(:last-child) {

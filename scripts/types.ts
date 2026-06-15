@@ -84,7 +84,8 @@ export type ResourceTreeDataNode =
     | ResourceTreeDataBooleanNode
     | ResourceTreeDataMultiplierNode
     | ResourceTreeDataTagNode
-    | ResourceTreeDataEntangledOrNode;
+    | ResourceTreeDataEntangledOrNode
+    | ResourceTreeDataBranchNode;
 
 // If I need to reference all types somewhere
 export type ResourceTreeDataType = ResourceTreeData["type"];
@@ -120,6 +121,12 @@ export type ResourceTreeDataMultiplierNode = {
     type: "MULTIPLIER";
     multiplier: SettingsTreeNode;
     resource: ResourceTreeData;
+};
+// Allows a tree to branch in different ways depending on an ENUMERATE setting
+export type ResourceTreeDataBranchNode = {
+    type: "BRANCH";
+    settingName: string;
+    branches: [string | string[], ResourceTreeData][];
 };
 
 // -------- Setting definitions --------
