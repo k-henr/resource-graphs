@@ -25,8 +25,8 @@ Please report this as a bug!`);
 
   // scripts/rational.ts
   var Rational = class _Rational {
-    // Split into "a b/c", "a", "a/b", "a.b" or "a.b c/d", or any negations of
-    // these. Also puts the parts into their respective groups
+    // Split "a b/c", "a", "a/b", "a.b" or "a.b c/d", or any negations of these, into
+    // the correct groups
     static patternMatcher = /^ *(?<NEG>-)? *(?:(?<FULL>\d*?(?:\.\d*)?)) *(?:(?<NUM>\d+) *\/ *(?<DEN>\d+))? *$/;
     // These are just normal numbers atm, do I need bigint?
     numerator;
@@ -55,6 +55,7 @@ Please report this as a bug!`);
       this.numerator = num / common;
       this.denominator = den / common;
     }
+    // Convert a [number, number] list to a rational
     static fromData(data) {
       return typeof data === "number" ? new _Rational(data, 1) : new _Rational(data[0], data[1]);
     }
@@ -103,6 +104,7 @@ Please report this as a bug!`);
         this.denominator * v2.numerator
       );
     }
+    // Raise this number to another number
     pow(v2) {
       if (v2.denominator !== 1)
         throw new GraphError(
@@ -113,16 +115,34 @@ Please report this as a bug!`);
         Math.pow(this.denominator, v2.denominator)
       );
     }
+    // Negate this number
     negate() {
       return new _Rational(-this.numerator, this.denominator);
     }
+    // Get the absolute value of this
     abs() {
+      if (this.denominator < 0 === this.numerator < 0) return this;
       return new _Rational(Math.abs(this.numerator), Math.abs(this.denominator));
     }
+    // Clamp between two values. Equal to median([lo, hi, this]), except that's not
+    // implemented (yet?)
     clamp(lo, hi) {
       if (this.lessThan(lo)) return lo;
       if (this.greaterThan(hi)) return hi;
       return this;
+    }
+    floor() {
+      if (this.denominator === 1) return this;
+      const approximateResult = Math.floor(this.numerator / this.denominator);
+      for (const v of [
+        approximateResult + 1,
+        approximateResult,
+        approximateResult - 1
+      ]) {
+        if (v * this.denominator <= this.numerator && this.numerator < (v + 1) * this.denominator)
+          return new _Rational(v);
+      }
+      return new _Rational(approximateResult);
     }
     equals(v2) {
       return this.numerator === v2.numerator && this.denominator === v2.denominator;
@@ -143,6 +163,7 @@ Please report this as a bug!`);
       rounded = rounded.replace(/\.0*$|(\.\d*?)0+$/, "$1");
       return rounded;
     }
+    // Get as a mixed fraction of the form "whole num/den"
     getMixedFractionString() {
       if (this.numerator === 0) return "0";
       const isNeg = Math.sign(this.numerator) !== Math.sign(this.denominator);
@@ -817,7 +838,6 @@ Please report this as a bug!`);
     evaluateSettingsTree(treeNode, settings) {
       if (typeof treeNode === "number" || Array.isArray(treeNode))
         return Rational.fromData(treeNode);
-      console.log(treeNode);
       switch (treeNode.type) {
         case "SETTING":
           return this.evaluateSettingsTree(
@@ -857,6 +877,12 @@ Please report this as a bug!`);
           const hi = this.evaluateSettingsTree(treeNode.high, settings);
           const v = this.evaluateSettingsTree(treeNode.value, settings);
           return v.clamp(lo, hi);
+        }
+        case "FLOOR": {
+          console.log(treeNode.value);
+          const v = this.evaluateSettingsTree(treeNode.value, settings);
+          console.log(v);
+          return v.floor();
         }
         case "THRESHOLD": {
           const v = this.evaluateSettingsTree(treeNode.value, settings);

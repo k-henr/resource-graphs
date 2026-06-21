@@ -8,8 +8,8 @@ import { RationalNumber } from "./types";
  */
 
 export class Rational {
-    // Split into "a b/c", "a", "a/b", "a.b" or "a.b c/d", or any negations of
-    // these. Also puts the parts into their respective groups
+    // Split "a b/c", "a", "a/b", "a.b" or "a.b c/d", or any negations of these, into
+    // the correct groups
     private static readonly patternMatcher =
         /^ *(?<NEG>-)? *(?:(?<FULL>\d*?(?:\.\d*)?)) *(?:(?<NUM>\d+) *\/ *(?<DEN>\d+))? *$/;
 
@@ -39,7 +39,7 @@ export class Rational {
             den *= factor;
         }
 
-        // Make sure that the num/den don't share a divisor
+        // Make sure that the num/den are as reduced as possible
         function gcd(a: number, b: number): number {
             if (!b) return a;
             return gcd(b, a % b);
@@ -49,6 +49,7 @@ export class Rational {
         this.denominator = den / common;
     }
 
+    // Convert a [number, number] list to a rational
     public static fromData(data: RationalNumber) {
         return typeof data === "number"
             ? new Rational(data, 1)
@@ -111,7 +112,11 @@ export class Rational {
         );
     }
 
+    // Raise this number to another number
     public pow(v2: Rational) {
+        // Since Q^Q !Є Q ((1/2)^(1/2) for example), I'm not sure how to handle this.
+        // Probably by rounding using some kind of extra argument for the needed
+        // precision
         if (v2.denominator !== 1)
             throw new GraphError(
                 "There's currently no support for raising a number to a non-integer!",
@@ -123,21 +128,52 @@ export class Rational {
         );
     }
 
+    // Negate this number
     public negate() {
         return new Rational(-this.numerator, this.denominator);
     }
 
+    // Get the absolute value of this
     public abs() {
+        if (this.denominator < 0 === this.numerator < 0) return this;
         return new Rational(Math.abs(this.numerator), Math.abs(this.denominator));
     }
 
+    // Clamp between two values. Equal to median([lo, hi, this]), except that's not
+    // implemented (yet?)
     public clamp(lo: Rational, hi: Rational) {
         if (this.lessThan(lo)) return lo;
         if (this.greaterThan(hi)) return hi;
         return this;
     }
 
+    public floor() {
+        // Apparently there's no good algorithm for this?? I couldn't find one at
+        // least
+        if (this.denominator === 1) return this;
+        // Approximate result, possibly floating-point-contaminated but probably
+        // within 1 of the correct result
+        const approximateResult = Math.floor(this.numerator / this.denominator);
+
+        // If v = floor(a/b), then v*b <= a < (v+1)*b
+        for (const v of [
+            approximateResult + 1,
+            approximateResult,
+            approximateResult - 1,
+        ]) {
+            if (
+                v * this.denominator <= this.numerator &&
+                this.numerator < (v + 1) * this.denominator
+            )
+                return new Rational(v);
+        }
+
+        // Fallback in case of >1 error. Keep searching outwards instead?
+        return new Rational(approximateResult);
+    }
+
     public equals(v2: Rational) {
+        // Easy enough, rationals are always stored in their most reduced form
         return (
             this.numerator === v2.numerator && this.denominator === v2.denominator
         );
@@ -151,7 +187,7 @@ export class Rational {
     }
 
     public greaterThan(v2: Rational) {
-        // See lessThan
+        // See lessThan. Should possibly implement using equals and lessThan instead?
         const temp =
             this.numerator * v2.denominator > v2.numerator * this.denominator;
         return temp === (this.denominator < 1 === v2.denominator < 1);
@@ -169,6 +205,7 @@ export class Rational {
         return rounded;
     }
 
+    // Get as a mixed fraction of the form "whole num/den"
     public getMixedFractionString(): string {
         if (this.numerator === 0) return "0";
         const isNeg = Math.sign(this.numerator) !== Math.sign(this.denominator);

@@ -202,6 +202,7 @@ export type SettingsTreeMathNode =
     | SettingsTreeSubNode
     | SettingsTreePowNode
     | SettingsTreeClampNode
+    | SettingsTreeFloorNode
     | SettingsTreeThresholdNode;
 // Mutliply the given nodes together
 export type SettingsTreeMulNode = {
@@ -237,6 +238,11 @@ export type SettingsTreeClampNode = {
     value: SettingsTreeNode;
     low: SettingsTreeNode;
     high: SettingsTreeNode;
+};
+// Floor the given value
+export type SettingsTreeFloorNode = {
+    type: "FLOOR";
+    value: SettingsTreeNode;
 };
 // Choose a branch depending on if the node is higher or lower than another branch
 export type SettingsTreeThresholdNode = {

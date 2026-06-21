@@ -1,11 +1,13 @@
 {
     "templateName": "critter",
     "displayName": "{Cramped|Cramped }{Wild|Wild }{Morph} (happiness {Happiness})",
-    "thumbName": "Hatch 2",
-    "adultLifespan": 95,
+    "thumbName": "Hatch",
     "morphs": ["Hatch", "Stone Hatch", "Smooth Hatch", "Sage Hatch"],
     "defaultMorph": "Hatch",
     "caloriesDropped": 3200,
+    "egg": "hatch_egg",
+    "baseReproduction": [1, 60],
+    "adultLifespan": 95,
     "consumeResource": [
         {
             "type": "BRANCH",
@@ -229,6 +231,5 @@
                 ]
             ]
         }
-    ],
-    "egg": "hatch_egg"
+    ]
 }

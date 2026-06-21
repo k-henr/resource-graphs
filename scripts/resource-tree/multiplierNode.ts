@@ -70,8 +70,6 @@ export class MultiplierNode implements ResourceTree {
         if (typeof treeNode === "number" || Array.isArray(treeNode))
             return Rational.fromData(treeNode);
 
-        console.log(treeNode);
-
         switch (treeNode.type) {
             case "SETTING":
                 return this.evaluateSettingsTree(
@@ -117,6 +115,13 @@ export class MultiplierNode implements ResourceTree {
                 const hi = this.evaluateSettingsTree(treeNode.high, settings);
                 const v = this.evaluateSettingsTree(treeNode.value, settings);
                 return v.clamp(lo, hi);
+            }
+
+            case "FLOOR": {
+                console.log(treeNode.value);
+                const v = this.evaluateSettingsTree(treeNode.value, settings);
+                console.log(v);
+                return v.floor();
             }
 
             case "THRESHOLD": {

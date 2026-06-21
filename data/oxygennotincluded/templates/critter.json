@@ -74,34 +74,51 @@
         {
             "type": "MULTIPLIER",
             "multiplier": {
-                "type": "SETTING",
-                "name": "Cramped",
-                "true": 0,
-                "false": {
-                    "type": "SETTING",
-                    "name": "Wild",
-                    "true": [1, "TEMPLATE:adultLifespan"],
-                    "false": {
-                        "type": "THRESHOLD",
-                        "value": { "type": "SETTING", "name": "Happiness" },
-                        "threshold": 1,
-                        "lower": [1, "TEMPLATE:adultLifespan"],
-                        "higherOrEqual": {
-                            "type": "ADD",
-                            "values": [
-                                [1, "TEMPLATE:adultLifespan"],
-                                {
-                                    "type": "MUL",
-                                    "values": [
-                                        [1, "TEMPLATE:adultLifespan"],
-                                        2.25,
-                                        { "type": "SETTING", "name": "Happiness" }
-                                    ]
-                                }
-                            ]
-                        }
+                "type": "DIV",
+                "value1": {
+                    "type": "FLOOR",
+                    "value": {
+                        "type": "MUL",
+                        "values": [
+                            {
+                                "type": "SETTING",
+                                "name": "Cramped",
+                                "true": 0,
+                                "false": 1
+                            },
+                            "TEMPLATE:adultLifespan",
+                            {
+                                "type": "ADD",
+                                "values": [
+                                    "TEMPLATE:baseReproduction",
+                                    {
+                                        "type": "MUL",
+                                        "values": [
+                                            2.25,
+                                            "TEMPLATE:baseReproduction",
+                                            {
+                                                "type": "CLAMP",
+                                                "value": {
+                                                    "type": "SETTING",
+                                                    "name": "Happiness"
+                                                },
+                                                "high": 9999,
+                                                "low": 0
+                                            },
+                                            {
+                                                "type": "SETTING",
+                                                "name": "Wild",
+                                                "true": 0,
+                                                "false": 1
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
                     }
-                }
+                },
+                "value2": "TEMPLATE:adultLifespan"
             },
             "resource": { "type": "RESOURCE", "id": "TEMPLATE:egg", "amount": 1 }
         },
