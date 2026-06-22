@@ -1,7 +1,8 @@
+import { ConverterSettings } from "../converterSettings";
 import { ProgramError } from "../errors";
 import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
-import { ConverterIngredient } from "../types";
+import { ConverterDependency, ConverterIngredient } from "../types";
 import { ResourceTree } from "./resourceTree";
 /**
  * An abtract class used by boolean nodes (AND, OR, ENTANGLED_OR), with some shared
@@ -32,17 +33,13 @@ export abstract class ResourceTreeBoolNode implements ResourceTree {
 
     public abstract addResourcesToList(
         output: ConverterIngredient[],
-        converter: IntermediateConverter,
+        converterDependencies: ConverterDependency[],
+        settings: ConverterSettings,
         multiplier: Rational,
     ): ConverterIngredient[];
 
-    public updateElement(
-        multiplier: Rational,
-        requestingConverter: IntermediateConverter,
-    ) {
+    public updateElement(multiplier: Rational, settings: ConverterSettings) {
         // Update all the children
-        this.children.map((child) =>
-            child.updateElement(multiplier, requestingConverter),
-        );
+        this.children.map((child) => child.updateElement(multiplier, settings));
     }
 }

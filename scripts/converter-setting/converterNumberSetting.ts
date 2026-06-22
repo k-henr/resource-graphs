@@ -13,12 +13,12 @@ export class ConverterNumberSetting extends ConverterSetting {
         name: string,
         defaultValue: Rational,
         unit: string | null,
-        requestingConverter: IntermediateConverter,
+        onchange: (e: Event) => void,
     ) {
         const [settingEl, , input] = ConverterSetting.makeInputElement(
             name,
             unit,
-            requestingConverter,
+            onchange,
         );
         // Add a text input (which will be parsed to a rational) with the correct
         // name and label

@@ -17,11 +17,11 @@ export class ConverterEnumerateSetting extends ConverterSetting {
         name: string,
         defaultOption: string,
         options: string[],
-        requestingConverter: IntermediateConverter,
+        onchange: (e: Event) => void,
     ) {
         const [settingEl, , select] = ConverterSetting.makeSelectElement(
             name,
-            requestingConverter,
+            onchange,
         );
         // Add all the options to the element
         for (const optionName of options) {

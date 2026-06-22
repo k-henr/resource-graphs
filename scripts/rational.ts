@@ -51,9 +51,10 @@ export class Rational {
 
     // Convert a [number, number] list to a rational
     public static fromData(data: RationalNumber) {
-        return typeof data === "number"
-            ? new Rational(data, 1)
-            : new Rational(data[0], data[1]);
+        console.log(data);
+        if (typeof data === "number") return new Rational(data, 1);
+        if (Array.isArray(data)) return new Rational(data[0], data[1]);
+        throw new GraphError(`Incorrect type "${typeof data}" for rational number!`);
     }
 
     // Parse the input from an input element into a rational, or make the input node

@@ -1,8 +1,9 @@
+import { ConverterSettings } from "../converterSettings";
 import { displayErr, ProgramError, UserError } from "../errors";
 import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
 import { Template } from "../template";
-import { ConverterIngredient } from "../types";
+import { ConverterDependency, ConverterIngredient } from "../types";
 import { ResourceTree } from "./resourceTree";
 import { ResourceTreeBoolNode } from "./resourceTreeBoolNode";
 /**
@@ -61,21 +62,13 @@ export class OrNode extends ResourceTreeBoolNode {
             const option = this.children[i];
 
             for (const name of optionList) {
-                console.log("Name: ", name, "| Option:", option);
                 this.optionNameToTreeMap.set(name, option);
                 // Create a wrapper for the option. This wrapper is what's being accessed
                 // in the collapse function, which means that the content of the wrapper
                 // can change without having to make a new collapse function and re-set
                 // the onclick for that element
                 const optionWrapper = OrNode.converterOptionTemplate.cloneElement();
-                console.log(
-                    option.element.querySelector(".converter-ingredient-amount")!
-                        .innerHTML,
-                );
                 const clone = option.element.cloneNode(true) as HTMLElement;
-                console.log(
-                    clone.querySelector(".converter-ingredient-amount")!.innerHTML,
-                );
                 optionWrapper.appendChild(clone);
 
                 // Set a listener for the option wrapper to collapse into it
@@ -142,13 +135,19 @@ export class OrNode extends ResourceTreeBoolNode {
 
     public override addResourcesToList(
         output: ConverterIngredient[],
-        converter: IntermediateConverter,
+        converterDependencies: ConverterDependency[],
+        settings: ConverterSettings,
         multiplier: Rational = Rational.one,
     ): ConverterIngredient[] {
         if (!this.chosenOption)
             throw new UserError(
                 "All OR nodes aren't resolved, please choose an option!",
             );
-        return this.chosenOption.addResourcesToList(output, converter, multiplier);
+        return this.chosenOption.addResourcesToList(
+            output,
+            converterDependencies,
+            settings,
+            multiplier,
+        );
     }
 }

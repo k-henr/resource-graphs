@@ -13,15 +13,11 @@ import { ConverterSetting } from "./converterSetting";
 export class ConverterToggleSetting extends ConverterSetting {
     private inputElement: HTMLInputElement;
 
-    constructor(
-        name: string,
-        defaultValue: boolean,
-        requestingConverter: IntermediateConverter,
-    ) {
+    constructor(name: string, defaultValue: boolean, onchange: (e: Event) => void) {
         const [settingEl, , input] = ConverterSetting.makeInputElement(
             name,
             "",
-            requestingConverter,
+            onchange,
         );
         // Add a toggle box
         input.type = "checkbox";

@@ -1,12 +1,17 @@
 import { Converter } from "./converter";
 import { ConverterSettings } from "./converterSettings";
 import { resourceTreeDataToClass } from "./data";
-import { displayErr, ProgramError } from "./errors";
+import { displayErr, GraphError, ProgramError } from "./errors";
 import { Rational } from "./rational";
 import { EntangledOrNode } from "./resource-tree/entangledOr";
 import { ResourceTree } from "./resource-tree/resourceTree";
 import { Template } from "./template";
-import { ConverterSettingData, ResourceTreeData } from "./types";
+import {
+    ConverterDependency,
+    ConverterIngredient,
+    ConverterSettingData,
+    ResourceTreeData,
+} from "./types";
 /**
  * The class for holding a converter currently being constructed, with ORs and
  * settings. After being contructed in the factory, but before being fully finalized.
@@ -24,7 +29,7 @@ export class IntermediateConverter {
     // (in most cases there'll only be a single group, but I wanted to support more)
     private readonly entangledOrs = new Map<string, EntangledOrNode[]>();
 
-    // todo: back to private after ddebugging
+    // todo: back to private after debugging
     public readonly infoElement: HTMLElement;
 
     // Ingredients and products
@@ -51,7 +56,10 @@ export class IntermediateConverter {
         this.ingredientTree = resourceTreeDataToClass(this, ingredientTree);
         this.productTree = resourceTreeDataToClass(this, productTree);
 
-        this.settings = new ConverterSettings(settingList, this);
+        this.settings = new ConverterSettings(settingList, (e) => {
+            e.preventDefault();
+            this.tryUpdateInfoPanel();
+        });
 
         // Populate the info panel
         this.infoElement = IntermediateConverter.infoTemplate.cloneElement();
@@ -79,16 +87,43 @@ export class IntermediateConverter {
     }
 
     // Returns a finalized converter, provided that all ambiguities are resolved
-    public finalize(): Converter {
-        const ingr = this.ingredientTree.addResourcesToList([], this, Rational.one);
-        const prod = this.productTree.addResourcesToList([], this, Rational.one);
-
+    public makeConverter(
+        ingr: ConverterIngredient[],
+        prod: ConverterIngredient[],
+    ): Converter {
         return new Converter(
             this.formatDisplayName(),
             this.displayImage,
             ingr,
             prod,
         );
+    }
+
+    public addIngredientsToList(
+        ingredientList: ConverterIngredient[],
+        converterDependencyList: ConverterDependency[],
+    ) {
+        return this.ingredientTree.addResourcesToList(
+            ingredientList,
+            converterDependencyList,
+            this.settings,
+            Rational.one,
+        );
+    }
+
+    public addProductsToList(ingredientList: ConverterIngredient[]) {
+        const depList: ConverterDependency[] = [];
+        const l = this.productTree.addResourcesToList(
+            ingredientList,
+            depList,
+            this.settings,
+            Rational.one,
+        );
+        if (depList.length !== 0)
+            throw new GraphError(
+                `${this.thumbName} contains a "CONVERTER" node in the output tree, which is not allowed at this time!`,
+            );
+        return l;
     }
 
     public tryUpdateInfoPanel() {
@@ -103,8 +138,8 @@ export class IntermediateConverter {
     // Update the info display with new settings
     public updateInfoPanel() {
         // Update the trees' elements
-        this.ingredientTree.updateElement(Rational.one, this);
-        this.productTree.updateElement(Rational.one, this);
+        this.ingredientTree.updateElement(Rational.one, this.settings);
+        this.productTree.updateElement(Rational.one, this.settings);
 
         // Update the header
         this.infoElement.querySelector<HTMLElement>(".rc-info-header")!.innerText =

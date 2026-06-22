@@ -1,8 +1,9 @@
 import { ConverterEnumerateSetting } from "../converter-setting/converterEnumerateSetting";
+import { ConverterSettings } from "../converterSettings";
 import { GraphError, ProgramError } from "../errors";
 import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
-import { ConverterIngredient } from "../types";
+import { ConverterDependency, ConverterIngredient } from "../types";
 import { ResourceTree } from "./resourceTree";
 /**
  * A node which chooses between various options depending on a given ENUMERATE
@@ -34,29 +35,32 @@ export class BranchNode implements ResourceTree {
 
     public addResourcesToList(
         output: ConverterIngredient[],
-        converter: IntermediateConverter,
+        converterDependencies: ConverterDependency[],
+        settings: ConverterSettings,
         multiplier: Rational = Rational.one,
     ) {
-        const branch = this.getBranch(converter);
-        return branch!.addResourcesToList(output, converter, multiplier);
+        const branch = this.getBranch(settings);
+        return branch!.addResourcesToList(
+            output,
+            converterDependencies,
+            settings,
+            multiplier,
+        );
     }
 
-    public updateElement(
-        multiplier: Rational,
-        requestingConverter: IntermediateConverter,
-    ): void {
+    public updateElement(multiplier: Rational, settings: ConverterSettings): void {
         for (const [, value] of this.childMap.entries()) {
-            value.updateElement(multiplier, requestingConverter);
+            value.updateElement(multiplier, settings);
         }
         // Update which branch is shown
         this.currentBranch?.element.classList.add("hidden");
-        const branch = this.getBranch(requestingConverter);
+        const branch = this.getBranch(settings);
         branch.element.classList.remove("hidden");
         this.currentBranch = branch;
     }
 
-    private getBranch(converter: IntermediateConverter): ResourceTree {
-        const setting = converter.settings.getSetting(this.settingName);
+    private getBranch(settings: ConverterSettings): ResourceTree {
+        const setting = settings.getSetting(this.settingName);
         if (!setting)
             throw new GraphError(
                 `Setting "${this.settingName}" not found on converter!`,

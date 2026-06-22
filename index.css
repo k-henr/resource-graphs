@@ -240,7 +240,8 @@ main {
     }
 }
 
-#rc-detail-popup {
+#rc-detail-popup,
+#converter-dependency-popup {
     position: fixed;
     top: 50vh;
     left: 50vw;
@@ -494,7 +495,8 @@ input {
         box-shadow: none;
         border: none;
     }
-    #rc-detail-popup {
+    #rc-detail-popup,
+    #converter-dependency-popup {
         width: 90%;
     }
 

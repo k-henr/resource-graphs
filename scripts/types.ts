@@ -1,4 +1,4 @@
-import { IntermediateConverter } from "./intermediateConverter";
+import { ConverterFactory } from "./converterFactory";
 import { Rational } from "./rational";
 import { Resource } from "./resource";
 /**
@@ -56,23 +56,16 @@ export type ConverterData = {
     produces: ResourceTreeData[];
 };
 
-// A type for a factory of a converter, before any settings or ingredient trees are
-// resolved. Stores some basic information for display and filtering. Not a json
-// type!
-export type ConverterFactory = {
-    name: string;
-    image: string;
-    tags: string[];
-    possibleIngredients: Resource[];
-    possibleProducts: Resource[];
-    // todo: switch to using an interface to not mix paradigms?
-    factory: () => IntermediateConverter;
-};
-
 // Used where the resource trees have been flattened. Not a json type!
 export type ConverterIngredient = {
     resource: Resource;
     amount: Rational;
+};
+// Used to say that a converter consumes the resources of a certain number of other
+// converters. Not a json type!
+export type ConverterDependency = {
+    converter: ConverterFactory;
+    amount: SettingsTreeNode;
 };
 
 // -------- Resource tree nodes --------
@@ -80,6 +73,9 @@ export type ConverterIngredient = {
 // Types for representing a resource tree on a converter (either an ingredient tree
 // or a product tree)
 export type ResourceTreeData = ResourceTreeDataLeaf | ResourceTreeDataNode;
+export type ResourceTreeDataLeaf =
+    | ResourceTreeDataResourceNode
+    | ResourceTreeDataConverterNode;
 export type ResourceTreeDataNode =
     | ResourceTreeDataBooleanNode
     | ResourceTreeDataMultiplierNode
@@ -91,8 +87,14 @@ export type ResourceTreeDataNode =
 export type ResourceTreeDataType = ResourceTreeData["type"];
 
 // A leaf node, representing a single resource with a base amount to be used/produced
-export type ResourceTreeDataLeaf = {
+export type ResourceTreeDataResourceNode = {
     type: "RESOURCE";
+    id: string;
+    amount: RationalNumber;
+};
+// Another leaf node, representing a certain amount of another converter's input
+export type ResourceTreeDataConverterNode = {
+    type: "CONVERTER";
     id: string;
     amount: RationalNumber;
 };

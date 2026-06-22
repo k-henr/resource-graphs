@@ -105,7 +105,7 @@ import { Template } from "./scripts/template";
         const cFilter = document.querySelector<HTMLFormElement>(
             "form#converter-filter-form",
         )!;
-        const cSettings = document.querySelector<HTMLElement>(
+        const cSettings = document.querySelector<HTMLFormElement>(
             "#converter-settings-form",
         )!;
         const cSubmit = document.querySelector<HTMLFormElement>(
@@ -117,11 +117,15 @@ import { Template } from "./scripts/template";
         const cFormWrapper = document.querySelector<HTMLElement>(
             "#converter-specific-footer",
         )!;
+        const cDepdendencyPopup = document.querySelector<HTMLElement>(
+            "#converter-dependency-popup",
+        )!;
 
         const converterMenu = new ConverterMenu(
             graph,
             addRcMenuWrapper,
             detailPopup,
+            cDepdendencyPopup,
             cHeader,
             thumbList,
             cFilter,

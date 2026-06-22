@@ -1,8 +1,9 @@
+import { ConverterSettings } from "../converterSettings";
 import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
 import { Resource } from "../resource";
 import { Template } from "../template";
-import { ConverterIngredient } from "../types";
+import { ConverterDependency, ConverterIngredient } from "../types";
 import { getUnits } from "../units";
 import { ResourceTree } from "./resourceTree";
 /**
@@ -27,7 +28,7 @@ export class ResourceNode implements ResourceTree {
         this.setAmount(amount);
     }
 
-    public updateElement(multiplier: Rational, ___: IntermediateConverter) {
+    public updateElement(multiplier: Rational, _: ConverterSettings) {
         // Update the amount on the element
         this.setAmount(this.amount.mul(multiplier));
     }
@@ -41,7 +42,8 @@ export class ResourceNode implements ResourceTree {
 
     public addResourcesToList(
         output: ConverterIngredient[],
-        _: IntermediateConverter,
+        _converterDependencies: ConverterDependency[],
+        _: ConverterSettings,
         multiplier: Rational = Rational.one,
     ) {
         output.push({

@@ -1,6 +1,6 @@
-import { IntermediateConverter } from "../intermediateConverter";
+import { ConverterSettings } from "../converterSettings";
 import { Rational } from "../rational";
-import { ConverterIngredient } from "../types";
+import { ConverterDependency, ConverterIngredient } from "../types";
 /**
  * An interface for a resource tree.
  */
@@ -11,13 +11,11 @@ export interface ResourceTree {
     // Add all resources present in this tree to the given list
     addResourcesToList(
         output: ConverterIngredient[],
-        converter: IntermediateConverter,
+        converterDependencies: ConverterDependency[],
+        settings: ConverterSettings,
         multiplier: Rational,
     ): ConverterIngredient[];
 
     // Get an element representing this resource tree
-    updateElement(
-        multiplier: Rational,
-        requestingConverter: IntermediateConverter,
-    ): void;
+    updateElement(multiplier: Rational, settings: ConverterSettings): void;
 }

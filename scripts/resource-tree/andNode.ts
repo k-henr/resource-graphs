@@ -1,6 +1,7 @@
+import { ConverterSettings } from "../converterSettings";
 import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
-import { ConverterIngredient } from "../types";
+import { ConverterDependency, ConverterIngredient } from "../types";
 import { ResourceTree } from "./resourceTree";
 import { ResourceTreeBoolNode } from "./resourceTreeBoolNode";
 /**
@@ -24,11 +25,17 @@ export class AndNode extends ResourceTreeBoolNode {
 
     public override addResourcesToList(
         output: ConverterIngredient[],
-        converter: IntermediateConverter,
+        converterDependencies: ConverterDependency[],
+        settings: ConverterSettings,
         multiplier: Rational = Rational.one,
     ) {
         this.children.map((c) =>
-            c.addResourcesToList(output, converter, multiplier),
+            c.addResourcesToList(
+                output,
+                converterDependencies,
+                settings,
+                multiplier,
+            ),
         );
         return output;
     }

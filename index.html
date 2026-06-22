@@ -179,6 +179,34 @@
                     </div>
                 </div>
             </div>
+
+            <div id="converter-dependency-popup" class="hidden">
+                <h1>
+                    Resolve ingredients for the consumed
+                    <span id="converter-dependency-name"></span>:
+                </h1>
+                <div id="converter-dependency-tree" class="flex-1"></div>
+                <form
+                    id="converter-dependency-settings-form"
+                    class="popup-form"
+                ></form>
+                <form
+                    class="popup-form"
+                    onsubmit="(event) => event.preventDefault()"
+                >
+                    <div>
+                        Number of converters needed per
+                        <span id="converter-dependency-primary-name"></span>:
+                        <span id="converter-dependency-amount">5</span>
+                    </div>
+                    <button
+                        id="submit-depencency"
+                        class="primary interactive rc-submit-button"
+                    >
+                        Accept
+                    </button>
+                </form>
+            </div>
         </div>
 
         <div id="loading-screen" class="center">

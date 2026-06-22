@@ -2,8 +2,7 @@ import { ConverterEnumerateSetting } from "./converter-setting/converterEnumerat
 import { ConverterNumberSetting } from "./converter-setting/converterNumberSetting";
 import { ConverterSetting } from "./converter-setting/converterSetting";
 import { ConverterToggleSetting } from "./converter-setting/converterToggleSetting";
-import { GraphError, ProgramError } from "./errors";
-import { IntermediateConverter } from "./intermediateConverter";
+import { GraphError } from "./errors";
 import { Rational } from "./rational";
 import {
     ConverterSettingData,
@@ -16,32 +15,35 @@ import {
 
 export class ConverterSettings {
     private settingsLookup = new Map<string, ConverterSetting>();
+    private settings: ConverterSetting[];
+    private onchange: (e: Event) => void;
 
-    // todo: make non-static?
-    private static settingsForm: HTMLFormElement =
-        document.querySelector<HTMLFormElement>("#converter-settings-form")!;
-
-    constructor(
-        settings: ConverterSettingData[],
-        requestingConverter: IntermediateConverter,
-    ) {
-        // (assumes there's only ever one active instance at a time!)
-        ConverterSettings.settingsForm.innerHTML = "";
-
-        // Go through the list and populate the settings form
+    constructor(settings: ConverterSettingData[], onchange: (e: Event) => void) {
+        this.onchange = onchange;
+        this.settings = [];
         for (const data of settings) {
             const setting = ConverterSettings.makeSettingInstance(
                 data,
-                requestingConverter,
+                this.onchange,
             );
-            ConverterSettings.settingsForm.appendChild(setting.getElement());
+            this.settings.push(setting);
             this.settingsLookup.set(data.name, setting);
+        }
+    }
+
+    public populateForm(formEl: HTMLFormElement) {
+        // (assumes there's only ever one active instance at a time!)
+        formEl.innerHTML = "";
+
+        // Go through the list and populate the settings form
+        for (const setting of this.settings) {
+            formEl.appendChild(setting.getElement());
         }
     }
 
     private static makeSettingInstance(
         data: ConverterSettingData,
-        requestingConverter: IntermediateConverter,
+        onchange: (e: Event) => void,
     ): ConverterSetting {
         switch (data.type) {
             case "NUMBER":
@@ -49,20 +51,16 @@ export class ConverterSettings {
                     data.name,
                     Rational.fromData(data.default),
                     data.unit ?? null,
-                    requestingConverter,
+                    onchange,
                 );
             case "TOGGLE":
-                return new ConverterToggleSetting(
-                    data.name,
-                    data.default,
-                    requestingConverter,
-                );
+                return new ConverterToggleSetting(data.name, data.default, onchange);
             case "ENUMERATE":
                 return new ConverterEnumerateSetting(
                     data.name,
                     data.default,
                     data.options,
-                    requestingConverter,
+                    onchange,
                 );
         }
     }
@@ -98,5 +96,69 @@ export class ConverterSettings {
             );
 
         return setting.getFormattedString(args);
+    }
+
+    public evaluateTree(treeNode: SettingsTreeNode): Rational {
+        if (typeof treeNode === "number" || Array.isArray(treeNode))
+            return Rational.fromData(treeNode);
+
+        switch (treeNode.type) {
+            case "SETTING":
+                return this.evaluateTree(this.getBranch(treeNode));
+
+            case "MUL":
+                let p = Rational.one;
+                for (const child of treeNode.values)
+                    p = p.mul(this.evaluateTree(child));
+                return p;
+
+            case "DIV":
+                return this.evaluateTree(treeNode.value1).div(
+                    this.evaluateTree(treeNode.value2),
+                );
+
+            case "ADD":
+                let s = Rational.zero;
+                for (const child of treeNode.values)
+                    s = s.add(this.evaluateTree(child));
+                return s;
+
+            case "SUB":
+                return this.evaluateTree(treeNode.value1).sub(
+                    this.evaluateTree(treeNode.value2),
+                );
+
+            case "POW":
+                return this.evaluateTree(treeNode.value1).pow(
+                    this.evaluateTree(treeNode.value2),
+                );
+
+            case "CLAMP": {
+                const lo = this.evaluateTree(treeNode.low);
+                const hi = this.evaluateTree(treeNode.high);
+                const v = this.evaluateTree(treeNode.value);
+                return v.clamp(lo, hi);
+            }
+
+            case "FLOOR": {
+                const v = this.evaluateTree(treeNode.value);
+                return v.floor();
+            }
+
+            case "THRESHOLD": {
+                const v = this.evaluateTree(treeNode.value);
+                const comp = this.evaluateTree(treeNode.threshold);
+                if (v.lessThan(comp)) {
+                    return this.evaluateTree(treeNode.lower);
+                } else {
+                    return this.evaluateTree(treeNode.higherOrEqual);
+                }
+            }
+
+            default:
+                throw new GraphError(
+                    `Unknown settings AST node type: ${(treeNode as any).type}!`,
+                );
+        }
     }
 }

@@ -1,7 +1,8 @@
+import { ConverterSettings } from "../converterSettings";
 import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
 import { Template } from "../template";
-import { ConverterIngredient } from "../types";
+import { ConverterDependency, ConverterIngredient } from "../types";
 import { ResourceTree } from "./resourceTree";
 /**
  * A node which does nothing. Used in cases where it's needed, such as for completely
@@ -24,14 +25,12 @@ export class NothingNode implements ResourceTree {
         this.element = el;
     }
 
-    public updateElement(
-        _multiplier: Rational,
-        _requestingConverter: IntermediateConverter,
-    ) {}
+    public updateElement(_multiplier: Rational, _settings: ConverterSettings) {}
 
     public addResourcesToList(
         output: ConverterIngredient[],
-        _: IntermediateConverter,
+        _converterDependencies: ConverterDependency[],
+        _settings: ConverterSettings,
     ) {
         return output;
     }

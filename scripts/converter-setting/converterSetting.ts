@@ -37,7 +37,7 @@ export abstract class ConverterSetting {
     protected static makeInputElement(
         name: string,
         unit: string | null,
-        requestingConverter: IntermediateConverter,
+        onchange: (e: Event) => void,
     ): [DocumentFragment, HTMLLabelElement, HTMLInputElement] {
         const settingEl = ConverterSetting.settingInputTemplate.clone();
         const label = settingEl.querySelector<HTMLLabelElement>("label")!;
@@ -49,17 +49,14 @@ export abstract class ConverterSetting {
         input.name = name;
         post.innerText = unit ?? "";
 
-        input.onchange = (event) => {
-            event.preventDefault();
-            requestingConverter.tryUpdateInfoPanel();
-        };
+        input.onchange = onchange;
 
         return [settingEl, label, input];
     }
 
     protected static makeSelectElement(
         name: string,
-        requestingConverter: IntermediateConverter,
+        onchange: (e: Event) => void,
     ): [DocumentFragment, HTMLLabelElement, HTMLSelectElement] {
         const settingEl = ConverterSetting.settingSelectTemplate.clone();
         const label = settingEl.querySelector<HTMLLabelElement>("label")!;
@@ -69,7 +66,7 @@ export abstract class ConverterSetting {
         label.innerText = name;
         input.name = name;
 
-        input.onchange = () => requestingConverter.tryUpdateInfoPanel();
+        input.onchange = onchange;
 
         return [settingEl, label, input];
     }

@@ -57,7 +57,10 @@ Please report this as a bug!`);
     }
     // Convert a [number, number] list to a rational
     static fromData(data) {
-      return typeof data === "number" ? new _Rational(data, 1) : new _Rational(data[0], data[1]);
+      console.log(data);
+      if (typeof data === "number") return new _Rational(data, 1);
+      if (Array.isArray(data)) return new _Rational(data[0], data[1]);
+      throw new GraphError(`Incorrect type "${typeof data}" for rational number!`);
     }
     // Parse the input from an input element into a rational, or make the input node
     // red if unparsable
@@ -290,7 +293,7 @@ Please report this as a bug!`);
     getElement() {
       return this.element;
     }
-    static makeInputElement(name, unit, requestingConverter) {
+    static makeInputElement(name, unit, onchange) {
       const settingEl = _ConverterSetting.settingInputTemplate.clone();
       const label = settingEl.querySelector("label");
       const input = settingEl.querySelector("input");
@@ -299,20 +302,17 @@ Please report this as a bug!`);
       label.innerText = name;
       input.name = name;
       post.innerText = unit ?? "";
-      input.onchange = (event) => {
-        event.preventDefault();
-        requestingConverter.tryUpdateInfoPanel();
-      };
+      input.onchange = onchange;
       return [settingEl, label, input];
     }
-    static makeSelectElement(name, requestingConverter) {
+    static makeSelectElement(name, onchange) {
       const settingEl = _ConverterSetting.settingSelectTemplate.clone();
       const label = settingEl.querySelector("label");
       const input = settingEl.querySelector("select");
       label.htmlFor = name;
       label.innerText = name;
       input.name = name;
-      input.onchange = () => requestingConverter.tryUpdateInfoPanel();
+      input.onchange = onchange;
       return [settingEl, label, input];
     }
   };
@@ -320,10 +320,10 @@ Please report this as a bug!`);
   // scripts/converter-setting/converterEnumerateSetting.ts
   var ConverterEnumerateSetting = class extends ConverterSetting {
     selectElement;
-    constructor(name, defaultOption, options, requestingConverter) {
+    constructor(name, defaultOption, options, onchange) {
       const [settingEl, , select] = ConverterSetting.makeSelectElement(
         name,
-        requestingConverter
+        onchange
       );
       for (const optionName of options) {
         const optionEl = document.createElement("option");
@@ -370,11 +370,11 @@ Please report this as a bug!`);
   // scripts/converter-setting/converterNumberSetting.ts
   var ConverterNumberSetting = class extends ConverterSetting {
     inputElement;
-    constructor(name, defaultValue, unit, requestingConverter) {
+    constructor(name, defaultValue, unit, onchange) {
       const [settingEl, , input] = ConverterSetting.makeInputElement(
         name,
         unit,
-        requestingConverter
+        onchange
       );
       input.type = "text";
       input.value = defaultValue.getMixedFractionString();
@@ -396,11 +396,11 @@ Please report this as a bug!`);
   // scripts/converter-setting/converterToggleSetting.ts
   var ConverterToggleSetting = class extends ConverterSetting {
     inputElement;
-    constructor(name, defaultValue, requestingConverter) {
+    constructor(name, defaultValue, onchange) {
       const [settingEl, , input] = ConverterSetting.makeInputElement(
         name,
         "",
-        requestingConverter
+        onchange
       );
       input.type = "checkbox";
       input.checked = defaultValue;
@@ -427,40 +427,43 @@ Please report this as a bug!`);
   // scripts/converterSettings.ts
   var ConverterSettings = class _ConverterSettings {
     settingsLookup = /* @__PURE__ */ new Map();
-    // todo: make non-static?
-    static settingsForm = document.querySelector("#converter-settings-form");
-    constructor(settings, requestingConverter) {
-      _ConverterSettings.settingsForm.innerHTML = "";
+    settings;
+    onchange;
+    constructor(settings, onchange) {
+      this.onchange = onchange;
+      this.settings = [];
       for (const data of settings) {
         const setting = _ConverterSettings.makeSettingInstance(
           data,
-          requestingConverter
+          this.onchange
         );
-        _ConverterSettings.settingsForm.appendChild(setting.getElement());
+        this.settings.push(setting);
         this.settingsLookup.set(data.name, setting);
       }
     }
-    static makeSettingInstance(data, requestingConverter) {
+    populateForm(formEl) {
+      formEl.innerHTML = "";
+      for (const setting of this.settings) {
+        formEl.appendChild(setting.getElement());
+      }
+    }
+    static makeSettingInstance(data, onchange) {
       switch (data.type) {
         case "NUMBER":
           return new ConverterNumberSetting(
             data.name,
             Rational.fromData(data.default),
             data.unit ?? null,
-            requestingConverter
+            onchange
           );
         case "TOGGLE":
-          return new ConverterToggleSetting(
-            data.name,
-            data.default,
-            requestingConverter
-          );
+          return new ConverterToggleSetting(data.name, data.default, onchange);
         case "ENUMERATE":
           return new ConverterEnumerateSetting(
             data.name,
             data.default,
             data.options,
-            requestingConverter
+            onchange
           );
       }
     }
@@ -489,6 +492,59 @@ Please report this as a bug!`);
         );
       return setting.getFormattedString(args);
     }
+    evaluateTree(treeNode) {
+      if (typeof treeNode === "number" || Array.isArray(treeNode))
+        return Rational.fromData(treeNode);
+      switch (treeNode.type) {
+        case "SETTING":
+          return this.evaluateTree(this.getBranch(treeNode));
+        case "MUL":
+          let p = Rational.one;
+          for (const child of treeNode.values)
+            p = p.mul(this.evaluateTree(child));
+          return p;
+        case "DIV":
+          return this.evaluateTree(treeNode.value1).div(
+            this.evaluateTree(treeNode.value2)
+          );
+        case "ADD":
+          let s = Rational.zero;
+          for (const child of treeNode.values)
+            s = s.add(this.evaluateTree(child));
+          return s;
+        case "SUB":
+          return this.evaluateTree(treeNode.value1).sub(
+            this.evaluateTree(treeNode.value2)
+          );
+        case "POW":
+          return this.evaluateTree(treeNode.value1).pow(
+            this.evaluateTree(treeNode.value2)
+          );
+        case "CLAMP": {
+          const lo = this.evaluateTree(treeNode.low);
+          const hi = this.evaluateTree(treeNode.high);
+          const v = this.evaluateTree(treeNode.value);
+          return v.clamp(lo, hi);
+        }
+        case "FLOOR": {
+          const v = this.evaluateTree(treeNode.value);
+          return v.floor();
+        }
+        case "THRESHOLD": {
+          const v = this.evaluateTree(treeNode.value);
+          const comp = this.evaluateTree(treeNode.threshold);
+          if (v.lessThan(comp)) {
+            return this.evaluateTree(treeNode.lower);
+          } else {
+            return this.evaluateTree(treeNode.higherOrEqual);
+          }
+        }
+        default:
+          throw new GraphError(
+            `Unknown settings AST node type: ${treeNode.type}!`
+          );
+      }
+    }
   };
 
   // scripts/intermediateConverter.ts
@@ -502,7 +558,7 @@ Please report this as a bug!`);
     // name
     // (in most cases there'll only be a single group, but I wanted to support more)
     entangledOrs = /* @__PURE__ */ new Map();
-    // todo: back to private after ddebugging
+    // todo: back to private after debugging
     infoElement;
     // Ingredients and products
     ingredientTree;
@@ -516,7 +572,10 @@ Please report this as a bug!`);
       this.displayImage = displayImage;
       this.ingredientTree = resourceTreeDataToClass(this, ingredientTree);
       this.productTree = resourceTreeDataToClass(this, productTree);
-      this.settings = new ConverterSettings(settingList, this);
+      this.settings = new ConverterSettings(settingList, (e) => {
+        e.preventDefault();
+        this.tryUpdateInfoPanel();
+      });
       this.infoElement = _IntermediateConverter.infoTemplate.cloneElement();
       this.infoElement.querySelector(".c-info-ingredients").appendChild(this.ingredientTree.element);
       this.infoElement.querySelector(".c-info-products").appendChild(this.productTree.element);
@@ -528,15 +587,35 @@ Please report this as a bug!`);
       return this.settings.parseFormattedString(this.displayName);
     }
     // Returns a finalized converter, provided that all ambiguities are resolved
-    finalize() {
-      const ingr = this.ingredientTree.addResourcesToList([], this, Rational.one);
-      const prod = this.productTree.addResourcesToList([], this, Rational.one);
+    makeConverter(ingr, prod) {
       return new Converter(
         this.formatDisplayName(),
         this.displayImage,
         ingr,
         prod
       );
+    }
+    addIngredientsToList(ingredientList, converterDependencyList) {
+      return this.ingredientTree.addResourcesToList(
+        ingredientList,
+        converterDependencyList,
+        this.settings,
+        Rational.one
+      );
+    }
+    addProductsToList(ingredientList) {
+      const depList = [];
+      const l = this.productTree.addResourcesToList(
+        ingredientList,
+        depList,
+        this.settings,
+        Rational.one
+      );
+      if (depList.length !== 0)
+        throw new GraphError(
+          `${this.thumbName} contains a "CONVERTER" node in the output tree, which is not allowed at this time!`
+        );
+      return l;
     }
     tryUpdateInfoPanel() {
       try {
@@ -548,8 +627,8 @@ Please report this as a bug!`);
     }
     // Update the info display with new settings
     updateInfoPanel() {
-      this.ingredientTree.updateElement(Rational.one, this);
-      this.productTree.updateElement(Rational.one, this);
+      this.ingredientTree.updateElement(Rational.one, this.settings);
+      this.productTree.updateElement(Rational.one, this.settings);
       this.infoElement.querySelector(".rc-info-header").innerText = this.formatDisplayName();
     }
     registerEntangledOr(name, node) {
@@ -576,6 +655,86 @@ Please report this as a bug!`);
       const ors = this.entangledOrs.get(entangledOrName);
       if (!ors) return;
       for (const node of ors) node.chooseOption(optionName);
+    }
+  };
+
+  // scripts/converterFactory.ts
+  var ConverterFactory = class _ConverterFactory {
+    displayName;
+    thumbName;
+    displayImage;
+    ingredientTreeData;
+    productTreeData;
+    settings;
+    // Used for filtering
+    tags;
+    possibleIngredients = [];
+    possibleProducts = [];
+    constructor(displayName, thumbName, displayImage, tags, settings, ingredientTreeData, productTreeData) {
+      this.displayName = displayName;
+      this.thumbName = thumbName;
+      this.displayImage = displayImage;
+      this.tags = tags;
+      this.settings = settings;
+      this.ingredientTreeData = ingredientTreeData;
+      this.productTreeData = productTreeData;
+      _ConverterFactory.getAllPossibleResources(
+        ingredientTreeData,
+        this.possibleIngredients
+      );
+      _ConverterFactory.getAllPossibleResources(
+        productTreeData,
+        this.possibleProducts
+      );
+    }
+    factory() {
+      try {
+        return new IntermediateConverter(
+          this.displayName,
+          this.thumbName,
+          this.displayImage,
+          this.settings ?? [],
+          this.ingredientTreeData,
+          this.productTreeData
+        );
+      } catch (e) {
+        displayErr(e);
+        throw e;
+      }
+    }
+    static getAllPossibleResources(data, output) {
+      switch (data.type) {
+        case "RESOURCE":
+          output.push(getResource(data.id));
+          return output;
+        case "CONVERTER":
+          return output;
+        // Does not recursively search through converters :cry:
+        case "AND":
+        case "OR":
+          data.resources.map((el) => this.getAllPossibleResources(el, output));
+          return output;
+        case "MULTIPLIER":
+          return this.getAllPossibleResources(data.resource, output);
+        case "TAG":
+          if (!data.tagName)
+            throw new GraphError(
+              "A TAG node is missing its tagName attribute!"
+            );
+          const resources = getResourcesWithTags(data.tagName);
+          for (const [, r] of resources) output.push(r);
+          return output;
+        case "ENTANGLED_OR":
+          data.resources.map(
+            ([, r]) => this.getAllPossibleResources(r, output)
+          );
+          return output;
+        case "BRANCH":
+          data.branches.map(
+            ([, r]) => this.getAllPossibleResources(r, output)
+          );
+          return output;
+      }
     }
   };
 
@@ -622,10 +781,8 @@ Please report this as a bug!`);
         "Child not found in boolean node when trying to replace it!"
       );
     }
-    updateElement(multiplier, requestingConverter) {
-      this.children.map(
-        (child) => child.updateElement(multiplier, requestingConverter)
-      );
+    updateElement(multiplier, settings) {
+      this.children.map((child) => child.updateElement(multiplier, settings));
     }
   };
 
@@ -639,9 +796,14 @@ Please report this as a bug!`);
       this.children.map((child) => andEl.appendChild(child.element));
       this.element = andEl;
     }
-    addResourcesToList(output, converter, multiplier = Rational.one) {
+    addResourcesToList(output, converterDependencies, settings, multiplier = Rational.one) {
       this.children.map(
-        (c) => c.addResourcesToList(output, converter, multiplier)
+        (c) => c.addResourcesToList(
+          output,
+          converterDependencies,
+          settings,
+          multiplier
+        )
       );
       return output;
     }
@@ -664,21 +826,26 @@ Please report this as a bug!`);
         else name.map((n) => this.childMap.set(n, child));
       });
     }
-    addResourcesToList(output, converter, multiplier = Rational.one) {
-      const branch = this.getBranch(converter);
-      return branch.addResourcesToList(output, converter, multiplier);
+    addResourcesToList(output, converterDependencies, settings, multiplier = Rational.one) {
+      const branch = this.getBranch(settings);
+      return branch.addResourcesToList(
+        output,
+        converterDependencies,
+        settings,
+        multiplier
+      );
     }
-    updateElement(multiplier, requestingConverter) {
+    updateElement(multiplier, settings) {
       for (const [, value] of this.childMap.entries()) {
-        value.updateElement(multiplier, requestingConverter);
+        value.updateElement(multiplier, settings);
       }
       this.currentBranch?.element.classList.add("hidden");
-      const branch = this.getBranch(requestingConverter);
+      const branch = this.getBranch(settings);
       branch.element.classList.remove("hidden");
       this.currentBranch = branch;
     }
-    getBranch(converter) {
-      const setting = converter.settings.getSetting(this.settingName);
+    getBranch(settings) {
+      const setting = settings.getSetting(this.settingName);
       if (!setting)
         throw new GraphError(
           `Setting "${this.settingName}" not found on converter!`
@@ -696,6 +863,43 @@ Please report this as a bug!`);
         );
       }
       return branch;
+    }
+  };
+
+  // scripts/resource-tree/converterNode.ts
+  var ConverterNode = class _ConverterNode {
+    amount;
+    converter;
+    element;
+    // Template for a resource element
+    static converterIngredientTemplate = new Template(
+      "converter-ingredient-template"
+    );
+    constructor(converterFactory, amount) {
+      this.amount = amount;
+      this.converter = converterFactory;
+      this.element = this.createIngredientElement();
+      this.setAmount(Rational.one);
+    }
+    updateElement(_multiplier, _settings) {
+    }
+    setAmount(amount) {
+      this.element.querySelector(
+        ".converter-ingredient-amount"
+      ).innerText = amount.getDecimalString();
+    }
+    addResourcesToList(output, converterDependencies, _settings, multiplier = Rational.one) {
+      converterDependencies.push({
+        converter: this.converter,
+        amount: { type: "MUL", values: [multiplier.getList(), this.amount] }
+      });
+      return output;
+    }
+    createIngredientElement() {
+      const el = _ConverterNode.converterIngredientTemplate.cloneElement();
+      el.querySelector(".converter-ingredient-name").innerText = this.converter.displayName;
+      el.querySelector(".converter-ingredient-image").src = this.converter.displayImage;
+      return el;
     }
   };
 
@@ -733,16 +937,9 @@ Please report this as a bug!`);
         const optionList = typeof optionName === "string" ? [optionName] : optionName;
         const option = this.children[i];
         for (const name of optionList) {
-          console.log("Name: ", name, "| Option:", option);
           this.optionNameToTreeMap.set(name, option);
           const optionWrapper = _OrNode.converterOptionTemplate.cloneElement();
-          console.log(
-            option.element.querySelector(".converter-ingredient-amount").innerHTML
-          );
           const clone = option.element.cloneNode(true);
-          console.log(
-            clone.querySelector(".converter-ingredient-amount").innerHTML
-          );
           optionWrapper.appendChild(clone);
           optionWrapper.onclick = () => {
             try {
@@ -772,12 +969,17 @@ Please report this as a bug!`);
       this.chosenOption = chosenOption;
       this.thisElement.replaceWith(chosenOption.element);
     }
-    addResourcesToList(output, converter, multiplier = Rational.one) {
+    addResourcesToList(output, converterDependencies, settings, multiplier = Rational.one) {
       if (!this.chosenOption)
         throw new UserError(
           "All OR nodes aren't resolved, please choose an option!"
         );
-      return this.chosenOption.addResourcesToList(output, converter, multiplier);
+      return this.chosenOption.addResourcesToList(
+        output,
+        converterDependencies,
+        settings,
+        multiplier
+      );
     }
   };
 
@@ -814,93 +1016,26 @@ Please report this as a bug!`);
       this.element = document.createElement("div");
       this.element.appendChild(this.resource.element);
     }
-    updateElement(multiplier, requestingConverter) {
-      const newMultiplier = this.evaluateSettingsTree(
-        this.multiplierAst,
-        requestingConverter.settings
-      );
+    updateElement(multiplier, settings) {
+      const newMultiplier = settings.evaluateTree(this.multiplierAst);
       multiplier = multiplier.mul(newMultiplier);
       if (multiplier.equals(Rational.zero)) {
         this.element.classList.add("hidden");
       } else {
         this.element.classList.remove("hidden");
-        this.resource.updateElement(multiplier, requestingConverter);
+        this.resource.updateElement(multiplier, settings);
       }
     }
-    addResourcesToList(output, converter, multiplier) {
-      multiplier = multiplier.mul(
-        this.evaluateSettingsTree(this.multiplierAst, converter.settings)
-      );
+    addResourcesToList(output, converterDependencies, settings, multiplier) {
+      multiplier = multiplier.mul(settings.evaluateTree(this.multiplierAst));
       if (multiplier.equals(Rational.zero)) return output;
-      this.resource.addResourcesToList(output, converter, multiplier);
+      this.resource.addResourcesToList(
+        output,
+        converterDependencies,
+        settings,
+        multiplier
+      );
       return output;
-    }
-    evaluateSettingsTree(treeNode, settings) {
-      if (typeof treeNode === "number" || Array.isArray(treeNode))
-        return Rational.fromData(treeNode);
-      switch (treeNode.type) {
-        case "SETTING":
-          return this.evaluateSettingsTree(
-            settings.getBranch(treeNode),
-            settings
-          );
-        case "MUL":
-          let p = Rational.one;
-          for (const child of treeNode.values)
-            p = p.mul(this.evaluateSettingsTree(child, settings));
-          return p;
-        case "DIV":
-          console.log(
-            "Value 1:",
-            treeNode.value1,
-            "| Value 2:",
-            treeNode.value2
-          );
-          return this.evaluateSettingsTree(treeNode.value1, settings).div(
-            this.evaluateSettingsTree(treeNode.value2, settings)
-          );
-        case "ADD":
-          let s = Rational.zero;
-          for (const child of treeNode.values)
-            s = s.add(this.evaluateSettingsTree(child, settings));
-          return s;
-        case "SUB":
-          return this.evaluateSettingsTree(treeNode.value1, settings).sub(
-            this.evaluateSettingsTree(treeNode.value2, settings)
-          );
-        case "POW":
-          return this.evaluateSettingsTree(treeNode.value1, settings).pow(
-            this.evaluateSettingsTree(treeNode.value2, settings)
-          );
-        case "CLAMP": {
-          const lo = this.evaluateSettingsTree(treeNode.low, settings);
-          const hi = this.evaluateSettingsTree(treeNode.high, settings);
-          const v = this.evaluateSettingsTree(treeNode.value, settings);
-          return v.clamp(lo, hi);
-        }
-        case "FLOOR": {
-          console.log(treeNode.value);
-          const v = this.evaluateSettingsTree(treeNode.value, settings);
-          console.log(v);
-          return v.floor();
-        }
-        case "THRESHOLD": {
-          const v = this.evaluateSettingsTree(treeNode.value, settings);
-          const comp = this.evaluateSettingsTree(treeNode.threshold, settings);
-          if (v.lessThan(comp)) {
-            return this.evaluateSettingsTree(treeNode.lower, settings);
-          } else {
-            return this.evaluateSettingsTree(
-              treeNode.higherOrEqual,
-              settings
-            );
-          }
-        }
-        default:
-          throw new GraphError(
-            `Unknown settings AST node type: ${treeNode.type}!`
-          );
-      }
     }
   };
 
@@ -970,7 +1105,7 @@ Please report this as a bug!`);
       this.element = this.createIngredientElement();
       this.setAmount(amount);
     }
-    updateElement(multiplier, ___) {
+    updateElement(multiplier, _) {
       this.setAmount(this.amount.mul(multiplier));
     }
     setAmount(amount) {
@@ -979,7 +1114,7 @@ Please report this as a bug!`);
         ".converter-ingredient-amount"
       ).innerText = `${amount.getDecimalString()} ${getUnits(unitGroupName)[1]}`;
     }
-    addResourcesToList(output, _, multiplier = Rational.one) {
+    addResourcesToList(output, _converterDependencies, _, multiplier = Rational.one) {
       output.push({
         resource: this.resource,
         amount: this.amount.mul(multiplier)
@@ -1056,30 +1191,20 @@ Please report this as a bug!`);
       );
     const json = await res.json();
     for (const data of json) {
-      const possibleIngr = getAllPossibleResources(andWrap(data.consumes), []);
-      const possibleProd = getAllPossibleResources(andWrap(data.produces), []);
-      loadedConverterFactories.set(data.id, {
-        name: data.thumbName ?? data.displayName,
-        image: getSrc(data.displayImage),
-        tags: data.tags ?? [],
-        possibleIngredients: possibleIngr,
-        possibleProducts: possibleProd,
-        factory: () => {
-          try {
-            return new IntermediateConverter(
-              data.displayName,
-              data.thumbName ?? data.displayName,
-              getSrc(data.displayImage),
-              data.settings ?? [],
-              andWrap(data.consumes),
-              andWrap(data.produces)
-            );
-          } catch (e) {
-            displayErr(e);
-            throw e;
-          }
-        }
-      });
+      const andWrappedIngr = andWrap(data.consumes);
+      const andWrappedProd = andWrap(data.produces);
+      loadedConverterFactories.set(
+        data.id,
+        new ConverterFactory(
+          data.displayName,
+          data.thumbName ?? data.displayName,
+          getSrc(data.displayImage),
+          data.tags ?? [],
+          data.settings,
+          andWrappedIngr,
+          andWrappedProd
+        )
+      );
     }
   }
   function resourceTreeDataToClass(converter, data) {
@@ -1089,6 +1214,13 @@ Please report this as a bug!`);
           getResource(data.id),
           Rational.fromData(data.amount)
         );
+      case "CONVERTER":
+        const conFact = getConverterFactory(data.id);
+        if (!conFact)
+          throw new GraphError(
+            `Couldn't find converter factory with id "${data.id}"!`
+          );
+        return new ConverterNode(conFact, data.amount);
       case "AND":
         return new AndNode(
           data.resources.map((c) => resourceTreeDataToClass(converter, c))
@@ -1174,36 +1306,14 @@ Please report this as a bug!`);
   function andWrap(r) {
     return { type: "AND", resources: r };
   }
-  function getAllPossibleResources(data, output) {
-    switch (data.type) {
-      case "RESOURCE":
-        output.push(getResource(data.id));
-        return output;
-      case "AND":
-      case "OR":
-        data.resources.map((el) => getAllPossibleResources(el, output));
-        return output;
-      case "MULTIPLIER":
-        return getAllPossibleResources(data.resource, output);
-      case "TAG":
-        if (!data.tagName)
-          throw new GraphError("A TAG node is missing its tagName attribute!");
-        const resources = getResourcesWithTags(data.tagName);
-        for (const [, r] of resources) output.push(r);
-        return output;
-      case "ENTANGLED_OR":
-        data.resources.map(([, r]) => getAllPossibleResources(r, output));
-        return output;
-      case "BRANCH":
-        data.branches.map(([, r]) => getAllPossibleResources(r, output));
-        return output;
-    }
+  function getConverterFactory(id) {
+    return loadedConverterFactories.get(id);
   }
   function getConverterFactoriesWithFilters(searchString = "", anyResourceProduced = [], anyResourceConsumed = []) {
     const list = loadedConverterFactories.entries();
     const output = [];
     for (const [id, c] of list) {
-      if (searchString && !c.name.toLowerCase().includes(searchString.toLowerCase()))
+      if (searchString && !c.thumbName.toLowerCase().includes(searchString.toLowerCase()))
         continue;
       let consumesPasses = anyResourceConsumed.length == 0;
       for (const consFilter of anyResourceConsumed) {
@@ -1468,14 +1578,14 @@ Please report this as a bug!`);
   // scripts/converterMenu.ts
   var ConverterMenu = class extends SubmitMenu {
     amountInput;
-    resourceBeingRequested = null;
-    amountOfResourceBeingRequested = Rational.zero;
+    dependencyPopup;
+    resourceRequest = null;
     searchString = "";
     // Since settings can be changed, which requires a converter and not a factory,
     // intermediate converter storage is required
-    intermediateConverter = null;
+    converterInProgress = null;
     converterSettingsForm;
-    constructor(graph, menuElement, detailPopup, headerElement, thumbList, filterForm, converterForm, converterSettingsForm, amountInput, infoPanel, showOnOpen, openButton, closeButton, closeDetailButton) {
+    constructor(graph, menuElement, detailPopup, depdendencyPopup, headerElement, thumbList, filterForm, converterForm, converterSettingsForm, amountInput, infoPanel, showOnOpen, openButton, closeButton, closeDetailButton) {
       super(
         graph,
         menuElement,
@@ -1490,12 +1600,102 @@ Please report this as a bug!`);
         closeButton,
         closeDetailButton
       );
+      this.dependencyPopup = depdendencyPopup;
       this.amountInput = amountInput;
       this.converterSettingsForm = converterSettingsForm;
     }
     onSubmit() {
-      if (!this.intermediateConverter) return;
-      const converter = this.intermediateConverter.finalize();
+      if (!this.converterInProgress)
+        throw new ProgramError(
+          "Tried to submit converter form when no converter was being constructed!"
+        );
+      this.converterInProgress.converter.addIngredientsToList(
+        this.converterInProgress.ingredients,
+        this.converterInProgress.unresolvedDependencies
+      );
+      this.converterInProgress.converter.addProductsToList(
+        this.converterInProgress.products
+      );
+      this.closeDetailPopup();
+      this.resolveConverterDependency();
+    }
+    resolveConverterDependency() {
+      if (!this.converterInProgress)
+        throw new ProgramError(
+          "Tried to resolve converter dependencies when no converter was being constructed!"
+        );
+      if (this.converterInProgress.unresolvedDependencies.length === 0) {
+        this.finalizeConverter();
+        this.close();
+        return;
+      }
+      const dependency = this.converterInProgress.unresolvedDependencies.pop();
+      this.openDependencyPopup();
+      this.dependencyPopup.querySelector(
+        "#converter-dependency-name"
+      ).innerText = dependency.converter.thumbName;
+      this.dependencyPopup.querySelector(
+        "#converter-dependency-primary-name"
+      ).innerText = this.converterInProgress.converter.thumbName;
+      const ingredientTree = resourceTreeDataToClass(
+        this.converterInProgress.converter,
+        dependency.converter.ingredientTreeData
+      );
+      const dependencyAmountEl = this.dependencyPopup.querySelector(
+        "#converter-dependency-amount"
+      );
+      const dependencySettings = new ConverterSettings(
+        dependency.converter.settings,
+        () => {
+          const amount2 = dependencySettings.evaluateTree(dependency.amount);
+          ingredientTree.updateElement(amount2, dependencySettings);
+          dependencyAmountEl.innerText = amount2.getDecimalString();
+        }
+      );
+      const amount = dependencySettings.evaluateTree(dependency.amount);
+      ingredientTree.updateElement(amount, dependencySettings);
+      dependencyAmountEl.innerText = amount.getDecimalString();
+      dependencySettings.populateForm(
+        this.dependencyPopup.querySelector(
+          "#converter-dependency-settings-form"
+        )
+      );
+      const treeContainer = this.dependencyPopup.querySelector(
+        "#converter-dependency-tree"
+      );
+      treeContainer.innerHTML = "";
+      treeContainer.appendChild(ingredientTree.element);
+      const submitBtn = this.dependencyPopup.querySelector("#submit-depencency");
+      submitBtn.onclick = () => {
+        try {
+          if (!this.converterInProgress)
+            throw new ProgramError(
+              "Tried to resolve a converter dependency while no converter was being constructed!"
+            );
+          ingredientTree.addResourcesToList(
+            this.converterInProgress.ingredients,
+            this.converterInProgress.unresolvedDependencies,
+            dependencySettings,
+            dependencySettings.evaluateTree(dependency.amount)
+          );
+          submitBtn.onclick = null;
+          this.closeDependencyPopup();
+          this.resolveConverterDependency();
+        } catch (e) {
+          displayErr(e);
+          throw e;
+        }
+      };
+    }
+    finalizeConverter() {
+      if (!this.converterInProgress)
+        throw new ProgramError(
+          "Tried to finalize converter dependencies when no converter was being constructed!"
+        );
+      const converter = this.converterInProgress.converter.makeConverter(
+        this.converterInProgress.ingredients,
+        this.converterInProgress.products
+      );
       const amount = this.getAmountToProduce(
         converter,
         this.submissionForm.querySelector(
@@ -1510,29 +1710,22 @@ Please report this as a bug!`);
       if (!amount.equals(Rational.zero)) {
         this.graph.addConverter(converter, amount);
       }
-      this.close();
     }
     getAmountToProduce(converter, input) {
-      if (this.resourceBeingRequested) {
+      if (this.resourceRequest) {
         return converter.getAmountToProduce(
-          this.resourceBeingRequested,
-          this.amountOfResourceBeingRequested
+          this.resourceRequest.resource,
+          this.resourceRequest.amount
         );
       }
-      const amount = Rational.fromInput(input.value, input);
-      if (amount) {
-        input.classList.add("input-invalic-amount");
-        return amount;
-      }
-      return null;
+      return Rational.fromInput(input.value, input);
     }
-    // Note: Does not apply changes!
+    // Note: Does not apply changes automatically!
     clearFilters() {
       this.filterForm.querySelector(
         "input[name=search-string]"
       ).value = "";
-      this.resourceBeingRequested = null;
-      this.amountOfResourceBeingRequested = Rational.zero;
+      this.resourceRequest = null;
     }
     applyCurrentFilters() {
       this.thumbList.innerHTML = "";
@@ -1540,7 +1733,7 @@ Please report this as a bug!`);
       this.searchString = String(formData.get("search-string").valueOf());
       const converterList = getConverterFactoriesWithFilters(
         this.searchString,
-        this.resourceBeingRequested ? [this.resourceBeingRequested] : [],
+        this.resourceRequest ? [this.resourceRequest.resource] : [],
         []
       );
       if (converterList.length === 0) {
@@ -1555,33 +1748,48 @@ Please report this as a bug!`);
       for (const [_, cFact] of converterList) {
         const tags = cFact.tags.length > 0 ? cFact.tags : ["Miscellaneous"];
         let onclickFn = () => {
-          this.intermediateConverter = cFact.factory();
-          this.intermediateConverter.tryUpdateInfoPanel();
+          this.converterInProgress = {
+            converter: cFact.factory(),
+            ingredients: [],
+            products: [],
+            unresolvedDependencies: []
+          };
+          this.converterInProgress.converter.settings.populateForm(
+            this.converterSettingsForm
+          );
+          this.converterInProgress.converter.tryUpdateInfoPanel();
+          this.closeDependencyPopup();
           this.openDetailPopup();
         };
         this.addThumbToTagLists(tags, tagLists, {
-          name: cFact.name,
-          image: cFact.image,
+          name: cFact.thumbName,
+          image: cFact.displayImage,
           onclick: onclickFn
         });
       }
       if (miscTag.querySelector(".tag-list-content").children.length > 0)
         this.thumbList.appendChild(miscTag);
     }
+    openDependencyPopup() {
+      this.dependencyPopup.classList.remove("hidden");
+    }
+    closeDependencyPopup() {
+      this.dependencyPopup.classList.add("hidden");
+    }
     open() {
       super.open();
     }
     close() {
       super.close();
-      this.intermediateConverter = null;
+      this.closeDependencyPopup();
+      this.converterInProgress = null;
       this.converterSettingsForm.innerHTML = "";
       this.amountInput.classList.remove("hidden");
     }
     // Request the user to choose a converter that produces the given amount of the
     // given resource
     requestConverterForResource(resource, amount) {
-      this.resourceBeingRequested = resource;
-      this.amountOfResourceBeingRequested = amount;
+      this.resourceRequest = { resource, amount };
       this.amountInput.classList.add("hidden");
       this.open();
       this.applyCurrentFilters();
@@ -1781,10 +1989,14 @@ Please report this as a bug!`);
       const cFormWrapper = document.querySelector(
         "#converter-specific-footer"
       );
+      const cDepdendencyPopup = document.querySelector(
+        "#converter-dependency-popup"
+      );
       const converterMenu = new ConverterMenu(
         graph,
         addRcMenuWrapper,
         detailPopup,
+        cDepdendencyPopup,
         cHeader,
         thumbList,
         cFilter,

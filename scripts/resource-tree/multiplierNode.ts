@@ -3,6 +3,7 @@ import { GraphError } from "../errors";
 import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
 import {
+    ConverterDependency,
     ConverterIngredient,
     ResourceTreeDataMultiplierNode,
     SettingsTreeNode,
@@ -26,14 +27,8 @@ export class MultiplierNode implements ResourceTree {
         this.element.appendChild(this.resource.element);
     }
 
-    public updateElement(
-        multiplier: Rational,
-        requestingConverter: IntermediateConverter,
-    ) {
-        const newMultiplier = this.evaluateSettingsTree(
-            this.multiplierAst,
-            requestingConverter.settings,
-        );
+    public updateElement(multiplier: Rational, settings: ConverterSettings) {
+        const newMultiplier = settings.evaluateTree(this.multiplierAst);
         // Parse the settings to modify the multiplier
         multiplier = multiplier.mul(newMultiplier);
 
@@ -43,104 +38,27 @@ export class MultiplierNode implements ResourceTree {
         } else {
             this.element.classList.remove("hidden");
             // Update the child resource with the new multiplier
-            this.resource.updateElement(multiplier, requestingConverter);
+            this.resource.updateElement(multiplier, settings);
         }
     }
 
     public addResourcesToList(
         output: ConverterIngredient[],
-        converter: IntermediateConverter,
+        converterDependencies: ConverterDependency[],
+        settings: ConverterSettings,
         multiplier: Rational,
     ) {
         // Evaluate the settings tree
-        multiplier = multiplier.mul(
-            this.evaluateSettingsTree(this.multiplierAst, converter.settings),
-        );
+        multiplier = multiplier.mul(settings.evaluateTree(this.multiplierAst));
         // If the multiplier is 0, don't continue
         if (multiplier.equals(Rational.zero)) return output;
 
-        this.resource.addResourcesToList(output, converter, multiplier);
+        this.resource.addResourcesToList(
+            output,
+            converterDependencies,
+            settings,
+            multiplier,
+        );
         return output;
-    }
-
-    private evaluateSettingsTree(
-        treeNode: SettingsTreeNode,
-        settings: ConverterSettings,
-    ): Rational {
-        if (typeof treeNode === "number" || Array.isArray(treeNode))
-            return Rational.fromData(treeNode);
-
-        switch (treeNode.type) {
-            case "SETTING":
-                return this.evaluateSettingsTree(
-                    settings.getBranch(treeNode),
-                    settings,
-                );
-
-            case "MUL":
-                let p = Rational.one;
-                for (const child of treeNode.values)
-                    p = p.mul(this.evaluateSettingsTree(child, settings));
-                return p;
-
-            case "DIV":
-                console.log(
-                    "Value 1:",
-                    treeNode.value1,
-                    "| Value 2:",
-                    treeNode.value2,
-                );
-                return this.evaluateSettingsTree(treeNode.value1, settings).div(
-                    this.evaluateSettingsTree(treeNode.value2, settings),
-                );
-
-            case "ADD":
-                let s = Rational.zero;
-                for (const child of treeNode.values)
-                    s = s.add(this.evaluateSettingsTree(child, settings));
-                return s;
-
-            case "SUB":
-                return this.evaluateSettingsTree(treeNode.value1, settings).sub(
-                    this.evaluateSettingsTree(treeNode.value2, settings),
-                );
-
-            case "POW":
-                return this.evaluateSettingsTree(treeNode.value1, settings).pow(
-                    this.evaluateSettingsTree(treeNode.value2, settings),
-                );
-
-            case "CLAMP": {
-                const lo = this.evaluateSettingsTree(treeNode.low, settings);
-                const hi = this.evaluateSettingsTree(treeNode.high, settings);
-                const v = this.evaluateSettingsTree(treeNode.value, settings);
-                return v.clamp(lo, hi);
-            }
-
-            case "FLOOR": {
-                console.log(treeNode.value);
-                const v = this.evaluateSettingsTree(treeNode.value, settings);
-                console.log(v);
-                return v.floor();
-            }
-
-            case "THRESHOLD": {
-                const v = this.evaluateSettingsTree(treeNode.value, settings);
-                const comp = this.evaluateSettingsTree(treeNode.threshold, settings);
-                if (v.lessThan(comp)) {
-                    return this.evaluateSettingsTree(treeNode.lower, settings);
-                } else {
-                    return this.evaluateSettingsTree(
-                        treeNode.higherOrEqual,
-                        settings,
-                    );
-                }
-            }
-
-            default:
-                throw new GraphError(
-                    `Unknown settings AST node type: ${(treeNode as any).type}!`,
-                );
-        }
     }
 }

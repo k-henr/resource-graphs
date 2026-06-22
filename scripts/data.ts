@@ -1,9 +1,11 @@
+import { ConverterFactory } from "./converterFactory";
 import { displayErr, GraphError, ProgramError } from "./errors";
 import { IntermediateConverter } from "./intermediateConverter";
 import { Rational } from "./rational";
 import { Resource } from "./resource";
 import { AndNode } from "./resource-tree/andNode";
 import { BranchNode } from "./resource-tree/branchNode";
+import { ConverterNode } from "./resource-tree/converterNode";
 import { EntangledOrNode } from "./resource-tree/entangledOr";
 import { MultiplierNode } from "./resource-tree/multiplierNode";
 import { OrNode } from "./resource-tree/orNode";
@@ -11,7 +13,6 @@ import { ResourceNode } from "./resource-tree/resourceNode";
 import { ResourceTree } from "./resource-tree/resourceTree";
 import {
     ConverterData,
-    ConverterFactory,
     ResourceData,
     ResourceTreeData,
     RationalNumber,
@@ -103,33 +104,22 @@ export async function loadAllConverters() {
     const json: ConverterData[] = await res.json();
 
     for (const data of json) {
-        // Construct lists of all possible ingredients and products from this converter
-        const possibleIngr = getAllPossibleResources(andWrap(data.consumes), []);
-        const possibleProd = getAllPossibleResources(andWrap(data.produces), []);
-
-        // Create a new converter factory object
-        loadedConverterFactories.set(data.id, {
-            name: data.thumbName ?? data.displayName,
-            image: getSrc(data.displayImage),
-            tags: data.tags ?? [],
-            possibleIngredients: possibleIngr,
-            possibleProducts: possibleProd,
-            factory: () => {
-                try {
-                    return new IntermediateConverter(
-                        data.displayName,
-                        data.thumbName ?? data.displayName,
-                        getSrc(data.displayImage),
-                        data.settings ?? [],
-                        andWrap(data.consumes),
-                        andWrap(data.produces),
-                    );
-                } catch (e: any) {
-                    displayErr(e);
-                    throw e;
-                }
-            },
-        });
+        // Wrap the ingr/prod lists in AND nodes
+        const andWrappedIngr = andWrap(data.consumes);
+        const andWrappedProd = andWrap(data.produces);
+        // Add this converter factory to the lookup
+        loadedConverterFactories.set(
+            data.id,
+            new ConverterFactory(
+                data.displayName,
+                data.thumbName ?? data.displayName,
+                getSrc(data.displayImage),
+                data.tags ?? [],
+                data.settings,
+                andWrappedIngr,
+                andWrappedProd,
+            ),
+        );
     }
 }
 
@@ -143,6 +133,14 @@ export function resourceTreeDataToClass(
                 getResource(data.id),
                 Rational.fromData(data.amount),
             );
+
+        case "CONVERTER":
+            const conFact = getConverterFactory(data.id);
+            if (!conFact)
+                throw new GraphError(
+                    `Couldn't find converter factory with id "${data.id}"!`,
+                );
+            return new ConverterNode(conFact, data.amount);
 
         case "AND":
             return new AndNode(
@@ -251,35 +249,6 @@ function andWrap(r: ResourceTreeData[]): ResourceTreeData {
     return { type: "AND", resources: r };
 }
 
-function getAllPossibleResources(
-    data: ResourceTreeData,
-    output: Resource[],
-): Resource[] {
-    switch (data.type) {
-        case "RESOURCE":
-            output.push(getResource(data.id));
-            return output;
-        case "AND":
-        case "OR":
-            data.resources.map((el) => getAllPossibleResources(el, output));
-            return output;
-        case "MULTIPLIER":
-            return getAllPossibleResources(data.resource, output);
-        case "TAG":
-            if (!data.tagName)
-                throw new GraphError("A TAG node is missing its tagName attribute!");
-            const resources = getResourcesWithTags(data.tagName);
-            for (const [, r] of resources) output.push(r);
-            return output;
-        case "ENTANGLED_OR":
-            data.resources.map(([, r]) => getAllPossibleResources(r, output));
-            return output;
-        case "BRANCH":
-            data.branches.map(([, r]) => getAllPossibleResources(r, output));
-            return output;
-    }
-}
-
 export function getConverterFactory(id: string) {
     return loadedConverterFactories.get(id);
 }
@@ -297,7 +266,7 @@ export function getConverterFactoriesWithFilters(
     for (const [id, c] of list) {
         if (
             searchString &&
-            !c.name.toLowerCase().includes(searchString.toLowerCase())
+            !c.thumbName.toLowerCase().includes(searchString.toLowerCase())
         )
             continue;
 
