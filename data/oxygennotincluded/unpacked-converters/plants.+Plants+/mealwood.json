@@ -1,0 +1,6 @@
+{
+    "templateName": "plant_base",
+    "growthTime": 3,
+    "consumes": [{ "type": "RESOURCE", "id": "dirt", "amount": 10 }],
+    "productsPerHarvest": [{ "type": "RESOURCE", "id": "meal_lice", "amount": 600 }]
+}

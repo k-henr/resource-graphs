@@ -1013,6 +1013,7 @@ Please report this as a bug!`);
     constructor(resource, multiplier) {
       this.multiplierAst = multiplier;
       this.resource = resource;
+      console.log(resource);
       this.element = document.createElement("div");
       this.element.appendChild(this.resource.element);
     }
@@ -1252,6 +1253,7 @@ Please report this as a bug!`);
           ])
         );
       case "MULTIPLIER":
+        console.log(data.resource);
         return new MultiplierNode(
           resourceTreeDataToClass(converter, data.resource),
           data.multiplier

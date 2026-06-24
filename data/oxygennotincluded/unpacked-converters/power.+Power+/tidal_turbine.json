@@ -1,0 +1,6 @@
+{
+    "templateName": "heavy_generator",
+
+    "consumes": [],
+    "tunedProduct": { "type": "RESOURCE", "id": "power", "amount": [225] }
+}

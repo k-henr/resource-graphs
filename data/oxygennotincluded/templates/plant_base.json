@@ -1,0 +1,223 @@
+{
+    "settings": [
+        { "type": "TOGGLE", "name": "Actively Harvested", "default": true },
+        { "type": "TOGGLE", "name": "Pollinated: Mimika", "default": false },
+        { "type": "TOGGLE", "name": "Pollinated: Sweetle", "default": false },
+        { "type": "TOGGLE", "name": "Pollinated: Grubgrub", "default": false },
+        {
+            "type": "ENUMERATE",
+            "name": "Mutation",
+            "options": [
+                "None",
+                "Blooming",
+                "Easygoing",
+                "Juicyfruit",
+                "Wildish",
+                "Licey",
+                "Exuberant",
+                "Leafy",
+                "Bountiful",
+                "Specialized",
+                "Superspecialized"
+            ],
+            "default": "None"
+        },
+        "...TEMPLATE?:additionalSettings"
+    ],
+    "consumes": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "SETTING",
+                "name": "Mutation",
+                "options": [
+                    [["None", "Specialized", "Superspecialized", "Blooming"], 1],
+                    ["Easygoing", 0.5],
+                    [["Juicyfruit", "Licey", "Leafy"], 1.25],
+                    ["Wildish", 0.1],
+                    ["Exuberant", 1.5],
+                    ["Bountiful", 1.2]
+                ]
+            },
+            "resource": { "type": "AND", "resources": "TEMPLATE:consumes" }
+        },
+        "...TEMPLATE?:additionalConsume"
+    ],
+    "produces": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "DIV",
+                "value1": {
+                    "type": "MUL",
+                    "values": [
+                        {
+                            "type": "SETTING",
+                            "name": "Pollinated: Mimika",
+                            "true": 1.25,
+                            "false": 1
+                        },
+                        {
+                            "type": "SETTING",
+                            "name": "Pollinated: Sweetle",
+                            "true": 1.25,
+                            "false": 1
+                        },
+                        {
+                            "type": "SETTING",
+                            "name": "Pollinated: Grubgrub",
+                            "true": 1.25,
+                            "false": 1
+                        },
+                        {
+                            "type": "SETTING",
+                            "name": "Mutation",
+                            "options": [
+                                [
+                                    [
+                                        "None",
+                                        "Blooming",
+                                        "Juicyfruit",
+                                        "Wildish",
+                                        "Licey",
+                                        "Exuberant",
+                                        "Leafy"
+                                    ],
+                                    1
+                                ],
+                                ["Easygoing", 0.75],
+                                [["Bountiful", "Superspecialized"], 2],
+                                ["Specialized", 1.5]
+                            ]
+                        }
+                    ]
+                },
+                "value2": {
+                    "type": "MUL",
+                    "values": [
+                        {
+                            "type": "ADD",
+                            "values": [
+                                "TEMPLATE:growthTime",
+                                {
+                                    "type": "SETTING",
+                                    "name": "Actively Harvested",
+                                    "true": 0,
+                                    "false": {
+                                        "type": "SETTING",
+                                        "name": "Mutation",
+                                        "options": [
+                                            [
+                                                [
+                                                    "None",
+                                                    "Blooming",
+                                                    "Easygoing",
+                                                    "Licey",
+                                                    "Specialized",
+                                                    "Superspecialized",
+                                                    "Wildish",
+                                                    "Exuberant",
+                                                    "Leafy"
+                                                ],
+                                                4
+                                            ],
+                                            ["Juicyfruit", 0]
+                                        ]
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "type": "SETTING",
+                            "name": "Mutation",
+                            "options": [
+                                [
+                                    [
+                                        "None",
+                                        "Blooming",
+                                        "Easygoing",
+                                        "Juicyfruit",
+                                        "Licey",
+                                        "Specialized",
+                                        "Superspecialized"
+                                    ],
+                                    1
+                                ],
+                                ["Wildish", 4.5],
+                                ["Exuberant", 0.25],
+                                ["Leafy", 0.5]
+                            ]
+                        }
+                    ]
+                }
+            },
+            "resource": {
+                "type": "AND",
+                "resources": [
+                    {
+                        "type": "MULTIPLIER",
+                        "multiplier": {
+                            "type": "SETTING",
+                            "name": "Mutation",
+                            "options": [
+                                [
+                                    [
+                                        "None",
+                                        "Blooming",
+                                        "Easygoing",
+                                        "Juicyfruit",
+                                        "Wildish",
+                                        "Exuberant",
+                                        "Leafy",
+                                        "Bountiful",
+                                        "Specialized",
+                                        "Superspecialized"
+                                    ],
+                                    0
+                                ],
+                                ["Licey", 1]
+                            ]
+                        },
+                        "resource": {
+                            "type": "RESOURCE",
+                            "id": "meal_lice",
+                            "amount": 600
+                        }
+                    },
+                    {
+                        "type": "MULTIPLIER",
+                        "multiplier": {
+                            "type": "SETTING",
+                            "name": "Mutation",
+                            "options": [
+                                [
+                                    [
+                                        "None",
+                                        "Blooming",
+                                        "Easygoing",
+                                        "Juicyfruit",
+                                        "Wildish",
+                                        "Licey",
+                                        "Leafy",
+                                        "Bountiful",
+                                        "Specialized",
+                                        "Superspecialized"
+                                    ],
+                                    0
+                                ],
+                                ["Exuberant", 1]
+                            ]
+                        },
+                        "resource": {
+                            "type": "RESOURCE",
+                            "id": "rot_pile",
+                            "amount": 600
+                        }
+                    },
+                    "...TEMPLATE:productsPerHarvest"
+                ]
+            }
+        },
+        "...TEMPLATE?:additionalProduce"
+    ]
+}

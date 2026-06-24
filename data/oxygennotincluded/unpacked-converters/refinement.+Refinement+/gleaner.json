@@ -1,11 +1,54 @@
 {
     "consumes": [
         { "type": "RESOURCE", "id": "power", "amount": 480 },
-        { "type": "RESOURCE", "id": "brackene", "amount": 600 }
+        {
+            "type": "ENTANGLED_OR",
+            "name": "recipe",
+            "resources": [
+                [
+                    "brackwax",
+                    { "type": "RESOURCE", "id": "brackene", "amount": 600 }
+                ],
+                ["caviar", { "type": "RESOURCE", "id": "ovolene", "amount": 600 }]
+            ]
+        }
     ],
     "produces": [
-        { "type": "RESOURCE", "id": "brackwax", "amount": 54 },
-        { "type": "RESOURCE", "id": "brine", "amount": 486 },
-        { "type": "RESOURCE", "id": "carbon_dioxide", "amount": 60 }
+        {
+            "type": "ENTANGLED_OR",
+            "name": "recipe",
+            "resources": [
+                [
+                    "brackwax",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "brackwax", "amount": 54 },
+                            { "type": "RESOURCE", "id": "brine", "amount": 486 },
+                            {
+                                "type": "RESOURCE",
+                                "id": "carbon_dioxide",
+                                "amount": 60
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "caviar",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "caviar", "amount": 54 },
+                            { "type": "RESOURCE", "id": "mucin", "amount": 486 },
+                            {
+                                "type": "RESOURCE",
+                                "id": "carbon_dioxide",
+                                "amount": 60
+                            }
+                        ]
+                    }
+                ]
+            ]
+        }
     ]
 }
