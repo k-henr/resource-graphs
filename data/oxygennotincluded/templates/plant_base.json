@@ -1,5 +1,8 @@
 {
+    "displayName": "{Wild|Wild }{{TEMPLATE:plantName}} (mutation: {Mutation})",
+    "thumbName": "TEMPLATE:plantName",
     "settings": [
+        { "type": "TOGGLE", "name": "Wild", "default": false },
         { "type": "TOGGLE", "name": "Actively Harvested", "default": true },
         { "type": "TOGGLE", "name": "Pollinated: Mimika", "default": false },
         { "type": "TOGGLE", "name": "Pollinated: Sweetle", "default": false },
@@ -28,15 +31,29 @@
         {
             "type": "MULTIPLIER",
             "multiplier": {
-                "type": "SETTING",
-                "name": "Mutation",
-                "options": [
-                    [["None", "Specialized", "Superspecialized", "Blooming"], 1],
-                    ["Easygoing", 0.5],
-                    [["Juicyfruit", "Licey", "Leafy"], 1.25],
-                    ["Wildish", 0.1],
-                    ["Exuberant", 1.5],
-                    ["Bountiful", 1.2]
+                "type": "MUL",
+                "values": [
+                    { "type": "SETTING", "name": "Wild", "true": 0, "false": 1 },
+                    {
+                        "type": "SETTING",
+                        "name": "Mutation",
+                        "options": [
+                            [
+                                [
+                                    "None",
+                                    "Specialized",
+                                    "Superspecialized",
+                                    "Blooming"
+                                ],
+                                1
+                            ],
+                            ["Easygoing", 0.5],
+                            [["Juicyfruit", "Licey", "Leafy"], 1.25],
+                            ["Wildish", 0.1],
+                            ["Exuberant", 1.5],
+                            ["Bountiful", 1.2]
+                        ]
+                    }
                 ]
             },
             "resource": { "type": "AND", "resources": "TEMPLATE:consumes" }
@@ -89,7 +106,8 @@
                                 [["Bountiful", "Superspecialized"], 2],
                                 ["Specialized", 1.5]
                             ]
-                        }
+                        },
+                        "...TEMPLATE?:additionalProductMultipliers"
                     ]
                 },
                 "value2": {
@@ -98,7 +116,18 @@
                         {
                             "type": "ADD",
                             "values": [
-                                "TEMPLATE:growthTime",
+                                {
+                                    "type": "MUL",
+                                    "values": [
+                                        "TEMPLATE:growthTime",
+                                        {
+                                            "type": "SETTING",
+                                            "name": "Wild",
+                                            "true": 4,
+                                            "false": 1
+                                        }
+                                    ]
+                                },
                                 {
                                     "type": "SETTING",
                                     "name": "Actively Harvested",
