@@ -68,6 +68,7 @@ export class ConverterFactory {
         data: ResourceTreeData,
         output: Resource[],
     ): Resource[] {
+        console.log(data);
         switch (data.type) {
             case "RESOURCE":
                 output.push(getResource(data.id));

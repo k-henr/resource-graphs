@@ -187,6 +187,7 @@ def parseConverter(
 
             # Load template file
             with open(os.path.join(templatePath, f"{converter["templateName"]}.json"), encoding="utf-8") as templateFile:
+                # Replace any template strings with values from the implementor
                 template: tuple[jsonObject, bool] | None = resolveTemplate(
                     json.loads(templateFile.read()))
 

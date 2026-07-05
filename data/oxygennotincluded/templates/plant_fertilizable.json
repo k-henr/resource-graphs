@@ -1,0 +1,33 @@
+{
+    "templateName": "plant_base",
+    "plantName": "TEMPLATE:plantName",
+    "additionalSettings": [
+        { "type": "TOGGLE", "name": "Fertilized" },
+        "...TEMPLATE?:additionalSettings"
+    ],
+    "consumes": "TEMPLATE:consumes",
+    "additionalConsume": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "SETTING",
+                "name": "Fertilized",
+                "true": 1,
+                "false": 0
+            },
+            "resource": {
+                "type": "RESOURCE",
+                "id": "micronutrient_fertilizer",
+                "amount": 5
+            }
+        },
+        "...TEMPLATE?:additionalConsume"
+    ],
+    "additionalProductMultipliers": [
+        { "type": "SETTING", "name": "Fertilized", "true": 2, "false": 1 },
+        "...TEMPLATE?:additionalProductMultipliers"
+    ],
+    "growthTime": "TEMPLATE:growthTime",
+    "productsPerHarvest": "TEMPLATE:productsPerHarvest",
+    "additionalProduce": "TEMPLATE?:additionalProduce"
+}

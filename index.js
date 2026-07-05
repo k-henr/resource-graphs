@@ -703,6 +703,7 @@ Please report this as a bug!`);
       }
     }
     static getAllPossibleResources(data, output) {
+      console.log(data);
       switch (data.type) {
         case "RESOURCE":
           output.push(getResource(data.id));
