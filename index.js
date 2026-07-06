@@ -381,12 +381,10 @@ Please report this as a bug!`);
       this.inputElement = input;
     }
     chooseBranch(_) {
-      console.log(this.inputElement.value);
       const r = Rational.fromInput(
         this.inputElement.value,
         this.inputElement
       )?.getList() ?? 0;
-      console.log(r);
       return r;
     }
     getFormattedString(_) {
@@ -497,7 +495,6 @@ Please report this as a bug!`);
     evaluateTree(treeNode) {
       if (typeof treeNode === "number" || Array.isArray(treeNode))
         return Rational.fromData(treeNode);
-      console.log(treeNode);
       switch (treeNode.type) {
         case "SETTING":
           return this.evaluateTree(this.getBranch(treeNode));
@@ -942,7 +939,7 @@ Please report this as a bug!`);
         for (const name of optionList) {
           this.optionNameToTreeMap.set(name, option);
           const optionWrapper = _OrNode.converterOptionTemplate.cloneElement();
-          const clone = option.element.cloneNode(true);
+          const clone = option.element;
           optionWrapper.appendChild(clone);
           optionWrapper.onclick = () => {
             try {
@@ -1098,6 +1095,7 @@ Please report this as a bug!`);
     amount;
     resource;
     element;
+    amountEl;
     // Template for a resource element
     static converterIngredientTemplate = new Template(
       "converter-ingredient-template"
@@ -1106,16 +1104,17 @@ Please report this as a bug!`);
       this.amount = amount;
       this.resource = resource;
       this.element = this.createIngredientElement();
-      this.setAmount(amount);
+      this.amountEl = this.element.querySelector(
+        ".converter-ingredient-amount"
+      );
     }
     updateElement(multiplier, _) {
       this.setAmount(this.amount.mul(multiplier));
     }
     setAmount(amount) {
       const unitGroupName = this.resource.unitGroupName;
-      this.element.querySelector(
-        ".converter-ingredient-amount"
-      ).innerText = `${amount.getDecimalString()} ${getUnits(unitGroupName)[1]}`;
+      const newContent = `${amount.getDecimalString()} ${getUnits(unitGroupName)[1]}`;
+      this.amountEl.innerText = newContent;
     }
     addResourcesToList(output, _converterDependencies, _, multiplier = Rational.one) {
       output.push({

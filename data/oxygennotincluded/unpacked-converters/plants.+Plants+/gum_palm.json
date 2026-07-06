@@ -1,0 +1,10 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Gum Palm",
+    "growthTime": 10,
+    "consumes": [{ "type": "RESOURCE", "id": "sulfur", "amount": 20 }],
+    "productsPerHarvest": [
+        { "type": "RESOURCE", "id": "gum_wood", "amount": 700 },
+        { "type": "RESOURCE", "id": "gum_palm_seed", "amount": 0.1 }
+    ]
+}

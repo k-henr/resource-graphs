@@ -1,0 +1,22 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Lura Plant",
+    "growthTime": 10,
+    "consumes": [],
+    "additionalConsume": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "SETTING",
+                "name": "Wild",
+                "true": [1, 48],
+                "false": [1, 12]
+            },
+            "resource": { "type": "TAG", "tagName": "&Flying", "amount": 1 }
+        }
+    ],
+    "productsPerHarvest": [
+        { "type": "RESOURCE", "id": "amber", "amount": 264 },
+        { "type": "RESOURCE", "id": "lura_seed", "amount": 0.1 }
+    ]
+}
