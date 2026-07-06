@@ -68,7 +68,7 @@ export class OrNode extends ResourceTreeBoolNode {
                 // can change without having to make a new collapse function and re-set
                 // the onclick for that element
                 const optionWrapper = OrNode.converterOptionTemplate.cloneElement();
-                const clone = option.element.cloneNode(true) as HTMLElement;
+                const clone = option.element;
                 optionWrapper.appendChild(clone);
 
                 // Set a listener for the option wrapper to collapse into it

@@ -1,11 +1,8 @@
 import { ConverterSettings } from "../converterSettings";
-import { GraphError } from "../errors";
-import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
 import {
     ConverterDependency,
     ConverterIngredient,
-    ResourceTreeDataMultiplierNode,
     SettingsTreeNode,
 } from "../types";
 import { ResourceTree } from "./resourceTree";

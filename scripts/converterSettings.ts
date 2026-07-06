@@ -102,8 +102,6 @@ export class ConverterSettings {
         if (typeof treeNode === "number" || Array.isArray(treeNode))
             return Rational.fromData(treeNode);
 
-        console.log(treeNode);
-
         switch (treeNode.type) {
             case "SETTING":
                 return this.evaluateTree(this.getBranch(treeNode));

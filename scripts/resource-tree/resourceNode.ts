@@ -1,5 +1,4 @@
 import { ConverterSettings } from "../converterSettings";
-import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
 import { Resource } from "../resource";
 import { Template } from "../template";
@@ -15,6 +14,7 @@ export class ResourceNode implements ResourceTree {
     private readonly resource: Resource;
 
     public readonly element: HTMLElement;
+    private readonly amountEl: HTMLElement;
 
     // Template for a resource element
     private static converterIngredientTemplate = new Template(
@@ -25,19 +25,19 @@ export class ResourceNode implements ResourceTree {
         this.amount = amount;
         this.resource = resource;
         this.element = this.createIngredientElement();
-        this.setAmount(amount);
+        this.amountEl = this.element.querySelector<HTMLElement>(
+            ".converter-ingredient-amount",
+        )!;
     }
 
     public updateElement(multiplier: Rational, _: ConverterSettings) {
-        // Update the amount on the element
         this.setAmount(this.amount.mul(multiplier));
     }
 
     private setAmount(amount: Rational) {
         const unitGroupName = this.resource.unitGroupName;
-        this.element.querySelector<HTMLElement>(
-            ".converter-ingredient-amount",
-        )!.innerText = `${amount.getDecimalString()} ${getUnits(unitGroupName)[1]}`;
+        const newContent = `${amount.getDecimalString()} ${getUnits(unitGroupName)[1]}`;
+        this.amountEl.innerText = newContent;
     }
 
     public addResourcesToList(
