@@ -1,0 +1,10 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Balm Lily",
+    "growthTime": 12,
+    "consumes": [],
+    "productsPerHarvest": [
+        { "type": "RESOURCE", "id": "balm_lily_flower", "amount": 2 },
+        { "type": "RESOURCE", "id": "balm_lily_seed", "amount": 0.1 }
+    ]
+}

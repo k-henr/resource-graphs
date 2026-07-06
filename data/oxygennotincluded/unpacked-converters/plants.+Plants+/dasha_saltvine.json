@@ -1,0 +1,11 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Dasha Saltvine",
+    "growthTime": 6,
+    "consumes": [{ "type": "RESOURCE", "id": "sand", "amount": 7 }],
+    "additionalConsume": [{ "type": "RESOURCE", "id": "chlorine", "amount": 3.6 }],
+    "productsPerHarvest": [
+        { "type": "RESOURCE", "id": "salt", "amount": 65 },
+        { "type": "RESOURCE", "id": "dasha_saltvine_seed", "amount": 0.1 }
+    ]
+}

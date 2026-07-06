@@ -1,0 +1,13 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Gas Grass",
+    "growthTime": 4,
+    "consumes": [
+        { "type": "RESOURCE", "id": "liquid_chlorine", "amount": 0.5 },
+        { "type": "RESOURCE", "id": "dirt", "amount": 25 }
+    ],
+    "productsPerHarvest": [
+        { "type": "RESOURCE", "id": "plant_husk", "amount": 400 },
+        { "type": "RESOURCE", "id": "gas_grass_seed", "amount": 0.1 }
+    ]
+}

@@ -179,7 +179,6 @@ export function resourceTreeDataToClass(
             );
 
         case "MULTIPLIER":
-            console.log(data.resource);
             return new MultiplierNode(
                 resourceTreeDataToClass(converter, data.resource),
                 data.multiplier,

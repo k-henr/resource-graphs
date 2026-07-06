@@ -1,0 +1,10 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Clampum",
+    "growthTime": 8,
+    "consumes": [{ "type": "RESOURCE", "id": "sand", "amount": 35 }],
+    "productsPerHarvest": [
+        { "type": "RESOURCE", "id": "pearl", "amount": 50 },
+        { "type": "RESOURCE", "id": "clampum_seed", "amount": 0.1 }
+    ]
+}

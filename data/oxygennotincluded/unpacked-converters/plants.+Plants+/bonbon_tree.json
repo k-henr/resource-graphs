@@ -1,0 +1,58 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Bonbon tree",
+    "growthTime": 4.5,
+    "additionalSettings": [
+        {
+            "type": "ENUMERATE",
+            "name": "Number of branches",
+            "options": [0, 1, 2, 3, 4, 5],
+            "default": 5
+        },
+        {
+            "type": "NUMBER",
+            "name": "Lux",
+            "default": 0
+        }
+    ],
+    "consumes": [{ "type": "RESOURCE", "id": "snow", "amount": 100 }],
+    "productsPerHarvest": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "SETTING",
+                "name": "Number of branches",
+                "options": [
+                    ["0", 0],
+                    ["1", 1],
+                    ["2", 2],
+                    ["3", 3],
+                    ["4", 4],
+                    ["5", 5]
+                ]
+            },
+            "resource": { "type": "RESOURCE", "id": "wood", "amount": 75 }
+        }
+    ],
+    "additionalProduce": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "THRESHOLD",
+                "value": {
+                    "type": "SETTING",
+                    "name": "Lux"
+                },
+                "threshold": 300,
+                "higherOrEqual": {
+                    "type": "CLAMP",
+                    "value": { "type": "SETTING", "name": "Lux" },
+                    "low": 0,
+                    "high": 10000
+                },
+                "lower": 0
+            },
+            "resource": { "type": "RESOURCE", "id": "nectar", "amount": [16, 10000] }
+        }
+    ]
+}

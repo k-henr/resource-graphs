@@ -1,0 +1,10 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Bog Bucket",
+    "growthTime": 6.6,
+    "consumes": [{ "type": "RESOURCE", "id": "polluted_water", "amount": 40 }],
+    "productsPerHarvest": [
+        { "type": "RESOURCE", "id": "bog_jelly", "amount": 1840 },
+        { "type": "RESOURCE", "id": "bog_bucket_seed", "amount": 0.1 }
+    ]
+}

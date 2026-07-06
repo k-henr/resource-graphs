@@ -1,0 +1,40 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Grubfruit Plant",
+    "additionalSettings": [
+        { "type": "TOGGLE", "name": "Spindly", "default": false }
+    ],
+    "growthTime": { "type": "SETTING", "name": "Spindly", "true": 4, "false": 8 },
+    "consumes": [{ "type": "RESOURCE", "id": "sulfur", "amount": 10 }],
+    "productsPerHarvest": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "SETTING",
+                "name": "Spindly",
+                "true": 1,
+                "false": 0
+            },
+            "resource": {
+                "type": "RESOURCE",
+                "id": "spindly_grubfruit",
+                "amount": 800
+            }
+        },
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "SETTING",
+                "name": "Spindly",
+                "true": 0,
+                "false": 1
+            },
+            "resource": {
+                "type": "RESOURCE",
+                "id": "grubfruit",
+                "amount": 2000
+            }
+        },
+        { "type": "RESOURCE", "id": "gas_grass_seed", "amount": 0.1 }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Dusk Cap",
+    "growthTime": 7.5,
+    "consumes": [{ "type": "RESOURCE", "id": "slime", "amount": 4 }],
+    "productsPerHarvest": [
+        { "type": "RESOURCE", "id": "mushroom", "amount": 2400 },
+        { "type": "RESOURCE", "id": "fungal_spore", "amount": 0.1 }
+    ]
+}

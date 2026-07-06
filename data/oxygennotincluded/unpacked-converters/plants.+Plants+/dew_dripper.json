@@ -1,0 +1,10 @@
+{
+    "templateName": "plant_base",
+    "plantName": "Dew Dripper",
+    "growthTime": 2,
+    "consumes": [{ "type": "RESOURCE", "id": "brine_ice", "amount": 10 }],
+    "productsPerHarvest": [
+        { "type": "RESOURCE", "id": "dewdrip", "amount": 1 },
+        { "type": "RESOURCE", "id": "dew_seed", "amount": 0.1 }
+    ]
+}

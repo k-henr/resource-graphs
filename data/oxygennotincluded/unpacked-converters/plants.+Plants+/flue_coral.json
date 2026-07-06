@@ -1,0 +1,19 @@
+{
+    "settings": [{ "type": "TOGGLE", "name": "Wild", "default": 0 }],
+    "consumes": [
+        { "type": "RESOURCE", "id": "salt_water", "amount": 20 },
+        { "type": "RESOURCE", "id": "lime", "amount": 5 }
+    ],
+    "produces": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "SETTING",
+                "name": "Wild",
+                "true": 37.5,
+                "false": 100
+            },
+            "resource": { "type": "RESOURCE", "id": "oxygen", "amount": [1, 1000] }
+        }
+    ]
+}

@@ -30,12 +30,14 @@ export class ConverterNumberSetting extends ConverterSetting {
     }
 
     public override chooseBranch(_: SettingsTreeInputNode): SettingsTreeNode {
-        return (
+        console.log(this.inputElement.value);
+        const r =
             Rational.fromInput(
                 this.inputElement.value,
                 this.inputElement,
-            )?.getList() ?? 0
-        );
+            )?.getList() ?? 0;
+        console.log(r);
+        return r;
     }
 
     public override getFormattedString(_: string[]): string {

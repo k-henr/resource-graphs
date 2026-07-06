@@ -23,7 +23,6 @@ export class MultiplierNode implements ResourceTree {
         this.multiplierAst = multiplier;
         this.resource = resource;
 
-        console.log(resource);
         this.element = document.createElement("div");
         this.element.appendChild(this.resource.element);
     }

@@ -57,7 +57,6 @@ Please report this as a bug!`);
     }
     // Convert a [number, number] list to a rational
     static fromData(data) {
-      console.log(data);
       if (typeof data === "number") return new _Rational(data, 1);
       if (Array.isArray(data)) return new _Rational(data[0], data[1]);
       throw new GraphError(`Incorrect type "${typeof data}" for rational number!`);
@@ -382,10 +381,13 @@ Please report this as a bug!`);
       this.inputElement = input;
     }
     chooseBranch(_) {
-      return Rational.fromInput(
+      console.log(this.inputElement.value);
+      const r = Rational.fromInput(
         this.inputElement.value,
         this.inputElement
       )?.getList() ?? 0;
+      console.log(r);
+      return r;
     }
     getFormattedString(_) {
       const rational = Rational.fromInput(this.inputElement.value, null);
@@ -495,6 +497,7 @@ Please report this as a bug!`);
     evaluateTree(treeNode) {
       if (typeof treeNode === "number" || Array.isArray(treeNode))
         return Rational.fromData(treeNode);
+      console.log(treeNode);
       switch (treeNode.type) {
         case "SETTING":
           return this.evaluateTree(this.getBranch(treeNode));
@@ -703,7 +706,6 @@ Please report this as a bug!`);
       }
     }
     static getAllPossibleResources(data, output) {
-      console.log(data);
       switch (data.type) {
         case "RESOURCE":
           output.push(getResource(data.id));
@@ -1014,7 +1016,6 @@ Please report this as a bug!`);
     constructor(resource, multiplier) {
       this.multiplierAst = multiplier;
       this.resource = resource;
-      console.log(resource);
       this.element = document.createElement("div");
       this.element.appendChild(this.resource.element);
     }
@@ -1254,7 +1255,6 @@ Please report this as a bug!`);
           ])
         );
       case "MULTIPLIER":
-        console.log(data.resource);
         return new MultiplierNode(
           resourceTreeDataToClass(converter, data.resource),
           data.multiplier

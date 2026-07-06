@@ -1,0 +1,10 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Bristle Blossom",
+    "growthTime": 6,
+    "consumes": [{ "type": "RESOURCE", "id": "water", "amount": 20 }],
+    "productsPerHarvest": [
+        { "type": "RESOURCE", "id": "bristle_berry", "amount": 1600 },
+        { "type": "RESOURCE", "id": "blossom_seed", "amount": 0.1 }
+    ]
+}

@@ -1,0 +1,22 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Alveo Vera",
+    "growthTime": 2,
+    "consumes": [{ "type": "RESOURCE", "id": "ice", "amount": 20 }],
+    "additionalConsume": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "SETTING",
+                "name": "Wild",
+                "true": 0.25,
+                "false": 1
+            },
+            "resource": { "type": "RESOURCE", "id": "carbon_dioxide", "amount": 1.2 }
+        }
+    ],
+    "productsPerHarvest": [
+        { "type": "RESOURCE", "id": "oxylite", "amount": 36 },
+        { "type": "RESOURCE", "id": "alveo_vera_seed", "amount": 0.1 }
+    ]
+}
