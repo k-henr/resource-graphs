@@ -1,0 +1,23 @@
+{
+    "settings": [{ "type": "TOGGLE", "name": "Wild", "default": false }],
+    "consumes": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "SETTING",
+                "name": "Wild",
+                "true": 0,
+                "false": 1
+            },
+            "resource": {
+                "type": "AND",
+                "resources": [
+                    { "type": "RESOURCE", "id": "dirt", "amount": 4 },
+                    { "type": "RESOURCE", "id": "water", "amount": 19 }
+                ]
+            }
+        },
+        { "type": "RESOURCE", "id": "carbon_dioxide", "amount": 0.375 }
+    ],
+    "produces": [{ "type": "RESOURCE", "id": "oxygen", "amount": 18.78 }]
+}

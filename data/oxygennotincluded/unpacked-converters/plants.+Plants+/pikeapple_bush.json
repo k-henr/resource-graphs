@@ -1,0 +1,10 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Pikeapple Bush",
+    "growthTime": 3,
+    "consumes": [{ "type": "RESOURCE", "id": "phosphorite", "amount": 5 }],
+    "productsPerHarvest": [
+        { "type": "RESOURCE", "id": "pikeapple", "amount": 800 },
+        { "type": "RESOURCE", "id": "pikeapple_bush_seed", "amount": 0.1 }
+    ]
+}

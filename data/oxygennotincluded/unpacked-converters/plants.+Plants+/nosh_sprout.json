@@ -1,0 +1,10 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Nosh Sprout",
+    "growthTime": 21,
+    "consumes": [
+        { "type": "RESOURCE", "id": "ethanol", "amount": 20 },
+        { "type": "RESOURCE", "id": "dirt", "amount": 5 }
+    ],
+    "productsPerHarvest": [{ "type": "RESOURCE", "id": "nosh_bean", "amount": 12 }]
+}

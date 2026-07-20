@@ -1,0 +1,11 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Ovagro",
+    "growthTime": 3,
+    "additionalSettings": [
+        { "type": "NUMBER", "name": "Number of vines", "default": 24 }
+    ],
+    "fertilizerMultiplier": { "type": "SETTING", "name": "Number of vines" },
+    "consumes": [{ "type": "RESOURCE", "id": "water", "amount": 90 }],
+    "productsPerHarvest": [{ "type": "RESOURCE", "id": "ovagro_fig", "amount": 325 }]
+}

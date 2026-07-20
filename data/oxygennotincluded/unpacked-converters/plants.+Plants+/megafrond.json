@@ -1,0 +1,10 @@
+{
+    "templateName": "plant_base",
+    "plantName": "Megafrond",
+    "growthTime": 9,
+    "consumes": [],
+    "additionalConsume": [{ "type": "RESOURCE", "id": "chlorine", "amount": 54 }],
+    "productsPerHarvest": [
+        { "type": "RESOURCE", "id": "megafrond_grain", "amount": 36 }
+    ]
+}

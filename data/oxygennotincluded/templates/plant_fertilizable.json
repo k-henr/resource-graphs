@@ -12,7 +12,10 @@
             "multiplier": {
                 "type": "SETTING",
                 "name": "Fertilized",
-                "true": 1,
+                "true": {
+                    "type": "MUL",
+                    "values": [1, "...TEMPLATE?:fertilizerMultiplier"]
+                },
                 "false": 0
             },
             "resource": {

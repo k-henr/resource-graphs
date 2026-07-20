@@ -1,0 +1,7 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Mimika Bud",
+    "growthTime": 5,
+    "consumes": [{ "type": "RESOURCE", "id": "dirt", "amount": 10 }],
+    "productsPerHarvest": [{ "type": "RESOURCE", "id": "mimillet", "amount": 1 }]
+}
