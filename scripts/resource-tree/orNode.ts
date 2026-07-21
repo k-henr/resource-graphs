@@ -109,9 +109,12 @@ export class OrNode extends ResourceTreeBoolNode {
         //     );
         // }
 
-        // Remove the last OR
+        // Remove the last OR, if any OR was added
         // (todo: don't do this if there was a nothing node added)
-        selectList.removeChild(selectList.children[selectList.children.length - 1]);
+        if (options.length > 0)
+            selectList.removeChild(
+                selectList.children[selectList.children.length - 1],
+            );
 
         // set the number of options
         this.element.querySelector<HTMLElement>(
