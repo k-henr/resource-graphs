@@ -1,0 +1,19 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Arbor Tree",
+    "growthTime": 4.5,
+    "additionalSettings": [
+        { "type": "NUMBER", "name": "Number of branches", "default": 5 }
+    ],
+    "consumes": [
+        { "type": "RESOURCE", "id": "polluted_water", "amount": 70 },
+        { "type": "RESOURCE", "id": "dirt", "amount": 10 }
+    ],
+    "productsPerHarvest": [{ "type": "RESOURCE", "id": "wood", "amount": 1500 }],
+    "additionalProductMultipliers": [
+        {
+            "type": "SETTING",
+            "name": "Number of branches"
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Pinpoket",
+    "growthTime": 16,
+    "consumes": [{ "type": "RESOURCE", "id": "refined_carbon", "amount": 5 }],
+    "productsPerHarvest": [
+        { "type": "RESOURCE", "id": "pinpoki", "amount": 1 },
+        { "type": "RESOURCE", "id": "pinpoket_seed", "amount": 0.1 }
+    ]
+}

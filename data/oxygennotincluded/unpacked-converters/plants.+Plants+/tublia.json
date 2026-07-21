@@ -1,0 +1,13 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Tublia",
+    "growthTime": 8,
+    "consumes": [
+        { "type": "RESOURCE", "id": "polluted_brine", "amount": 30 },
+        { "type": "RESOURCE", "id": "sulfur", "amount": 20 }
+    ],
+    "productsPerHarvest": [
+        { "type": "RESOURCE", "id": "plastic", "amount": 200 },
+        { "type": "RESOURCE", "id": "tublia_seed", "amount": 0.1 }
+    ]
+}

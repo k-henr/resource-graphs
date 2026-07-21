@@ -1,0 +1,22 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Saturn critter trap",
+    "growthTime": 30,
+    "consumes": [],
+    "additionalConsume": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "SETTING",
+                "name": "Wild",
+                "true": [1, 48],
+                "false": [1, 12]
+            },
+            "resource": { "type": "TAG", "tagName": "&SCT", "amount": 1 }
+        }
+    ],
+    "productsPerHarvest": [
+        { "type": "RESOURCE", "id": "plant_meat", "amount": 12000 }
+    ],
+    "additionalProduce": { "type": "RESOURCE", "id": "hydrogen", "amount": 25 }
+}

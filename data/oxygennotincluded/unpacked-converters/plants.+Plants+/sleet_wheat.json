@@ -1,0 +1,12 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Sleet wheat",
+    "growthTime": 18,
+    "consumes": [
+        { "type": "RESOURCE", "id": "water", "amount": 20 },
+        { "type": "RESOURCE", "id": "dirt", "amount": 5 }
+    ],
+    "productsPerHarvest": [
+        { "type": "RESOURCE", "id": "sleet_wheat_grain", "amount": 18 }
+    ]
+}

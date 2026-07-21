@@ -1,0 +1,10 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Seakomb",
+    "growthTime": 5,
+    "consumes": [{ "type": "RESOURCE", "id": "polluted_dirt", "amount": 10 }],
+    "productsPerHarvest": [
+        { "type": "RESOURCE", "id": "seakomb_leaf", "amount": 50 },
+        { "type": "RESOURCE", "id": "seakomb_seed", "amount": 0.1 }
+    ]
+}

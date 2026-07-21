@@ -1,0 +1,10 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Starnacle",
+    "growthTime": 4,
+    "consumes": [{ "type": "RESOURCE", "id": "coquina", "amount": 20 }],
+    "productsPerHarvest": [
+        { "type": "RESOURCE", "id": "phosphorite", "amount": 80 },
+        { "type": "RESOURCE", "id": "starnacle_seed", "amount": 0.1 }
+    ]
+}

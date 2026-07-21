@@ -1,0 +1,10 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Waterweed",
+    "growthTime": 12,
+    "consumes": [{ "type": "RESOURCE", "id": "salt_water", "amount": 20 }],
+    "productsPerHarvest": [
+        { "type": "RESOURCE", "id": "lettuce", "amount": 4800 },
+        { "type": "RESOURCE", "id": "waterweed_seed", "amount": 0.1 }
+    ]
+}

@@ -954,7 +954,10 @@ Please report this as a bug!`);
           selectList.appendChild(_OrNode.converterOrTemplate.clone());
         }
       }
-      selectList.removeChild(selectList.children[selectList.children.length - 1]);
+      if (options.length > 0)
+        selectList.removeChild(
+          selectList.children[selectList.children.length - 1]
+        );
       this.element.querySelector(
         ".converter-select-count"
       ).innerText = String(numOptions);

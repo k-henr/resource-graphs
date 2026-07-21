@@ -1,0 +1,10 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Sodicane",
+    "growthTime": 4,
+    "consumes": [{ "type": "RESOURCE", "id": "salt", "amount": 10 }],
+    "productsPerHarvest": [
+        { "type": "RESOURCE", "id": "salty_sticks", "amount": 600 },
+        { "type": "RESOURCE", "id": "sodicane_seed", "amount": 0.1 }
+    ]
+}

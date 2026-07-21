@@ -1,0 +1,20 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Tower Kelp",
+    "growthTime": 3,
+    "additionalSettings": [
+        { "type": "NUMBER", "name": "Number of stalks", "default": 8 }
+    ],
+    "consumes": [
+        { "type": "RESOURCE", "id": "polluted_water", "amount": 30 },
+        { "type": "RESOURCE", "id": "polluted_dirt", "amount": 40 }
+    ],
+    "productsPerHarvest": [{ "type": "RESOURCE", "id": "nori", "amount": 10 }],
+    "additionalProductMultipliers": [
+        { "type": "SETTING", "name": "Number of stalks" }
+    ],
+    "fertilizerMultiplier": {
+        "type": "SETTING",
+        "name": "Number of stalks"
+    }
+}

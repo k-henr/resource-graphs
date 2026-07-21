@@ -1,0 +1,13 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Pincha Pepperplant",
+    "growthTime": 8,
+    "consumes": [
+        { "type": "RESOURCE", "id": "phosphorite", "amount": 1 },
+        { "type": "RESOURCE", "id": "polluted_water", "amount": 35 }
+    ],
+    "productsPerHarvest": [
+        { "type": "RESOURCE", "id": "pincha_peppernut", "amount": 4 },
+        { "type": "RESOURCE", "id": "pincha_pepper_seed", "amount": 0.1 }
+    ]
+}

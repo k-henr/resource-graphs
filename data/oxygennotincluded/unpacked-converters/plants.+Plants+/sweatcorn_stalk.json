@@ -1,0 +1,38 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Sweatcorn Stalk",
+    "growthTime": 3,
+    "consumes": [{ "type": "RESOURCE", "id": "peat", "amount": 10 }],
+    "productsPerHarvest": [
+        { "type": "RESOURCE", "id": "sweatcorn", "amount": 800 },
+        { "type": "RESOURCE", "id": "sweatcorn_seed", "amount": 0.1 }
+    ],
+    "additionalProductMultipliers": {
+        "type": "CLAMP",
+        "value": {
+            "type": "ADD",
+            "values": [
+                {
+                    "type": "SETTING",
+                    "name": "Pollinated: Mimika",
+                    "true": 1,
+                    "false": 0
+                },
+                {
+                    "type": "SETTING",
+                    "name": "Pollinated: Sweetle",
+                    "true": 1,
+                    "false": 0
+                },
+                {
+                    "type": "SETTING",
+                    "name": "Pollinated: Grubgrub",
+                    "true": 1,
+                    "false": 0
+                }
+            ]
+        },
+        "high": 1,
+        "low": 0
+    }
+}

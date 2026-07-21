@@ -1,0 +1,10 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Plume Squash Plant",
+    "growthTime": 9,
+    "consumes": [{ "type": "RESOURCE", "id": "ethanol", "amount": 15 }],
+    "productsPerHarvest": [
+        { "type": "RESOURCE", "id": "plume_squash", "amount": 4000 },
+        { "type": "RESOURCE", "id": "plume_squash_seed", "amount": 0.1 }
+    ]
+}

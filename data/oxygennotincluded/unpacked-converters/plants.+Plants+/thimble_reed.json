@@ -1,0 +1,10 @@
+{
+    "templateName": "plant_fertilizable",
+    "plantName": "Thimble Reed",
+    "growthTime": 2,
+    "consumes": [{ "type": "RESOURCE", "id": "polluted_water", "amount": 160 }],
+    "productsPerHarvest": [
+        { "type": "RESOURCE", "id": "reed_fiber", "amount": 1 },
+        { "type": "RESOURCE", "id": "thimble_reed_seed", "amount": 0.1 }
+    ]
+}
