@@ -318,9 +318,9 @@ input {
 
 .converter-select-children,
 .converter-child-list {
-    & > *:not(:last-child) {
-        margin-bottom: 4px;
-    }
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .converter-ingredient {
