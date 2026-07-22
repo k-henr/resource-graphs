@@ -333,7 +333,6 @@ input {
 
     & > div {
         display: flex;
-        margin: 0px 8px;
         gap: 8px;
     }
 }
@@ -352,6 +351,7 @@ input {
 .image-heading {
     display: flex;
     align-items: center;
+    gap: 8px;
 }
 
 .converter-ingredient-image {
