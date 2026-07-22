@@ -1,0 +1,180 @@
+{
+    "settings": [
+        {
+            "type": "ENUMERATE",
+            "name": "Recipe",
+            "options": [
+                "Barbeque",
+                "Cooked Seafood",
+                "Fried Mushroom",
+                "Frost Bun",
+                "Gristle Berry",
+                "Grubfruit Preserve",
+                "Mush Fry",
+                "Omelette",
+                "Pickled Meal",
+                "Pikeapple Skewer",
+                "Roast Grubfruit Nut",
+                "Soufflé Pancakes",
+                "Swampy Delights",
+                "Toasted Mimillet"
+            ],
+            "default": "Barbeque"
+        }
+    ],
+    "consumes": [
+        {
+            "type": "BRANCH",
+            "settingName": "Recipe",
+            "branches": [
+                ["Barbeque", { "type": "RESOURCE", "id": "meat", "amount": 3200 }],
+                [
+                    "Cooked Seafood",
+                    {
+                        "type": "OR",
+                        "resources": [
+                            {
+                                "type": "RESOURCE",
+                                "id": "fish_fillet",
+                                "amount": 1000
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "raw_shellfish",
+                                "amount": 1000
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "Fried Mushroom",
+                    { "type": "RESOURCE", "id": "mushroom", "amount": 2400 }
+                ],
+                [
+                    "Frost Bun",
+                    {
+                        "type": "TAG",
+                        "tagName": "&Grain",
+                        "amount": 3
+                    }
+                ],
+                [
+                    "Gristle Berry",
+                    { "type": "RESOURCE", "id": "bristle_berry", "amount": 1600 }
+                ],
+                [
+                    "Grubfruit Preserve",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            {
+                                "type": "RESOURCE",
+                                "id": "grubfruit",
+                                "amount": 2000
+                            },
+                            { "type": "RESOURCE", "id": "sucrose", "amount": 4 }
+                        ]
+                    }
+                ],
+                [
+                    "Mush Fry",
+                    { "type": "RESOURCE", "id": "mush_bar", "amount": 1800 }
+                ],
+                [
+                    "Omelette",
+                    { "type": "RESOURCE", "id": "raw_egg", "amount": 1200 }
+                ],
+                [
+                    "Pickled Meal",
+                    { "type": "RESOURCE", "id": "meal_lice", "amount": 1800 }
+                ],
+                [
+                    "Pikeapple Skewer",
+                    { "type": "RESOURCE", "id": "pikeapple", "amount": 800 }
+                ],
+                [
+                    "Roast Grubfruit Nut",
+                    { "type": "RESOURCE", "id": "spindly_grubfruit", "amount": 800 }
+                ],
+                [
+                    "Soufflé Pancakes",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "raw_egg", "amount": 1600 },
+                            {
+                                "type": "TAG",
+                                "tagName": "&Grain",
+                                "amount": 2
+                            }
+                        ]
+                    }
+                ]
+            ]
+        }
+    ],
+    "produces": [
+        {
+            "type": "BRANCH",
+            "settingName": "Recipe",
+            "branches": [
+                [
+                    "Barbeque",
+                    { "type": "RESOURCE", "id": "barbeque", "amount": 4000 }
+                ],
+                [
+                    "Cooked Seafood",
+                    { "type": "RESOURCE", "id": "cooked_seafood", "amount": 1600 }
+                ],
+                [
+                    "Fried Mushroom",
+                    { "type": "RESOURCE", "id": "fried_mushroom", "amount": 2800 }
+                ],
+                [
+                    "Frost Bun",
+                    { "type": "RESOURCE", "id": "frost_bun", "amount": 1200 }
+                ],
+                [
+                    "Gristle Berry",
+                    { "type": "RESOURCE", "id": "gristle_berry", "amount": 2000 }
+                ],
+                [
+                    "Grubfruit Preserve",
+                    {
+                        "type": "RESOURCE",
+                        "id": "grubfruit_preserve",
+                        "amount": 2400
+                    }
+                ],
+                [
+                    "Mush Fry",
+                    { "type": "RESOURCE", "id": "mush_fry", "amount": 1050 }
+                ],
+                [
+                    "Omelette",
+                    { "type": "RESOURCE", "id": "omelette", "amount": 2800 }
+                ],
+                [
+                    "Pickled Meal",
+                    { "type": "RESOURCE", "id": "pickled_meal", "amount": 1800 }
+                ],
+                [
+                    "Pikeapple Skewer",
+                    { "type": "RESOURCE", "id": "pikeapple_skewer", "amount": 1200 }
+                ],
+                [
+                    "Roast Grubfruit Nut",
+                    {
+                        "type": "RESOURCE",
+                        "id": "roast_grubfruit_nut",
+                        "amount": 1200
+                    }
+                ],
+                [
+                    "Soufflé Pancakes",
+                    { "type": "RESOURCE", "id": "souffle_pancakes", "amount": 3600 }
+                ]
+            ]
+        }
+    ]
+}
