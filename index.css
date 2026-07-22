@@ -255,6 +255,10 @@ main {
     padding: 16px;
     background-color: var(--background-color);
     box-shadow: black 0px 0px 50px;
+
+    & > *:not(:first-child) {
+        margin-top: 4px;
+    }
 }
 
 input {
