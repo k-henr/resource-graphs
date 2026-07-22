@@ -1,0 +1,145 @@
+{
+    "settings": [
+        {
+            "type": "ENUMERATE",
+            "name": "Recipe",
+            "options": [
+                "Fish Taco",
+                "Nosh Noms",
+                "Shellfish Tempura",
+                "Squash Fries"
+            ],
+            "default": "Fish Taco"
+        }
+    ],
+    "consumes": [
+        {
+            "type": "BRANCH",
+            "settingName": "Recipe",
+            "branches": [
+                [
+                    "Fish Taco",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            {
+                                "type": "RESOURCE",
+                                "id": "fish_fillet",
+                                "amount": 1000
+                            },
+                            {
+                                "type": "TAG",
+                                "tagName": "&Grain",
+                                "amount": 2
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "tallow",
+                                "amount": 2.4
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "Nosh Noms",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            {
+                                "type": "RESOURCE",
+                                "id": "nosh_bean",
+                                "amount": 6
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "tallow",
+                                "amount": 1
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "Shellfish Tempura",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            {
+                                "type": "RESOURCE",
+                                "id": "raw_shellfish",
+                                "amount": 1000
+                            },
+                            {
+                                "type": "TAG",
+                                "tagName": "&Grain",
+                                "amount": 2
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "tallow",
+                                "amount": 2.4
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "Squash Fries",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            {
+                                "type": "RESOURCE",
+                                "id": "plume_squash",
+                                "amount": 4000
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "tallow",
+                                "amount": 2.4
+                            }
+                        ]
+                    }
+                ]
+            ]
+        }
+    ],
+    "produces": [
+        {
+            "type": "BRANCH",
+            "settingName": "Recipe",
+            "branches": [
+                [
+                    "Fish Taco",
+                    {
+                        "type": "RESOURCE",
+                        "id": "fish_taco",
+                        "amount": 4200
+                    }
+                ],
+                [
+                    "Nosh Noms",
+                    {
+                        "type": "RESOURCE",
+                        "id": "nosh_noms",
+                        "amount": 5000
+                    }
+                ],
+                [
+                    "Shellfish Tempura",
+                    {
+                        "type": "RESOURCE",
+                        "id": "shellfish_tempura",
+                        "amount": 4200
+                    }
+                ],
+                [
+                    "Squash Fries",
+                    {
+                        "type": "RESOURCE",
+                        "id": "squash_fries",
+                        "amount": 5400
+                    }
+                ]
+            ]
+        }
+    ]
+}
