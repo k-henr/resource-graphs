@@ -1,0 +1,43 @@
+{
+    "displayImage": "images/resources/solids.+&Solid+/.+Liquefiable+/ice.png",
+    "consumes": [
+        {
+            "type": "ENTANGLED_OR",
+            "resources": [
+                ["water", { "type": "RESOURCE", "id": "water", "amount": 1 }],
+                [
+                    "polluted_water",
+                    { "type": "RESOURCE", "id": "polluted_water", "amount": 1 }
+                ],
+                [
+                    "salt_water",
+                    { "type": "RESOURCE", "id": "salt_water", "amount": 1 }
+                ],
+                ["brine", { "type": "RESOURCE", "id": "brine", "amount": 1 }]
+            ]
+        }
+    ],
+    "produces": [
+        {
+            "type": "ENTANGLED_OR",
+            "resources": [
+                ["water", { "type": "RESOURCE", "id": "ice", "amount": 1 }],
+                [
+                    "polluted_water",
+                    { "type": "RESOURCE", "id": "polluted_ice", "amount": 1 }
+                ],
+                [
+                    "salt_water",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "ice", "amount": 0.77 },
+                            { "type": "RESOURCE", "id": "brine", "amount": 0.23 }
+                        ]
+                    }
+                ],
+                ["brine", { "type": "RESOURCE", "id": "brine_ice", "amount": 1 }]
+            ]
+        }
+    ]
+}

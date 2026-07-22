@@ -1,0 +1,5 @@
+{
+    "displayImage": "images/resources/liquids.+&Liquid+/.+Plastic Monomer+/petroleum.+Combustible Liquid+.png",
+    "consumes": [{ "type": "RESOURCE", "id": "crude_oil", "amount": 1 }],
+    "produces": [{ "type": "RESOURCE", "id": "petroleum", "amount": 1 }]
+}

@@ -1,0 +1,13 @@
+{
+    "displayImage": "images/resources/gases.+&Gas+/polluted_oxygen.png",
+    "consumes": [
+        {
+            "type": "OR",
+            "resources": [
+                { "type": "RESOURCE", "id": "polluted_water", "amount": 1 },
+                { "type": "RESOURCE", "id": "polluted_dirt", "amount": 1 }
+            ]
+        }
+    ],
+    "produces": [{ "type": "RESOURCE", "id": "polluted_oxygen", "amount": 1 }]
+}

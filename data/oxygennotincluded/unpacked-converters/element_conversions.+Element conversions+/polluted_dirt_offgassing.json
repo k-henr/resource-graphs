@@ -1,5 +1,0 @@
-{
-    "displayImage": "images/resources/gases.+&Gas+/polluted_oxygen.png",
-    "consumes": [{ "type": "RESOURCE", "id": "polluted_dirt", "amount": 1 }],
-    "produces": [{ "type": "RESOURCE", "id": "polluted_oxygen", "amount": 1 }]
-}

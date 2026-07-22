@@ -1,0 +1,58 @@
+{
+    "displayImage": "images/resources/gases.+&Gas+/steam.png",
+    "consumes": [
+        {
+            "type": "ENTANGLED_OR",
+            "resources": [
+                ["water", { "type": "RESOURCE", "id": "water", "amount": 1 }],
+                [
+                    "polluted_water",
+                    { "type": "RESOURCE", "id": "polluted_water", "amount": 1 }
+                ],
+                [
+                    "salt_water",
+                    { "type": "RESOURCE", "id": "salt_water", "amount": 1 }
+                ],
+                ["brine", { "type": "RESOURCE", "id": "brine", "amount": 1 }]
+            ]
+        }
+    ],
+    "produces": [
+        {
+            "type": "ENTANGLED_OR",
+            "resources": [
+                ["water", { "type": "RESOURCE", "id": "steam", "amount": 1 }],
+                [
+                    "polluted_water",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "steam", "amount": 0.99 },
+                            { "type": "RESOURCE", "id": "dirt", "amount": 0.01 }
+                        ]
+                    }
+                ],
+                [
+                    "salt_water",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "steam", "amount": 0.93 },
+                            { "type": "RESOURCE", "id": "salt", "amount": 0.07 }
+                        ]
+                    }
+                ],
+                [
+                    "brine",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "steam", "amount": 0.7 },
+                            { "type": "RESOURCE", "id": "salt", "amount": 0.3 }
+                        ]
+                    }
+                ]
+            ]
+        }
+    ]
+}

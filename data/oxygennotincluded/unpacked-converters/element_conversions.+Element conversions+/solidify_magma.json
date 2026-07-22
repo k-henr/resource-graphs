@@ -1,0 +1,5 @@
+{
+    "displayImage": "images/resources/solids.+&Solid+/.+Raw Mineral+/.+&Rock+/igneous_rock.png",
+    "consumes": [{ "type": "RESOURCE", "id": "magma", "amount": 1 }],
+    "produces": [{ "type": "RESOURCE", "id": "igneous_rock", "amount": 1 }]
+}

@@ -1,0 +1,5 @@
+{
+    "displayImage": "images/resources/solids.+&Solid+/.+Manufactured Material+/glass.png",
+    "consumes": [{ "type": "RESOURCE", "id": "molten_glass", "amount": 1 }],
+    "produces": [{ "type": "RESOURCE", "id": "glass", "amount": 1 }]
+}

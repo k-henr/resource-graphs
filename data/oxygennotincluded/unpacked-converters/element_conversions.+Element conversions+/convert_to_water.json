@@ -1,0 +1,13 @@
+{
+    "displayImage": "images/resources/liquids.+&Liquid+/.+Water Based+/water.png",
+    "consumes": [
+        {
+            "type": "OR",
+            "resources": [
+                { "type": "RESOURCE", "id": "ice", "amount": 1 },
+                { "type": "RESOURCE", "id": "steam", "amount": 1 }
+            ]
+        }
+    ],
+    "produces": [{ "type": "RESOURCE", "id": "water", "amount": 1 }]
+}

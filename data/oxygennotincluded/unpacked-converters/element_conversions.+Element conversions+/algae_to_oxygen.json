@@ -1,0 +1,5 @@
+{
+    "displayImage": "images/resources/gases.+&Gas+/oxygen.png",
+    "consumes": [{ "type": "RESOURCE", "id": "algae", "amount": 1 }],
+    "produces": [{ "type": "RESOURCE", "id": "oxygen", "amount": 0.5 }]
+}

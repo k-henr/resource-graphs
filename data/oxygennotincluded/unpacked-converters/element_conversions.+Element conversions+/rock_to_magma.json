@@ -1,0 +1,11 @@
+{
+    "displayImage": "images/resources/liquids.+&Liquid+/magma.png",
+    "consumes": [
+        {
+            "type": "TAG",
+            "tagName": "&Rock",
+            "amount": 1
+        }
+    ],
+    "produces": [{ "type": "RESOURCE", "id": "magma", "amount": 1 }]
+}
