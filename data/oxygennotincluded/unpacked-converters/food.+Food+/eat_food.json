@@ -1,0 +1,4 @@
+{
+    "consumes": [{ "type": "TAG", "tagName": "&Edible", "amount": 1 }],
+    "produces": [{ "type": "RESOURCE", "id": "food", "amount": 1 }]
+}
