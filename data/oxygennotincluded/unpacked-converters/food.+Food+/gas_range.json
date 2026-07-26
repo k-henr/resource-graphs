@@ -1,0 +1,220 @@
+{
+    "settings": [
+        {
+            "type": "ENUMERATE",
+            "name": "Recipe",
+            "options": [
+                "Curried Beans",
+                "Frost Burger",
+                "Mixed Berry Pie",
+                "Mushroom Quiche",
+                "Mushroom Wrap",
+                "Pepper Bread",
+                "Spicy Tofu",
+                "Stuffed Berry",
+                "Surf'n'Turf"
+            ],
+            "default": "Curried Beans"
+        }
+    ],
+    "consumes": [
+        {
+            "type": "BRANCH",
+            "settingName": "Recipe",
+            "branches": [
+                [
+                    "Curried Beans",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "tonic_root", "amount": 4 },
+                            { "type": "RESOURCE", "id": "nosh_bean", "amount": 4 }
+                        ]
+                    }
+                ],
+                [
+                    "Frost Burger",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            {
+                                "type": "RESOURCE",
+                                "id": "frost_bun",
+                                "amount": 1200
+                            },
+                            { "type": "RESOURCE", "id": "lettuce", "amount": 400 },
+                            { "type": "RESOURCE", "id": "barbeque", "amount": 4000 }
+                        ]
+                    }
+                ],
+                [
+                    "Mixed Berry Pie",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "TAG", "tagName": "&Grain", "amount": 3 },
+                            {
+                                "type": "RESOURCE",
+                                "id": "grubfruit",
+                                "amount": 1000
+                            },
+                            {
+                                "type": "OR",
+                                "resources": [
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "gristle_berry",
+                                        "amount": 2000
+                                    },
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "pikeapple_skewer",
+                                        "amount": 2000
+                                    },
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "ovagro_fig",
+                                        "amount": 2000
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "Mushroom Quiche",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "omelette", "amount": 2800 },
+                            { "type": "RESOURCE", "id": "lettuce", "amount": 400 },
+                            {
+                                "type": "RESOURCE",
+                                "id": "fried_mushroom",
+                                "amount": 2800
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "Mushroom Wrap",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            {
+                                "type": "RESOURCE",
+                                "id": "fried_mushroom",
+                                "amount": 2800
+                            },
+                            { "type": "RESOURCE", "id": "lettuce", "amount": 1600 }
+                        ]
+                    }
+                ],
+                [
+                    "Pepper Bread",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "TAG", "tagName": "&Grain", "amount": 10 },
+                            {
+                                "type": "RESOURCE",
+                                "id": "pincha_peppernut",
+                                "amount": 1
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "Spicy Tofu",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "tofu", "amount": 3600 },
+                            {
+                                "type": "RESOURCE",
+                                "id": "pincha_peppernut",
+                                "amount": 1
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "Stuffed Berry",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            {
+                                "type": "RESOURCE",
+                                "id": "gristle_berry",
+                                "amount": 4000
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "pincha_peppernut",
+                                "amount": 2
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "Surf'n'Turf",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "barbeque", "amount": 4000 },
+                            {
+                                "type": "RESOURCE",
+                                "id": "cooked_seafood",
+                                "amount": 1600
+                            }
+                        ]
+                    }
+                ]
+            ]
+        }
+    ],
+    "produces": [
+        {
+            "type": "BRANCH",
+            "settingName": "Recipe",
+            "branches": [
+                [
+                    "Curried Beans",
+                    { "type": "RESOURCE", "id": "curried_beans", "amount": 5000 }
+                ],
+                [
+                    "Frost Burger",
+                    { "type": "RESOURCE", "id": "frost_burger", "amount": 6000 }
+                ],
+                [
+                    "Mixed Berry Pie",
+                    { "type": "RESOURCE", "id": "mixed_berry_pie", "amount": 4200 }
+                ],
+                [
+                    "Mushroom Quiche",
+                    { "type": "RESOURCE", "id": "mushroom_quiche", "amount": 6400 }
+                ],
+                [
+                    "Mushroom Wrap",
+                    { "type": "RESOURCE", "id": "mushroom_wrap", "amount": 4800 }
+                ],
+                [
+                    "Pepper Bread",
+                    { "type": "RESOURCE", "id": "pepper_bread", "amount": 4000 }
+                ],
+                [
+                    "Spicy Tofu",
+                    { "type": "RESOURCE", "id": "spicy_tofu", "amount": 4000 }
+                ],
+                [
+                    "Stuffed Berry",
+                    { "type": "RESOURCE", "id": "stuffed_berry", "amount": 4400 }
+                ],
+                [
+                    "Surf'n'Turf",
+                    { "type": "RESOURCE", "id": "surf'n'turf", "amount": 6000 }
+                ]
+            ]
+        }
+    ]
+}
