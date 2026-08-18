@@ -1,0 +1,111 @@
+{
+    "templateName": "critter-2%",
+    "displayName": "{Cramped|Cramped }{Wild|Wild }{Morph} (happiness {Happiness})",
+    "thumbName": "Flox",
+    "morphs": ["Flox", "Shatter Flox"],
+    "defaultMorph": "Flox",
+    "meat": "meat",
+    "caloriesDropped": 1600,
+    "egg": "flox_egg",
+    "consumeResource": [
+        {
+            "type": "BRANCH",
+            "settingName": "Morph",
+            "branches": [
+                [
+                    "Flox",
+                    {
+                        "type": "OR",
+                        "resources": [
+                            {
+                                "type": "RESOURCE",
+                                "id": "bristle_berry",
+                                "amount": 160
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "pikeapple",
+                                "amount": 160
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "Shatter Flox",
+                    {
+                        "type": "ENTANGLED_OR",
+                        "name": "shatter_diet",
+                        "resources": [
+                            [
+                                "pikeapple",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "pikeapple",
+                                    "amount": 160
+                                }
+                            ],
+                            [
+                                "bristle_berry",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "bristle_berry",
+                                    "amount": 160
+                                }
+                            ],
+                            [
+                                "abyssalite",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "abyssalite",
+                                    "amount": 20
+                                }
+                            ]
+                        ]
+                    }
+                ]
+            ]
+        }
+    ],
+    "produceResource": [
+        { "type": "RESOURCE", "id": "dirt", "amount": 5 },
+        {
+            "type": "BRANCH",
+            "settingName": "Morph",
+            "branches": [
+                [
+                    "Flox",
+                    {
+                        "type": "RESOURCE",
+                        "id": "wood",
+                        "amount": [360, 6]
+                    }
+                ],
+                [
+                    "Shatter Flox",
+                    {
+                        "type": "ENTANGLED_OR",
+                        "name": "shatter_diet",
+                        "resources": [
+                            [
+                                ["pikeapple", "bristle_berry"],
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "glass",
+                                    "amount": 0
+                                }
+                            ],
+                            [
+                                "abyssalite",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "glass",
+                                    "amount": [60, 6]
+                                }
+                            ]
+                        ]
+                    }
+                ]
+            ]
+        }
+    ]
+}

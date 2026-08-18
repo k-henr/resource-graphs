@@ -124,7 +124,7 @@
         },
         {
             "type": "RESOURCE",
-            "id": "meat",
+            "id": "TEMPLATE:meat",
             "amount": ["TEMPLATE:caloriesDropped", "TEMPLATE:adultLifespan"]
         }
     ]
