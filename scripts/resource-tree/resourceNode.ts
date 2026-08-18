@@ -10,11 +10,10 @@ import { ResourceTree } from "./resourceTree";
  */
 
 export class ResourceNode implements ResourceTree {
+    public elements: HTMLElement[] = [];
+
     private readonly amount: Rational;
     private readonly resource: Resource;
-
-    public readonly element: HTMLElement;
-    private readonly amountEl: HTMLElement;
 
     // Template for a resource element
     private static converterIngredientTemplate = new Template(
@@ -24,20 +23,25 @@ export class ResourceNode implements ResourceTree {
     public constructor(resource: Resource, amount: Rational) {
         this.amount = amount;
         this.resource = resource;
-        this.element = this.createIngredientElement();
-        this.amountEl = this.element.querySelector<HTMLElement>(
-            ".converter-ingredient-amount",
-        )!;
     }
 
-    public updateElement(multiplier: Rational, _: ConverterSettings) {
-        this.setAmount(this.amount.mul(multiplier));
+    public createElement(): HTMLElement {
+        const el = this.createIngredientElement();
+        this.elements.push(el);
+        return el;
     }
 
-    private setAmount(amount: Rational) {
+    public updateElements(multiplier: Rational, _: ConverterSettings) {
+        const amount = this.amount.mul(multiplier);
         const unitGroupName = this.resource.unitGroupName;
         const newContent = `${amount.getDecimalString()} ${getUnits(unitGroupName)[1]}`;
-        this.amountEl.innerText = newContent;
+
+        // Update all elements to match the new amount
+        for (const el of this.elements) {
+            el.querySelector<HTMLElement>(
+                ".converter-ingredient-amount",
+            )!.innerText = newContent;
+        }
     }
 
     public addResourcesToList(
@@ -62,5 +66,9 @@ export class ResourceNode implements ResourceTree {
             this.resource.displayImage;
 
         return el;
+    }
+
+    public untrackAllElements(): void {
+        this.elements = [];
     }
 }

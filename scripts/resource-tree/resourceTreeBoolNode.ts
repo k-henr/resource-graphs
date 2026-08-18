@@ -1,6 +1,4 @@
 import { ConverterSettings } from "../converterSettings";
-import { ProgramError } from "../errors";
-import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
 import { ConverterDependency, ConverterIngredient } from "../types";
 import { ResourceTree } from "./resourceTree";
@@ -10,25 +8,18 @@ import { ResourceTree } from "./resourceTree";
  */
 
 export abstract class ResourceTreeBoolNode implements ResourceTree {
-    public abstract readonly element: HTMLElement;
-
+    public elements: HTMLElement[] = [];
     protected children: ResourceTree[];
 
     public constructor(children: ResourceTree[]) {
         this.children = children;
     }
 
-    public replaceChild(oldChild: ResourceTree, newChild: ResourceTree): void {
-        for (const i in this.children) {
-            if (this.children[i] === oldChild) {
-                this.children[i].element.replaceWith(newChild.element);
-                this.children[i] = newChild;
-                return;
-            }
-        }
-        throw new ProgramError(
-            "Child not found in boolean node when trying to replace it!",
-        );
+    public abstract createElement(): HTMLElement;
+
+    public untrackAllElements() {
+        this.elements = [];
+        this.children.map((child) => child.untrackAllElements());
     }
 
     public abstract addResourcesToList(
@@ -38,8 +29,8 @@ export abstract class ResourceTreeBoolNode implements ResourceTree {
         multiplier: Rational,
     ): ConverterIngredient[];
 
-    public updateElement(multiplier: Rational, settings: ConverterSettings) {
+    public updateElements(multiplier: Rational, settings: ConverterSettings) {
         // Update all the children
-        this.children.map((child) => child.updateElement(multiplier, settings));
+        this.children.map((child) => child.updateElements(multiplier, settings));
     }
 }

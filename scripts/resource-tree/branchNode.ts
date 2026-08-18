@@ -1,7 +1,6 @@
 import { ConverterEnumerateSetting } from "../converter-setting/converterEnumerateSetting";
 import { ConverterSettings } from "../converterSettings";
-import { GraphError, ProgramError } from "../errors";
-import { IntermediateConverter } from "../intermediateConverter";
+import { GraphError } from "../errors";
 import { Rational } from "../rational";
 import { ConverterDependency, ConverterIngredient } from "../types";
 import { ResourceTree } from "./resourceTree";
@@ -11,26 +10,34 @@ import { ResourceTree } from "./resourceTree";
  */
 
 export class BranchNode implements ResourceTree {
-    public readonly element: HTMLElement;
+    public elements: HTMLElement[] = [];
 
     private readonly settingName: string;
+    private readonly childNodes: [string | string[], ResourceTree][];
     private readonly childMap = new Map<string, ResourceTree>();
     private currentBranch: ResourceTree | null = null;
 
     public constructor(
         settingName: string,
-        children: [string | string[], ResourceTree][],
+        childNodes: [string | string[], ResourceTree][],
     ) {
-        this.element = document.createElement("div");
-        this.element.classList.toggle("test-class"); // todo: remove
         this.settingName = settingName;
-        children.map(([name, child]) => {
-            this.element.appendChild(child.element);
-            child.element.classList.add("hidden");
+        this.childNodes = childNodes;
+    }
+
+    public createElement(): HTMLElement {
+        const el = document.createElement("div");
+        this.childNodes.map(([name, child]) => {
+            const childEl = child.createElement();
+            el.appendChild(childEl);
+            childEl.classList.add("hidden");
             // Allow for multiple options pointing to the same node
             if (typeof name === "string") this.childMap.set(name, child);
             else name.map((n) => this.childMap.set(n, child));
         });
+
+        this.elements.push(el);
+        return el;
     }
 
     public addResourcesToList(
@@ -48,14 +55,17 @@ export class BranchNode implements ResourceTree {
         );
     }
 
-    public updateElement(multiplier: Rational, settings: ConverterSettings): void {
+    public updateElements(multiplier: Rational, settings: ConverterSettings): void {
         for (const [, value] of this.childMap.entries()) {
-            value.updateElement(multiplier, settings);
+            value.updateElements(multiplier, settings);
         }
         // Update which branch is shown
-        this.currentBranch?.element.classList.add("hidden");
+        // (todo: only hide child branches that were created by this node. Add
+        // wrapper elements like in OR?)
+        this.currentBranch?.elements.map((el) => el.classList.add("hidden"));
+        // Switch branch to the new one
         const branch = this.getBranch(settings);
-        branch.element.classList.remove("hidden");
+        branch.elements.map((el) => el.classList.remove("hidden"));
         this.currentBranch = branch;
     }
 
@@ -80,5 +90,12 @@ export class BranchNode implements ResourceTree {
             );
         }
         return branch;
+    }
+
+    public untrackAllElements(): void {
+        this.elements = [];
+        for (const [, n] of this.childNodes) {
+            n.untrackAllElements();
+        }
     }
 }

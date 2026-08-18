@@ -7,7 +7,7 @@ import { Rational } from "./rational";
 import { Resource } from "./resource";
 import { ResourceGraph } from "./resourceGraph";
 import { SubmitMenu } from "./submitMenu";
-import { ConverterDependency, ConverterIngredient, SettingsTreeNode } from "./types";
+import { ConverterDependency, ConverterIngredient } from "./types";
 /**
  * The menu used when adding converters.
  */
@@ -89,6 +89,7 @@ export class ConverterMenu extends SubmitMenu {
 
         // All stuff in the detail popup has been resolved now, can be closed
         this.closeDetailPopup();
+        this.converterInProgress.converter.unregisterTrackedElementsForTrees();
 
         // Resolve any converter dependencies. If none are around, this function adds
         // the converter to the graph instead
@@ -135,7 +136,7 @@ export class ConverterMenu extends SubmitMenu {
             dependency.converter.settings,
             () => {
                 const amount = dependencySettings.evaluateTree(dependency.amount);
-                ingredientTree.updateElement(amount, dependencySettings);
+                ingredientTree.updateElements(amount, dependencySettings);
                 dependencyAmountEl.innerText = amount.getDecimalString();
             },
         );
@@ -145,7 +146,7 @@ export class ConverterMenu extends SubmitMenu {
         // I can simply call it here. Hard to do because it references a half-
         // constructed settings object (which is apparently legal???))
         const amount = dependencySettings.evaluateTree(dependency.amount);
-        ingredientTree.updateElement(amount, dependencySettings);
+        ingredientTree.updateElements(amount, dependencySettings);
         dependencyAmountEl.innerText = amount.getDecimalString();
 
         // Populate the correct form with the settings
@@ -160,7 +161,7 @@ export class ConverterMenu extends SubmitMenu {
             "#converter-dependency-tree",
         )!;
         treeContainer.innerHTML = "";
-        treeContainer.appendChild(ingredientTree.element);
+        treeContainer.appendChild(ingredientTree.createElement());
 
         // Add a listener to the submit button, that:
         // - Tries to add the ingredient tree's resources to the ingredient list
@@ -184,6 +185,7 @@ export class ConverterMenu extends SubmitMenu {
                 submitBtn.onclick = null;
                 this.closeDependencyPopup();
                 this.resolveConverterDependency();
+                ingredientTree.untrackAllElements();
             } catch (e: any) {
                 displayErr(e);
                 throw e;

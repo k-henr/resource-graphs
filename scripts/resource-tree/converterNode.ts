@@ -14,10 +14,10 @@ import { ResourceTree } from "./resourceTree";
  */
 
 export class ConverterNode implements ResourceTree {
+    public elements: HTMLElement[] = [];
+
     private readonly amount: SettingsTreeNode;
     private readonly converter: ConverterFactory;
-
-    public readonly element: HTMLElement;
 
     // Template for a resource element
     private static converterIngredientTemplate = new Template(
@@ -30,16 +30,23 @@ export class ConverterNode implements ResourceTree {
     ) {
         this.amount = amount;
         this.converter = converterFactory;
-        this.element = this.createIngredientElement();
         this.setAmount(Rational.one); //TODO: Use another template without the amount
     }
 
-    public updateElement(_multiplier: Rational, _settings: ConverterSettings) {}
+    public createElement(): HTMLElement {
+        const el = this.createIngredientElement();
+        this.elements.push(el);
+        return el;
+    }
+
+    public updateElements(_multiplier: Rational, _settings: ConverterSettings) {}
 
     private setAmount(amount: Rational) {
-        this.element.querySelector<HTMLElement>(
-            ".converter-ingredient-amount",
-        )!.innerText = amount.getDecimalString();
+        for (const el of this.elements) {
+            el.querySelector<HTMLElement>(
+                ".converter-ingredient-amount",
+            )!.innerText = amount.getDecimalString();
+        }
     }
 
     public addResourcesToList(
@@ -64,5 +71,9 @@ export class ConverterNode implements ResourceTree {
             this.converter.displayImage;
 
         return el;
+    }
+
+    public untrackAllElements() {
+        this.elements = [];
     }
 }

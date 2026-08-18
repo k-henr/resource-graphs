@@ -29,8 +29,7 @@ export class IntermediateConverter {
     // (in most cases there'll only be a single group, but I wanted to support more)
     private readonly entangledOrs = new Map<string, EntangledOrNode[]>();
 
-    // todo: back to private after debugging
-    public readonly infoElement: HTMLElement;
+    private readonly infoElement: HTMLElement;
 
     // Ingredients and products
     private readonly ingredientTree: ResourceTree;
@@ -61,16 +60,18 @@ export class IntermediateConverter {
             this.tryUpdateInfoPanel();
         });
 
+        // == TODO: Move the below code into ConverterMenu where it belongs ==
+
         // Populate the info panel
         this.infoElement = IntermediateConverter.infoTemplate.cloneElement();
 
         // Add the trees' elements to the info panel
         this.infoElement
             .querySelector<Element>(".c-info-ingredients")!
-            .appendChild(this.ingredientTree.element);
+            .appendChild(this.ingredientTree.createElement());
         this.infoElement
             .querySelector<Element>(".c-info-products")!
-            .appendChild(this.productTree.element);
+            .appendChild(this.productTree.createElement());
 
         // Update the trees to make their numbers correct
         this.updateInfoPanel();
@@ -80,6 +81,8 @@ export class IntermediateConverter {
             this.displayImage;
 
         IntermediateConverter.infoPanel.replaceChildren(this.infoElement);
+
+        // ==  ==
     }
 
     public formatDisplayName() {
@@ -138,8 +141,8 @@ export class IntermediateConverter {
     // Update the info display with new settings
     public updateInfoPanel() {
         // Update the trees' elements
-        this.ingredientTree.updateElement(Rational.one, this.settings);
-        this.productTree.updateElement(Rational.one, this.settings);
+        this.ingredientTree.updateElements(Rational.one, this.settings);
+        this.productTree.updateElements(Rational.one, this.settings);
 
         // Update the header
         this.infoElement.querySelector<HTMLElement>(".rc-info-header")!.innerText =
@@ -176,5 +179,11 @@ export class IntermediateConverter {
         if (!ors) return;
 
         for (const node of ors) node.chooseOption(optionName);
+    }
+
+    // Unregister all tracked elements for the trees involved in this converter
+    public unregisterTrackedElementsForTrees() {
+        this.ingredientTree.untrackAllElements();
+        this.productTree.untrackAllElements();
     }
 }

@@ -1,5 +1,4 @@
 import { ConverterSettings } from "../converterSettings";
-import { IntermediateConverter } from "../intermediateConverter";
 import { Rational } from "../rational";
 import { Template } from "../template";
 import { ConverterDependency, ConverterIngredient } from "../types";
@@ -10,22 +9,22 @@ import { ResourceTree } from "./resourceTree";
  */
 
 export class NothingNode implements ResourceTree {
-    public readonly element: HTMLElement;
+    public elements: HTMLElement[] = [];
 
     private static converterIngredientTemplate = new Template(
         "converter-ingredient-template",
     );
 
-    constructor() {
+    public createElement(): HTMLElement {
         const el = NothingNode.converterIngredientTemplate.cloneElement();
         el.querySelector<HTMLElement>(".converter-ingredient-name")!.innerText =
             `[Nothing]`;
         el.querySelector<HTMLImageElement>(".converter-ingredient-image")!.remove();
-
-        this.element = el;
+        this.elements.push(el);
+        return el;
     }
 
-    public updateElement(_multiplier: Rational, _settings: ConverterSettings) {}
+    public updateElements(_multiplier: Rational, _settings: ConverterSettings) {}
 
     public addResourcesToList(
         output: ConverterIngredient[],
@@ -33,5 +32,9 @@ export class NothingNode implements ResourceTree {
         _settings: ConverterSettings,
     ) {
         return output;
+    }
+
+    public untrackAllElements() {
+        this.elements = [];
     }
 }

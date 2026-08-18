@@ -6,7 +6,7 @@ import { ConverterDependency, ConverterIngredient } from "../types";
  */
 
 export interface ResourceTree {
-    readonly element: HTMLElement;
+    elements: HTMLElement[];
 
     // Add all resources present in this tree to the given list
     addResourcesToList(
@@ -16,6 +16,12 @@ export interface ResourceTree {
         multiplier: Rational,
     ): ConverterIngredient[];
 
-    // Get an element representing this resource tree
-    updateElement(multiplier: Rational, settings: ConverterSettings): void;
+    // Create a new (tracked) element representing this tree
+    createElement(): HTMLElement;
+
+    // Update all elements representing this resource tree
+    updateElements(multiplier: Rational, settings: ConverterSettings): void;
+
+    // Untrack all elements related to this tree. Used when exiting menus etc
+    untrackAllElements(): void;
 }
