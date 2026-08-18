@@ -110,10 +110,10 @@ export class ConverterMenu extends SubmitMenu {
 
         // Otherwise, resolve one of the unresolved dependency converters
 
-        // Get a converter dependency to resolve
+        // Get the next converter dependency to resolve
         const dependency = this.converterInProgress.unresolvedDependencies.pop()!;
 
-        // Open the dependency popup and set basic values that won't change
+        // Open the dependency popup and set basic values that won't change during resolution
         this.openDependencyPopup();
         this.dependencyPopup.querySelector<HTMLElement>(
             "#converter-dependency-name",
@@ -127,17 +127,35 @@ export class ConverterMenu extends SubmitMenu {
             this.converterInProgress.converter,
             dependency.converter.ingredientTreeData,
         );
-        // Get the settings from the dependency
+
+        // Add the tree element to the container for it
+        const treeContainer = this.dependencyPopup.querySelector<HTMLElement>(
+            "#converter-dependency-tree",
+        )!;
+        treeContainer.innerHTML = "";
+        treeContainer.appendChild(ingredientTree.createElement());
+
+        // Create the settings from the dependency, so that the final amount can depend on these settings
         const dependencyAmountEl = this.dependencyPopup.querySelector<HTMLElement>(
             "#converter-dependency-amount",
         )!;
         const dependencySettings = new ConverterSettings(
             dependency.converter.settings,
             () => {
+                // When the settings are changed, this should update the amount required
+                console.log("Settings changed");
                 const amount = dependencySettings.evaluateTree(dependency.amount);
+                console.log(amount.getDecimalString());
                 ingredientTree.updateElements(amount, dependencySettings);
                 dependencyAmountEl.innerText = amount.getDecimalString();
             },
+        );
+
+        // Populate the form with the settings
+        dependencySettings.populateForm(
+            this.dependencyPopup.querySelector<HTMLFormElement>(
+                "#converter-dependency-settings-form",
+            )!,
         );
 
         // Perform an initial update of the tree
@@ -147,20 +165,6 @@ export class ConverterMenu extends SubmitMenu {
         const amount = dependencySettings.evaluateTree(dependency.amount);
         ingredientTree.updateElements(amount, dependencySettings);
         dependencyAmountEl.innerText = amount.getDecimalString();
-
-        // Populate the correct form with the settings
-        dependencySettings.populateForm(
-            this.dependencyPopup.querySelector<HTMLFormElement>(
-                "#converter-dependency-settings-form",
-            )!,
-        );
-
-        // Add the tree element to the container for it
-        const treeContainer = this.dependencyPopup.querySelector<HTMLElement>(
-            "#converter-dependency-tree",
-        )!;
-        treeContainer.innerHTML = "";
-        treeContainer.appendChild(ingredientTree.createElement());
 
         // Add a listener to the submit button, that:
         // - Tries to add the ingredient tree's resources to the ingredient list

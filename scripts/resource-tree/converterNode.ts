@@ -5,6 +5,7 @@ import { Template } from "../template";
 import {
     ConverterDependency,
     ConverterIngredient,
+    RationalNumber,
     SettingsTreeNode,
 } from "../types";
 import { ResourceTree } from "./resourceTree";
@@ -17,6 +18,7 @@ export class ConverterNode implements ResourceTree {
     public elements: HTMLElement[] = [];
 
     private readonly amount: SettingsTreeNode;
+    private readonly amountPreview: Rational;
     private readonly converter: ConverterFactory;
 
     // Template for a resource element
@@ -27,10 +29,11 @@ export class ConverterNode implements ResourceTree {
     public constructor(
         converterFactory: ConverterFactory,
         amount: SettingsTreeNode,
+        amountPreview: RationalNumber,
     ) {
         this.amount = amount;
         this.converter = converterFactory;
-        this.setAmount(Rational.one); //TODO: Use another template without the amount
+        this.amountPreview = Rational.fromData(amountPreview);
     }
 
     public createElement(): HTMLElement {
@@ -39,9 +42,9 @@ export class ConverterNode implements ResourceTree {
         return el;
     }
 
-    public updateElements(_multiplier: Rational, _settings: ConverterSettings) {}
-
-    private setAmount(amount: Rational) {
+    public updateElements(multiplier: Rational, _settings: ConverterSettings) {
+        // TODO: The amount stored is a settings tree referring to the other converter's settings tree, which means it can't be used here. It's weird; the amount will depend both on the settings of this
+        const amount = this.amountPreview.mul(multiplier);
         for (const el of this.elements) {
             el.querySelector<HTMLElement>(
                 ".converter-ingredient-amount",
@@ -66,7 +69,7 @@ export class ConverterNode implements ResourceTree {
         const el = ConverterNode.converterIngredientTemplate.cloneElement();
 
         el.querySelector<HTMLElement>(".converter-ingredient-name")!.innerText =
-            this.converter.displayName;
+            this.converter.thumbName;
         el.querySelector<HTMLImageElement>(".converter-ingredient-image")!.src =
             this.converter.displayImage;
 

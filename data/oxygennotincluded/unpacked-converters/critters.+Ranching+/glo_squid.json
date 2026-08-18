@@ -1,0 +1,24 @@
+{
+    "templateName": "critter-2%",
+    "displayName": "{Cramped|Cramped }{Wild|Wild }{Morph} (happiness {Happiness})",
+    "thumbName": "Glo squid",
+    "morphs": ["Glo squid"],
+    "defaultMorph": "Glo squid",
+    "meat": "calamari",
+    "caloriesDropped": 9600,
+    "egg": "glo_squid_egg",
+    "consumeResource": [
+        {
+            "type": "CONVERTER",
+            "id": "tublia",
+            "amount": {
+                "type": "SETTING",
+                "name": "Wild",
+                "true": 1,
+                "false": 0.25
+            },
+            "amountPreview": 0.25
+        }
+    ],
+    "produceResource": [{ "type": "RESOURCE", "id": "abyssalite", "amount": 20 }]
+}

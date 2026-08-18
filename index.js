@@ -866,24 +866,24 @@ Please report this as a bug!`);
   var ConverterNode = class _ConverterNode {
     elements = [];
     amount;
+    amountPreview;
     converter;
     // Template for a resource element
     static converterIngredientTemplate = new Template(
       "converter-ingredient-template"
     );
-    constructor(converterFactory, amount) {
+    constructor(converterFactory, amount, amountPreview) {
       this.amount = amount;
       this.converter = converterFactory;
-      this.setAmount(Rational.one);
+      this.amountPreview = Rational.fromData(amountPreview);
     }
     createElement() {
       const el = this.createIngredientElement();
       this.elements.push(el);
       return el;
     }
-    updateElements(_multiplier, _settings) {
-    }
-    setAmount(amount) {
+    updateElements(multiplier, _settings) {
+      const amount = this.amountPreview.mul(multiplier);
       for (const el of this.elements) {
         el.querySelector(
           ".converter-ingredient-amount"
@@ -899,7 +899,7 @@ Please report this as a bug!`);
     }
     createIngredientElement() {
       const el = _ConverterNode.converterIngredientTemplate.cloneElement();
-      el.querySelector(".converter-ingredient-name").innerText = this.converter.displayName;
+      el.querySelector(".converter-ingredient-name").innerText = this.converter.thumbName;
       el.querySelector(".converter-ingredient-image").src = this.converter.displayImage;
       return el;
     }
@@ -1264,7 +1264,7 @@ Please report this as a bug!`);
           throw new GraphError(
             `Couldn't find converter factory with id "${data.id}"!`
           );
-        return new ConverterNode(conFact, data.amount);
+        return new ConverterNode(conFact, data.amount, data.amountPreview);
       case "AND":
         return new AndNode(
           data.resources.map((c) => resourceTreeDataToClass(converter, c))
@@ -1685,30 +1685,32 @@ Please report this as a bug!`);
         this.converterInProgress.converter,
         dependency.converter.ingredientTreeData
       );
+      const treeContainer = this.dependencyPopup.querySelector(
+        "#converter-dependency-tree"
+      );
+      treeContainer.innerHTML = "";
+      treeContainer.appendChild(ingredientTree.createElement());
       const dependencyAmountEl = this.dependencyPopup.querySelector(
         "#converter-dependency-amount"
       );
       const dependencySettings = new ConverterSettings(
         dependency.converter.settings,
         () => {
+          console.log("Settings changed");
           const amount2 = dependencySettings.evaluateTree(dependency.amount);
+          console.log(amount2.getDecimalString());
           ingredientTree.updateElements(amount2, dependencySettings);
           dependencyAmountEl.innerText = amount2.getDecimalString();
         }
       );
-      const amount = dependencySettings.evaluateTree(dependency.amount);
-      ingredientTree.updateElements(amount, dependencySettings);
-      dependencyAmountEl.innerText = amount.getDecimalString();
       dependencySettings.populateForm(
         this.dependencyPopup.querySelector(
           "#converter-dependency-settings-form"
         )
       );
-      const treeContainer = this.dependencyPopup.querySelector(
-        "#converter-dependency-tree"
-      );
-      treeContainer.innerHTML = "";
-      treeContainer.appendChild(ingredientTree.createElement());
+      const amount = dependencySettings.evaluateTree(dependency.amount);
+      ingredientTree.updateElements(amount, dependencySettings);
+      dependencyAmountEl.innerText = amount.getDecimalString();
       const submitBtn = this.dependencyPopup.querySelector("#submit-depencency");
       submitBtn.onclick = () => {
         try {

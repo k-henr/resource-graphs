@@ -96,7 +96,8 @@ export type ResourceTreeDataResourceNode = {
 export type ResourceTreeDataConverterNode = {
     type: "CONVERTER";
     id: string;
-    amount: RationalNumber;
+    amount: SettingsTreeNode;
+    amountPreview: RationalNumber;
 };
 // Combine resources either using AND or OR
 export type ResourceTreeDataBooleanNode = {

@@ -140,7 +140,7 @@ export function resourceTreeDataToClass(
                 throw new GraphError(
                     `Couldn't find converter factory with id "${data.id}"!`,
                 );
-            return new ConverterNode(conFact, data.amount);
+            return new ConverterNode(conFact, data.amount, data.amountPreview);
 
         case "AND":
             return new AndNode(
