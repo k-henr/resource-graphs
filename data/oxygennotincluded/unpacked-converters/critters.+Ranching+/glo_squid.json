@@ -14,10 +14,10 @@
             "amount": {
                 "type": "SETTING",
                 "name": "Wild",
-                "true": 1,
-                "false": 0.25
+                "true": 8,
+                "false": 2
             },
-            "amountPreview": 0.25
+            "amountPreview": 2
         }
     ],
     "produceResource": [{ "type": "RESOURCE", "id": "abyssalite", "amount": 20 }]
