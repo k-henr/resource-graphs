@@ -89,7 +89,6 @@ export class ConverterMenu extends SubmitMenu {
 
         // All stuff in the detail popup has been resolved now, can be closed
         this.closeDetailPopup();
-        this.converterInProgress.converter.unregisterTrackedElementsForTrees();
 
         // Resolve any converter dependencies. If none are around, this function adds
         // the converter to the graph instead
@@ -185,7 +184,6 @@ export class ConverterMenu extends SubmitMenu {
                 submitBtn.onclick = null;
                 this.closeDependencyPopup();
                 this.resolveConverterDependency();
-                ingredientTree.untrackAllElements();
             } catch (e: any) {
                 displayErr(e);
                 throw e;

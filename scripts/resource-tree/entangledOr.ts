@@ -1,5 +1,4 @@
 import { IntermediateConverter } from "../intermediateConverter";
-import { ResourceTreeDataEntangledOrNode } from "../types";
 import { OrNode } from "./orNode";
 import { ResourceTree } from "./resourceTree";
 /**

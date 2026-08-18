@@ -46,14 +46,14 @@ export class IntermediateConverter {
         thumbName: string,
         displayImage: string,
         settingList: ConverterSettingData[],
-        ingredientTree: ResourceTreeData,
-        productTree: ResourceTreeData,
+        ingredientTreeData: ResourceTreeData,
+        productTreeData: ResourceTreeData,
     ) {
         this.displayName = displayName;
         this.thumbName = thumbName;
         this.displayImage = displayImage;
-        this.ingredientTree = resourceTreeDataToClass(this, ingredientTree);
-        this.productTree = resourceTreeDataToClass(this, productTree);
+        this.ingredientTree = resourceTreeDataToClass(this, ingredientTreeData);
+        this.productTree = resourceTreeDataToClass(this, productTreeData);
 
         this.settings = new ConverterSettings(settingList, (e) => {
             e.preventDefault();
@@ -179,11 +179,5 @@ export class IntermediateConverter {
         if (!ors) return;
 
         for (const node of ors) node.chooseOption(optionName);
-    }
-
-    // Unregister all tracked elements for the trees involved in this converter
-    public unregisterTrackedElementsForTrees() {
-        this.ingredientTree.untrackAllElements();
-        this.productTree.untrackAllElements();
     }
 }

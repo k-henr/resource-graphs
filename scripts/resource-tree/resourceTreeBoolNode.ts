@@ -17,11 +17,6 @@ export abstract class ResourceTreeBoolNode implements ResourceTree {
 
     public abstract createElement(): HTMLElement;
 
-    public untrackAllElements() {
-        this.elements = [];
-        this.children.map((child) => child.untrackAllElements());
-    }
-
     public abstract addResourcesToList(
         output: ConverterIngredient[],
         converterDependencies: ConverterDependency[],

@@ -33,8 +33,4 @@ export class NothingNode implements ResourceTree {
     ) {
         return output;
     }
-
-    public untrackAllElements() {
-        this.elements = [];
-    }
 }

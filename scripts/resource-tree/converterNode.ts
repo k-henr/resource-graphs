@@ -72,8 +72,4 @@ export class ConverterNode implements ResourceTree {
 
         return el;
     }
-
-    public untrackAllElements() {
-        this.elements = [];
-    }
 }

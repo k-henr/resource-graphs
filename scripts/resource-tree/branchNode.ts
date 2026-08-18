@@ -91,11 +91,4 @@ export class BranchNode implements ResourceTree {
         }
         return branch;
     }
-
-    public untrackAllElements(): void {
-        this.elements = [];
-        for (const [, n] of this.childNodes) {
-            n.untrackAllElements();
-        }
-    }
 }

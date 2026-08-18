@@ -21,7 +21,4 @@ export interface ResourceTree {
 
     // Update all elements representing this resource tree
     updateElements(multiplier: Rational, settings: ConverterSettings): void;
-
-    // Untrack all elements related to this tree. Used when exiting menus etc
-    untrackAllElements(): void;
 }

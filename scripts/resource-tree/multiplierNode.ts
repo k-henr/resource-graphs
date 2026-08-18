@@ -64,9 +64,4 @@ export class MultiplierNode implements ResourceTree {
         );
         return output;
     }
-
-    public untrackAllElements(): void {
-        this.elements = [];
-        this.resource.untrackAllElements();
-    }
 }

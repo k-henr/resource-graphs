@@ -67,8 +67,4 @@ export class ResourceNode implements ResourceTree {
 
         return el;
     }
-
-    public untrackAllElements(): void {
-        this.elements = [];
-    }
 }

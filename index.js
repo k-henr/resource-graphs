@@ -565,12 +565,12 @@ Please report this as a bug!`);
     static infoTemplate = new Template("converter-info-template");
     static infoPanel = document.querySelector("#rc-info-panel");
     // note: overrides any current content of the info panel!
-    constructor(displayName, thumbName, displayImage, settingList, ingredientTree, productTree) {
+    constructor(displayName, thumbName, displayImage, settingList, ingredientTreeData, productTreeData) {
       this.displayName = displayName;
       this.thumbName = thumbName;
       this.displayImage = displayImage;
-      this.ingredientTree = resourceTreeDataToClass(this, ingredientTree);
-      this.productTree = resourceTreeDataToClass(this, productTree);
+      this.ingredientTree = resourceTreeDataToClass(this, ingredientTreeData);
+      this.productTree = resourceTreeDataToClass(this, productTreeData);
       this.settings = new ConverterSettings(settingList, (e) => {
         e.preventDefault();
         this.tryUpdateInfoPanel();
@@ -654,11 +654,6 @@ Please report this as a bug!`);
       const ors = this.entangledOrs.get(entangledOrName);
       if (!ors) return;
       for (const node of ors) node.chooseOption(optionName);
-    }
-    // Unregister all tracked elements for the trees involved in this converter
-    unregisterTrackedElementsForTrees() {
-      this.ingredientTree.untrackAllElements();
-      this.productTree.untrackAllElements();
     }
   };
 
@@ -774,10 +769,6 @@ Please report this as a bug!`);
     constructor(children) {
       this.children = children;
     }
-    untrackAllElements() {
-      this.elements = [];
-      this.children.map((child) => child.untrackAllElements());
-    }
     updateElements(multiplier, settings) {
       this.children.map((child) => child.updateElements(multiplier, settings));
     }
@@ -869,12 +860,6 @@ Please report this as a bug!`);
       }
       return branch;
     }
-    untrackAllElements() {
-      this.elements = [];
-      for (const [, n] of this.childNodes) {
-        n.untrackAllElements();
-      }
-    }
   };
 
   // scripts/resource-tree/converterNode.ts
@@ -917,9 +902,6 @@ Please report this as a bug!`);
       el.querySelector(".converter-ingredient-name").innerText = this.converter.displayName;
       el.querySelector(".converter-ingredient-image").src = this.converter.displayImage;
       return el;
-    }
-    untrackAllElements() {
-      this.elements = [];
     }
   };
 
@@ -1095,10 +1077,6 @@ Please report this as a bug!`);
       );
       return output;
     }
-    untrackAllElements() {
-      this.elements = [];
-      this.resource.untrackAllElements();
-    }
   };
 
   // scripts/units.ts
@@ -1192,9 +1170,6 @@ Please report this as a bug!`);
       el.querySelector(".converter-ingredient-name").innerText = this.resource.displayName;
       el.querySelector(".converter-ingredient-image").src = this.resource.displayImage;
       return el;
-    }
-    untrackAllElements() {
-      this.elements = [];
     }
   };
 
@@ -1686,7 +1661,6 @@ Please report this as a bug!`);
         this.converterInProgress.products
       );
       this.closeDetailPopup();
-      this.converterInProgress.converter.unregisterTrackedElementsForTrees();
       this.resolveConverterDependency();
     }
     resolveConverterDependency() {
@@ -1751,7 +1725,6 @@ Please report this as a bug!`);
           submitBtn.onclick = null;
           this.closeDependencyPopup();
           this.resolveConverterDependency();
-          ingredientTree.untrackAllElements();
         } catch (e) {
           displayErr(e);
           throw e;
