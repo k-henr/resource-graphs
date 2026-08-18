@@ -179,11 +179,29 @@ export class ConverterMenu extends SubmitMenu {
                     throw new ProgramError(
                         "Tried to resolve a converter dependency while no converter was being constructed!",
                     );
+                const finalDependencyAmount = dependencySettings.evaluateTree(
+                    dependency.amount,
+                );
                 ingredientTree.addResourcesToList(
                     this.converterInProgress.ingredients,
                     this.converterInProgress.unresolvedDependencies,
                     dependencySettings,
-                    dependencySettings.evaluateTree(dependency.amount),
+                    finalDependencyAmount,
+                );
+
+                // Add the dependency so that it shows up correctly in the converter
+                // list
+                const dependencyConFact = dependency.converter;
+                this.converterInProgress.converter.addDependency(
+                    new Converter(
+                        dependencySettings.parseFormattedString(
+                            dependencyConFact.displayName,
+                        ),
+                        dependencyConFact.displayImage,
+                        [],
+                        [],
+                    ),
+                    finalDependencyAmount,
                 );
                 submitBtn.onclick = null;
                 this.closeDependencyPopup();

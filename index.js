@@ -185,13 +185,17 @@ Please report this as a bug!`);
     // All the inputs and outputs of this conversion
     ingredients;
     products;
+    // Stores dependencies for display purposes
+    dependencies;
     name;
     image;
-    constructor(name, image, ingredients, products) {
+    constructor(name, image, ingredients, products, dependencies = []) {
       this.name = name;
       this.image = image;
       this.ingredients = ingredients;
       this.products = products;
+      this.dependencies = dependencies;
+      console.log(dependencies);
     }
     /**
      * Apply this conversion to a given graph, consuming and adding items. This can
@@ -562,6 +566,8 @@ Please report this as a bug!`);
     // Ingredients and products
     ingredientTree;
     productTree;
+    // Resolved dependencies, for display purposes
+    dependencies = [];
     static infoTemplate = new Template("converter-info-template");
     static infoPanel = document.querySelector("#rc-info-panel");
     // note: overrides any current content of the info panel!
@@ -591,7 +597,8 @@ Please report this as a bug!`);
         this.formatDisplayName(),
         this.displayImage,
         ingr,
-        prod
+        prod,
+        this.dependencies
       );
     }
     addIngredientsToList(ingredientList, converterDependencyList) {
@@ -615,6 +622,11 @@ Please report this as a bug!`);
           `${this.thumbName} contains a "CONVERTER" node in the output tree, which is not allowed at this time!`
         );
       return l;
+    }
+    // Add a dependency, once that dependency has been resolved
+    addDependency(dependency, amount) {
+      console.log("Adding dependency:", dependency);
+      this.dependencies.push([dependency, amount]);
     }
     tryUpdateInfoPanel() {
       try {
@@ -1398,6 +1410,8 @@ Please report this as a bug!`);
   var ResourceGraph = class {
     // All conversions that are happening
     converters = new NumberedSet();
+    // All resource deltas from the current converters
+    resourceDeltas = new NumberedSet();
     // A ConverterMenu to request converters from in case of adjusting to fit an item
     converterRequestTarget;
     // Whether the graph needs to be updated or not
@@ -1417,17 +1431,25 @@ Please report this as a bug!`);
     setConverterRequestTarget(menu) {
       this.converterRequestTarget = menu;
     }
-    // Update the resource deltas and display. Runs automatically
-    recalculateIfNeeded() {
+    updateIfNeeded() {
       if (!this.requiresRecalculation) return;
       this.requiresRecalculation = false;
-      const resourceDeltas = new NumberedSet();
+      this.recalculateDeltas();
+      this.updateVisuals();
+    }
+    // Update the resource deltas and display. Runs automatically
+    recalculateDeltas() {
+      this.resourceDeltas = new NumberedSet();
       for (const [converter, count] of this.converters.getEntries()) {
-        converter.apply(resourceDeltas, count);
+        converter.apply(this.resourceDeltas, count);
       }
+    }
+    // Update visuals. For now simply remove and repopulate, if that's too slow
+    // then consider saving elements
+    updateVisuals() {
       this.resourceDeltaList.innerHTML = "";
       this.converterList.innerHTML = "";
-      for (const [resource, amount] of resourceDeltas.getEntries()) {
+      for (const [resource, amount] of this.resourceDeltas.getEntries()) {
         const el = this.resourceDeltaTemplate.cloneElement();
         el.querySelector(".resource-name").innerText = resource.displayName;
         el.querySelector(".resource-image").src = resource.displayImage;
@@ -1444,21 +1466,36 @@ Please report this as a bug!`);
         }
         this.resourceDeltaList.appendChild(el);
       }
-      for (const [converter, number] of this.converters.getEntries()) {
-        const el = this.converterTemplate.clone();
-        el.querySelector(".converter-name").innerText = converter.getDisplayName();
-        el.querySelector(".converter-image").src = converter.getDisplayImage();
-        el.querySelector(".converter-decimal-approx").innerText = number.getDecimalString();
-        const amountEl = el.querySelector(".converter-amount");
-        amountEl.value = number.getMixedFractionString();
-        amountEl.onchange = (e) => {
-          const el2 = e.target;
-          const amount = Rational.fromInput(el2.value, el2);
-          if (amount) this.setConverterAmount(converter, amount);
-        };
-        el.querySelector(".remove-converter-button").onclick = () => this.removeConverter(converter);
-        this.converterList.appendChild(el);
+      for (const [converter, amount] of this.converters.getEntries()) {
+        this.addConverterElement(converter, amount, this.converterList);
       }
+    }
+    addConverterElement(converter, amount, listElement, removable = true) {
+      const el = this.converterTemplate.clone();
+      el.querySelector(".converter-name").innerText = converter.getDisplayName();
+      el.querySelector(".converter-image").src = converter.getDisplayImage();
+      el.querySelector(".converter-decimal-approx").innerText = amount.getDecimalString();
+      const amountEl = el.querySelector(".converter-amount");
+      amountEl.value = amount.getMixedFractionString();
+      amountEl.onchange = (e) => {
+        const el2 = e.target;
+        const amount2 = Rational.fromInput(el2.value, el2);
+        if (amount2) this.setConverterAmount(converter, amount2);
+      };
+      if (removable) {
+        el.querySelector(".remove-converter-button").onclick = () => this.removeConverter(converter);
+      } else {
+        el.querySelector(".remove-converter-button").remove();
+      }
+      for (const [dependency, dependencyAmount] of converter.dependencies) {
+        this.addConverterElement(
+          dependency,
+          dependencyAmount,
+          el.querySelector(".converter-dependencies"),
+          false
+        );
+      }
+      listElement.appendChild(el);
     }
     addConverter(converter, amount) {
       this.converters.add(converter, amount);
@@ -1476,7 +1513,7 @@ Please report this as a bug!`);
   function requestGraphUpdate(graph) {
     requestAnimationFrame(() => requestGraphUpdate(graph));
     try {
-      graph.recalculateIfNeeded();
+      graph.updateIfNeeded();
     } catch (e) {
       displayErr(e);
       throw e;
@@ -1718,11 +1755,26 @@ Please report this as a bug!`);
             throw new ProgramError(
               "Tried to resolve a converter dependency while no converter was being constructed!"
             );
+          const finalDependencyAmount = dependencySettings.evaluateTree(
+            dependency.amount
+          );
           ingredientTree.addResourcesToList(
             this.converterInProgress.ingredients,
             this.converterInProgress.unresolvedDependencies,
             dependencySettings,
-            dependencySettings.evaluateTree(dependency.amount)
+            finalDependencyAmount
+          );
+          const dependencyConFact = dependency.converter;
+          this.converterInProgress.converter.addDependency(
+            new Converter(
+              dependencySettings.parseFormattedString(
+                dependencyConFact.displayName
+              ),
+              dependencyConFact.displayImage,
+              [],
+              []
+            ),
+            finalDependencyAmount
           );
           submitBtn.onclick = null;
           this.closeDependencyPopup();

@@ -152,23 +152,25 @@ main {
 }
 
 .converter {
-    height: 32px;
-    padding: 8px;
-
     border-width: 4px;
     border-style: solid;
 
-    display: flex;
-    gap: 8px;
+    padding: 8px;
 
-    & > div {
+    & > .converter-details {
+        height: 32px;
         display: flex;
         align-items: center;
         gap: 8px;
-        height: 100%;
+    }
 
-        &:last-child {
-            flex: 1;
+    & > .converter-dependencies {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        & > * {
+            margin-top: 8px;
         }
     }
 }
@@ -514,11 +516,15 @@ input {
         height: fit-content;
         align-items: start;
         gap: 8px;
-        & > div {
-            width: 100%;
-        }
-        & .converter-image {
-            height: 32px;
+        & > .converter-details {
+            gap: 8px;
+
+            & > div {
+                width: 100%;
+            }
+            & .converter-image {
+                height: 32px;
+            }
         }
     }
 
@@ -544,8 +550,8 @@ input {
         }
     }
 
-    .converter-ingredient > div {
-        display: block;
+    .converter-ingredient {
+        overflow-x: auto;
     }
 
     .rc-form-option {

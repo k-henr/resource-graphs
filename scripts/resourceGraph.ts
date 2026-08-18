@@ -37,6 +37,9 @@ export class ResourceGraph {
     // All conversions that are happening
     private converters = new NumberedSet<Converter>();
 
+    // All resource deltas from the current converters
+    resourceDeltas = new NumberedSet<Resource>();
+
     // A ConverterMenu to request converters from in case of adjusting to fit an item
     private converterRequestTarget: ConverterMenu | undefined;
 
@@ -68,28 +71,31 @@ export class ResourceGraph {
         this.converterRequestTarget = menu;
     }
 
-    // Update the resource deltas and display. Runs automatically
-    public recalculateIfNeeded() {
-        // Keep checking
+    public updateIfNeeded() {
         if (!this.requiresRecalculation) return;
         this.requiresRecalculation = false;
+        this.recalculateDeltas();
+        this.updateVisuals();
+    }
 
+    // Update the resource deltas and display. Runs automatically
+    private recalculateDeltas() {
         // Reset resource deltas, then go through all the conversions and apply them
-        const resourceDeltas = new NumberedSet<Resource>();
+        this.resourceDeltas = new NumberedSet<Resource>();
 
         for (const [converter, count] of this.converters.getEntries()) {
-            converter.apply(resourceDeltas, count);
+            converter.apply(this.resourceDeltas, count);
         }
+    }
 
-        // Update visuals. For now simply remove and repopulate, if that's too slow
-        // then consider saving elements
-        // (todo: break out into a new function?)
-
+    // Update visuals. For now simply remove and repopulate, if that's too slow
+    // then consider saving elements
+    private updateVisuals() {
         this.resourceDeltaList.innerHTML = "";
         this.converterList.innerHTML = "";
 
         // Add resource displays
-        for (const [resource, amount] of resourceDeltas.getEntries()) {
+        for (const [resource, amount] of this.resourceDeltas.getEntries()) {
             const el = this.resourceDeltaTemplate.cloneElement();
 
             el.querySelector<HTMLElement>(".resource-name")!.innerText =
@@ -118,33 +124,56 @@ export class ResourceGraph {
         }
 
         // Add converter displays
-        for (const [converter, number] of this.converters.getEntries()) {
-            const el = this.converterTemplate.clone();
+        for (const [converter, amount] of this.converters.getEntries()) {
+            this.addConverterElement(converter, amount, this.converterList);
+        }
+    }
 
-            el.querySelector<HTMLElement>(".converter-name")!.innerText =
-                converter.getDisplayName();
-            el.querySelector<HTMLImageElement>(".converter-image")!.src =
-                converter.getDisplayImage();
-            el.querySelector<HTMLElement>(".converter-decimal-approx")!.innerText =
-                number.getDecimalString();
+    private addConverterElement(
+        converter: Converter,
+        amount: Rational,
+        listElement: HTMLElement,
+        removable: boolean = true,
+    ) {
+        const el = this.converterTemplate.clone();
 
-            const amountEl =
-                el.querySelector<HTMLInputElement>(".converter-amount")!;
-            amountEl.value = number.getMixedFractionString();
-            amountEl.onchange = (e) => {
-                const el = <HTMLInputElement>e.target;
+        el.querySelector<HTMLElement>(".converter-name")!.innerText =
+            converter.getDisplayName();
+        el.querySelector<HTMLImageElement>(".converter-image")!.src =
+            converter.getDisplayImage();
+        el.querySelector<HTMLElement>(".converter-decimal-approx")!.innerText =
+            amount.getDecimalString();
 
-                // Parse input into a rational
-                const amount = Rational.fromInput(el.value, el);
-                if (amount) this.setConverterAmount(converter, amount);
-            };
+        const amountEl = el.querySelector<HTMLInputElement>(".converter-amount")!;
+        amountEl.value = amount.getMixedFractionString();
+        amountEl.onchange = (e) => {
+            const el = <HTMLInputElement>e.target;
 
+            // Parse input into a rational
+            const amount = Rational.fromInput(el.value, el);
+            if (amount) this.setConverterAmount(converter, amount);
+        };
+
+        if (removable) {
             // Button to remove
             el.querySelector<HTMLElement>(".remove-converter-button")!.onclick =
                 () => this.removeConverter(converter);
-
-            this.converterList.appendChild(el);
+        } else {
+            // Kill the remove button to make it impossible to remove if it should be
+            el.querySelector<HTMLElement>(".remove-converter-button")!.remove();
         }
+
+        // Add the dependencies to the converter
+        for (const [dependency, dependencyAmount] of converter.dependencies) {
+            this.addConverterElement(
+                dependency,
+                dependencyAmount,
+                el.querySelector(".converter-dependencies")!,
+                false,
+            );
+        }
+
+        listElement.appendChild(el);
     }
 
     public addConverter(converter: Converter, amount: Rational) {
@@ -168,7 +197,7 @@ export class ResourceGraph {
 function requestGraphUpdate(graph: ResourceGraph) {
     requestAnimationFrame(() => requestGraphUpdate(graph));
     try {
-        graph.recalculateIfNeeded();
+        graph.updateIfNeeded();
     } catch (e: any) {
         displayErr(e);
         throw e;

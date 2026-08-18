@@ -13,6 +13,9 @@ export class Converter {
     private ingredients: ConverterIngredient[];
     private products: ConverterIngredient[];
 
+    // Stores dependencies for display purposes
+    public readonly dependencies: [Converter, Rational][];
+
     private name: string;
     private image: string;
 
@@ -21,11 +24,14 @@ export class Converter {
         image: string,
         ingredients: ConverterIngredient[],
         products: ConverterIngredient[],
+        dependencies: [Converter, Rational][] = [],
     ) {
         this.name = name;
         this.image = image;
         this.ingredients = ingredients;
         this.products = products;
+        this.dependencies = dependencies;
+        console.log(dependencies);
     }
 
     /**

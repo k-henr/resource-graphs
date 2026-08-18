@@ -35,6 +35,9 @@ export class IntermediateConverter {
     private readonly ingredientTree: ResourceTree;
     private readonly productTree: ResourceTree;
 
+    // Resolved dependencies, for display purposes
+    private readonly dependencies: [Converter, Rational][] = [];
+
     private static infoTemplate = new Template("converter-info-template");
 
     private static infoPanel =
@@ -99,6 +102,7 @@ export class IntermediateConverter {
             this.displayImage,
             ingr,
             prod,
+            this.dependencies,
         );
     }
 
@@ -127,6 +131,12 @@ export class IntermediateConverter {
                 `${this.thumbName} contains a "CONVERTER" node in the output tree, which is not allowed at this time!`,
             );
         return l;
+    }
+
+    // Add a dependency, once that dependency has been resolved
+    public addDependency(dependency: Converter, amount: Rational) {
+        console.log("Adding dependency:", dependency);
+        this.dependencies.push([dependency, amount]);
     }
 
     public tryUpdateInfoPanel() {
