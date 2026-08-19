@@ -1,4 +1,6 @@
 {
+    "thumbName": "Critter Murder",
+    "displayName": "{Critter} Murder",
     "settings": [
         {
             "type": "ENUMERATE",
