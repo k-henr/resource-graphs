@@ -1,0 +1,163 @@
+{
+    "settings": [
+        {
+            "type": "ENUMERATE",
+            "name": "Critter",
+            "options": [
+                "Bammoth",
+                "Beakon",
+                "Blowter",
+                "Dartle",
+                "Drecko",
+                "Flox",
+                "Gassy Moo",
+                "Glo Squid",
+                "Grubgrub",
+                "Hatch",
+                "Jawbo",
+                "Lumb",
+                "Orehull",
+                "Pacu",
+                "Pip",
+                "Plug slug",
+                "Pokeshell",
+                "Puft",
+                "Rhex",
+                "Seaquine",
+                "Shine Bug",
+                "Shove Vole",
+                "Slickster",
+                "Slogo",
+                "Spigot Seal",
+                "Sweetle"
+            ],
+            "default": "Bammoth"
+        }
+    ],
+    "consumes": [
+        {
+            "type": "BRANCH",
+            "settingName": "Critter",
+            "branches": [
+                [
+                    "Bammoth",
+                    { "type": "RESOURCE", "id": "bammoth_egg", "amount": 1 }
+                ],
+                ["Beakon", { "type": "RESOURCE", "id": "beakon_egg", "amount": 1 }],
+                [
+                    "Blowter",
+                    { "type": "RESOURCE", "id": "blowter_egg", "amount": 1 }
+                ],
+                ["Dartle", { "type": "RESOURCE", "id": "dartle_egg", "amount": 1 }],
+                ["Drecko", { "type": "RESOURCE", "id": "drecko_egg", "amount": 1 }],
+                ["Flox", { "type": "RESOURCE", "id": "flox_egg", "amount": 1 }],
+                ["Gassy Moo", { "type": "AND", "resources": [] }],
+                [
+                    "Glo Squid",
+                    { "type": "RESOURCE", "id": "glo_squid_egg", "amount": 1 }
+                ],
+                [
+                    "Grubgrub",
+                    { "type": "RESOURCE", "id": "divergent_egg", "amount": 1 }
+                ],
+                ["Hatch", { "type": "RESOURCE", "id": "hatch_egg", "amount": 1 }],
+                ["Jawbo", { "type": "RESOURCE", "id": "jawbo_egg", "amount": 1 }],
+                ["Lumb", { "type": "RESOURCE", "id": "lumb_egg", "amount": 1 }],
+                [
+                    "Orehull",
+                    { "type": "RESOURCE", "id": "orehull_egg", "amount": 1 }
+                ],
+                ["Pacu", { "type": "RESOURCE", "id": "pacu_egg", "amount": 1 }],
+                ["Pip", { "type": "RESOURCE", "id": "pip_egg", "amount": 1 }],
+                [
+                    "Plug Slug",
+                    { "type": "RESOURCE", "id": "plug_slug_egg", "amount": 1 }
+                ],
+                [
+                    "Pokeshell",
+                    { "type": "RESOURCE", "id": "pokeshell_roe", "amount": 1 }
+                ],
+                ["Puft", { "type": "RESOURCE", "id": "puft_egg", "amount": 1 }],
+                ["Rhex", { "type": "RESOURCE", "id": "rhex_egg", "amount": 1 }],
+                [
+                    "Seaquine",
+                    { "type": "RESOURCE", "id": "seaquine_egg", "amount": 1 }
+                ],
+                [
+                    "Shine Bug",
+                    { "type": "RESOURCE", "id": "shine_bug_egg", "amount": 1 }
+                ],
+                [
+                    "Shove Vole",
+                    { "type": "RESOURCE", "id": "shove_vole_egg", "amount": 1 }
+                ],
+                [
+                    "Slickster",
+                    { "type": "RESOURCE", "id": "slickster_egg", "amount": 1 }
+                ],
+                ["Slogo", { "type": "RESOURCE", "id": "slogo_egg", "amount": 1 }],
+                [
+                    "Spigot Seal",
+                    { "type": "RESOURCE", "id": "spigot_seal_egg", "amount": 1 }
+                ],
+                [
+                    "Sweetle",
+                    { "type": "RESOURCE", "id": "divergent_egg", "amount": 1 }
+                ]
+            ]
+        }
+    ],
+    "produces": [
+        {
+            "type": "BRANCH",
+            "settingName": "Critter",
+            "branches": [
+                [
+                    ["Dartle", "Slogo"],
+                    { "type": "RESOURCE", "id": "meat", "amount": 800 }
+                ],
+                [
+                    ["Flox", "Pip", "Puft", "Sweetle"],
+                    { "type": "RESOURCE", "id": "meat", "amount": 1600 }
+                ],
+                [
+                    ["Drecko", "Hatch", "Plug Slug", "Slickster"],
+                    { "type": "RESOURCE", "id": "meat", "amount": 3200 }
+                ],
+                ["Grubgrub", { "type": "RESOURCE", "id": "meat", "amount": 4800 }],
+                [
+                    ["Gassy Moo", "Shove Vole"],
+                    { "type": "RESOURCE", "id": "meat", "amount": 16000 }
+                ],
+                ["Bammoth", { "type": "RESOURCE", "id": "meat", "amount": 22400 }],
+                ["Rhex", { "type": "RESOURCE", "id": "tough_meat", "amount": 5 }],
+                ["Lumb", { "type": "RESOURCE", "id": "tough_meat", "amount": 12 }],
+                [
+                    "Pokeshell",
+                    { "type": "RESOURCE", "id": "raw_shellfish", "amount": 1200 }
+                ],
+                [
+                    "Orehull",
+                    { "type": "RESOURCE", "id": "raw_shellfish", "amount": 6000 }
+                ],
+                [
+                    ["Beakon", "Blowter", "Pacu", "Seaquine"],
+                    { "type": "RESOURCE", "id": "fish_fillet", "amount": 1000 }
+                ],
+                [
+                    "Jawbo",
+                    { "type": "RESOURCE", "id": "jawbo_fillet", "amount": 12000 }
+                ],
+                [
+                    "Glo Squid",
+                    { "type": "RESOURCE", "id": "calamari", "amount": 9600 }
+                ],
+                [
+                    "Spigot Seal",
+                    { "type": "RESOURCE", "id": "tallow", "amount": 50 }
+                ],
+                ["Shine Bug", { "type": "AND", "resources": [] }]
+            ]
+        }
+    ]
+}

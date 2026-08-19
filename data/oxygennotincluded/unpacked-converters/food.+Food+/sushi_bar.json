@@ -1,0 +1,78 @@
+{
+    "settings": [
+        {
+            "type": "ENUMERATE",
+            "name": "Recipe",
+            "options": ["Edamame", "Nigiri", "Sushi Roll", "Uni"],
+            "default": "Edamame"
+        }
+    ],
+    "consumes": [
+        {
+            "type": "BRANCH",
+            "settingName": "Recipe",
+            "branches": [
+                [
+                    "Edamame",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "nosh_bean", "amount": 1 },
+                            {
+                                "type": "RESOURCE",
+                                "id": "salty_sticks",
+                                "amount": 600
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "Nigiri",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "liceloaf", "amount": 1700 },
+                            { "type": "RESOURCE", "id": "nori", "amount": 1 },
+                            {
+                                "type": "RESOURCE",
+                                "id": "calamari",
+                                "amount": 800
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "Sushi Roll",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "liceloaf", "amount": 1700 },
+                            { "type": "RESOURCE", "id": "nori", "amount": 1 },
+                            {
+                                "type": "RESOURCE",
+                                "id": "fish_fillet",
+                                "amount": 1000
+                            }
+                        ]
+                    }
+                ],
+                ["Uni", { "type": "RESOURCE", "id": "pinpoki", "amount": 1 }]
+            ]
+        }
+    ],
+    "produces": [
+        {
+            "type": "BRANCH",
+            "settingName": "Recipe",
+            "branches": [
+                ["Edamame", { "type": "RESOURCE", "id": "edamame", "amount": 1450 }],
+                ["Nigiri", { "type": "RESOURCE", "id": "nigiri", "amount": 3600 }],
+                [
+                    "Sushi Roll",
+                    { "type": "RESOURCE", "id": "sushi_roll", "amount": 3600 }
+                ],
+                ["Uni", { "type": "RESOURCE", "id": "uni", "amount": 7200 }]
+            ]
+        }
+    ]
+}

@@ -1,0 +1,83 @@
+{
+    "settings": [
+        {
+            "type": "ENUMERATE",
+            "name": "Recipe",
+            "options": ["Tender Brisket", "Smoked Fish", "Veggie Poppers"],
+            "default": "Tender Brisket"
+        }
+    ],
+    "consumes": [
+        {
+            "type": "BRANCH",
+            "settingName": "Recipe",
+            "branches": [
+                [
+                    "Tender Brisket",
+                    { "type": "RESOURCE", "id": "tough_meat", "amount": 6 }
+                ],
+                [
+                    "Smoked Fish",
+                    {
+                        "type": "OR",
+                        "resources": [
+                            {
+                                "type": "RESOURCE",
+                                "id": "fish_fillet",
+                                "amount": 6000
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "jawbo_fillet",
+                                "amount": 6000
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "Veggie Poppers",
+                    {
+                        "type": "OR",
+                        "resources": [
+                            {
+                                "type": "RESOURCE",
+                                "id": "sweatcorn",
+                                "amount": 5600
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "pikeapple",
+                                "amount": 5600
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "spindly_grubfruit",
+                                "amount": 5600
+                            }
+                        ]
+                    }
+                ]
+            ]
+        }
+    ],
+    "produces": [
+        {
+            "type": "BRANCH",
+            "settingName": "Recipe",
+            "branches": [
+                [
+                    "Tender Brisket",
+                    { "type": "RESOURCE", "id": "tender_brisket", "amount": 16000 }
+                ],
+                [
+                    "Smoked Fish",
+                    { "type": "RESOURCE", "id": "smoked_fish", "amount": 11200 }
+                ],
+                [
+                    "Veggie Poppers",
+                    { "type": "RESOURCE", "id": "veggie_poppers", "amount": 11450 }
+                ]
+            ]
+        }
+    ]
+}

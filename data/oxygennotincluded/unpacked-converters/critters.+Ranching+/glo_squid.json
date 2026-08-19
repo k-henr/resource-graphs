@@ -20,5 +20,8 @@
             "amountPreview": 2
         }
     ],
-    "produceResource": [{ "type": "RESOURCE", "id": "abyssalite", "amount": 20 }]
+    "produceResource": [
+        { "type": "RESOURCE", "id": "abyssalite", "amount": 20 },
+        { "type": "RESOURCE", "id": "squid_ink", "amount": 50 }
+    ]
 }

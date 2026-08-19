@@ -1,0 +1,21 @@
+{
+    "templateName": "critter-2%",
+    "displayName": "{Cramped|Cramped }{Wild|Wild }{Morph} (happiness {Happiness})",
+    "thumbName": "Jawbo",
+    "morphs": ["Jawbo"],
+    "defaultMorph": "Jawbo",
+    "meat": "jawbo_fillet",
+    "caloriesDropped": 12000,
+    "egg": "jawbo_egg",
+    "consumeResource": [
+        {
+            "type": "OR",
+            "resources": [
+                { "type": "TAG", "tagName": "&Jawbo", "amount": 1 },
+                { "type": "RESOURCE", "id": "fish_fillet", "amount": 1000 },
+                { "type": "RESOURCE", "id": "cooked_seafood", "amount": 1600 }
+            ]
+        }
+    ],
+    "produceResource": [{ "type": "RESOURCE", "id": "rust", "amount": 60 }]
+}

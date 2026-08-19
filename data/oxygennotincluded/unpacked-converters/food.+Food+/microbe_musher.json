@@ -1,0 +1,174 @@
+{
+    "settings": [
+        {
+            "type": "ENUMERATE",
+            "name": "Recipe",
+            "options": [
+                "Berry Sludge",
+                "Liceloaf",
+                "Mush Bar",
+                "Pacu Treat",
+                "Pemmican",
+                "Tofu"
+            ],
+            "default": "Berry Sludge"
+        }
+    ],
+    "consumes": [
+        {
+            "type": "BRANCH",
+            "settingName": "Recipe",
+            "branches": [
+                [
+                    "Berry Sludge",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "TAG", "tagName": "&Grain", "amount": 5 },
+                            {
+                                "type": "OR",
+                                "resources": [
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "bristle_berry",
+                                        "amount": 1600
+                                    },
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "pikeapple",
+                                        "amount": 1600
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "Liceloaf",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            {
+                                "type": "RESOURCE",
+                                "id": "meal_lice",
+                                "amount": 1200
+                            },
+                            {
+                                "type": "OR",
+                                "resources": [
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "water",
+                                        "amount": 50
+                                    },
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "mucin",
+                                        "amount": 50
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "Mush Bar",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "dirt", "amount": 75 },
+                            {
+                                "type": "OR",
+                                "resources": [
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "water",
+                                        "amount": 75
+                                    },
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "mucin",
+                                        "amount": 75
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "Pacu Treat",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "TAG", "tagName": "&Pacu Treat", "amount": 6 },
+                            {
+                                "type": "OR",
+                                "resources": [
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "water",
+                                        "amount": 30
+                                    },
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "mucin",
+                                        "amount": 30
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "Pemmican",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "meat", "amount": 1600 },
+                            { "type": "RESOURCE", "id": "tallow", "amount": 1 }
+                        ]
+                    }
+                ],
+                [
+                    "Tofu",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "nosh_bean", "amount": 6 },
+                            { "type": "RESOURCE", "id": "water", "amount": 50 }
+                        ]
+                    }
+                ]
+            ]
+        }
+    ],
+    "produces": [
+        {
+            "type": "BRANCH",
+            "settingName": "Recipe",
+            "branches": [
+                [
+                    "Berry Sludge",
+                    { "type": "RESOURCE", "id": "berry_sludge", "amount": 4000 }
+                ],
+                [
+                    "Liceloaf",
+                    { "type": "RESOURCE", "id": "liceloaf", "amount": 1700 }
+                ],
+                [
+                    "Mush Bar",
+                    { "type": "RESOURCE", "id": "mush_bar", "amount": 800 }
+                ],
+                [
+                    "Pacu Treat",
+                    { "type": "RESOURCE", "id": "pacu_treat", "amount": 6 }
+                ],
+                [
+                    "Pemmican",
+                    { "type": "RESOURCE", "id": "pemmican", "amount": 2600 }
+                ],
+                ["Tofu", { "type": "RESOURCE", "id": "tofu", "amount": 3600 }]
+            ]
+        }
+    ]
+}
