@@ -322,14 +322,17 @@
 
         <!-- Template for OR elements in converters ingr/prod trees -->
         <template id="converter-select-template">
-            <div class="converter-child-list">
-                <div class="converter-ingredient converter-select">
-                    SELECT ONE OF
-                    <span class="converter-select-count"></span> OPTIONS:
-                </div>
-                <div class="flex">
-                    <div class="horiz-padding"></div>
-                    <div class="converter-select-children flex-1"></div>
+            <!-- Wrapper div is needed because when nesting ORs, the dictionary in the outer OR has to keep referring to the right element even after the inner OR has collapsed -->
+            <div>
+                <div class="converter-child-list">
+                    <div class="converter-ingredient converter-select">
+                        SELECT ONE OF
+                        <span class="converter-select-count"></span> OPTIONS:
+                    </div>
+                    <div class="flex">
+                        <div class="horiz-padding"></div>
+                        <div class="converter-select-children flex-1"></div>
+                    </div>
                 </div>
             </div>
         </template>

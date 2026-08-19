@@ -180,7 +180,7 @@ export class OrNode extends ResourceTreeBoolNode {
                 throw new ProgramError(
                     `An element representing an OR node did not store the element for option "${optionName}"!`,
                 );
-            el.replaceWith(optionEl);
+            el.firstElementChild!.replaceWith(optionEl);
         }
     }
 
