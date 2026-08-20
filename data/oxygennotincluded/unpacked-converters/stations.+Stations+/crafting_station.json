@@ -1,65 +1,79 @@
 {
-    "consumes": [
-        { "type": "RESOURCE", "id": "power", "amount": 60 },
+    "settings": [
         {
-            "type": "ENTANGLED_OR",
-            "id": "recipe",
-            "resources": [
+            "type": "ENUMERATE",
+            "name": "Recipe",
+            "options": [
+                "Metal Power Bank",
+                "Oxygen Mask",
+                "Plastic Gasket",
+                "Rubber Gasket",
+                "Uranium Ore Power Bank"
+            ],
+            "default": "Plastic Gasket"
+        }
+    ],
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": [60, 15] },
+        {
+            "type": "BRANCH",
+            "settingName": "Recipe",
+            "branches": [
                 [
-                    "oxygen_mask",
-                    { "type": "TAG", "tagName": "&Unrefined Ore", "amount": 750 }
+                    "Oxygen Mask",
+                    { "type": "TAG", "tagName": "&Unrefined Ore", "amount": 50 }
                 ],
                 [
-                    "metal_power_bank",
-                    { "type": "TAG", "tagName": "&Unrefined Ore", "amount": 3000 }
+                    "Metal Power Bank",
+                    { "type": "TAG", "tagName": "&Unrefined Ore", "amount": 200 }
                 ],
                 [
-                    "uranium_power_bank",
-                    { "type": "RESOURCE", "id": "uranium_ore", "amount": 150 }
+                    "Uranium Ore Power Bank",
+                    { "type": "RESOURCE", "id": "uranium_ore", "amount": 10 }
                 ],
                 [
-                    "rubber_gasket",
-                    { "type": "RESOURCE", "id": "rubber", "amount": 750 }
+                    "Rubber Gasket",
+                    { "type": "RESOURCE", "id": "rubber", "amount": 50 }
                 ],
                 [
-                    "plastic_gasket",
-                    { "type": "RESOURCE", "id": "plastic", "amount": 750 }
+                    "Plastic Gasket",
+                    { "type": "RESOURCE", "id": "plastic", "amount": 50 }
                 ]
             ]
         }
     ],
     "produces": [
         {
-            "type": "ENTANGLED_OR",
-            "id": "recipe",
-            "resources": [
+            "type": "BRANCH",
+            "settingName": "Recipe",
+            "branches": [
                 [
-                    "oxygen_mask",
-                    { "type": "RESOURCE", "id": "oxygen_mask", "amount": 15 }
+                    "Oxygen Mask",
+                    { "type": "RESOURCE", "id": "oxygen_mask", "amount": 1 }
                 ],
                 [
-                    "metal_power_bank",
+                    "Metal Power Bank",
                     {
                         "type": "RESOURCE",
                         "id": "metal_power_bank",
-                        "amount": 1800000
+                        "amount": 120000
                     }
                 ],
                 [
-                    "uranium_power_bank",
+                    "Uranium Ore Power Bank",
                     {
                         "type": "RESOURCE",
                         "id": "uranium_ore_power_bank",
-                        "amount": 1800000
+                        "amount": 120000
                     }
                 ],
                 [
-                    "rubber_gasket",
-                    { "type": "RESOURCE", "id": "rubber_gasket", "amount": 15 }
+                    "Rubber Gasket",
+                    { "type": "RESOURCE", "id": "rubber_gasket", "amount": 1 }
                 ],
                 [
-                    "plastic_gasket",
-                    { "type": "RESOURCE", "id": "plastic_gasket", "amount": 15 }
+                    "Plastic Gasket",
+                    { "type": "RESOURCE", "id": "plastic_gasket", "amount": 1 }
                 ]
             ]
         }

@@ -1,11 +1,19 @@
 {
+    "settings": [
+        {
+            "type": "ENUMERATE",
+            "name": "Recipe",
+            "options": ["Refined Carbon", "Ceramic"],
+            "default": "Refined Carbon"
+        }
+    ],
     "consumes": [
         {
-            "type": "ENTANGLED_OR",
-            "name": "recipe",
-            "resources": [
+            "type": "BRANCH",
+            "settingName": "Recipe",
+            "branches": [
                 [
-                    "refined_carbon",
+                    "Refined Carbon",
                     {
                         "type": "OR",
                         "resources": [
@@ -16,7 +24,7 @@
                     }
                 ],
                 [
-                    "ceramic",
+                    "Ceramic",
                     {
                         "type": "AND",
                         "resources": [
@@ -49,14 +57,14 @@
     ],
     "produces": [
         {
-            "type": "ENTANGLED_OR",
-            "name": "recipe",
-            "resources": [
+            "type": "BRANCH",
+            "settingName": "Recipe",
+            "branches": [
                 [
-                    "refined_carbon",
+                    "Refined Carbon",
                     { "type": "RESOURCE", "id": "refined_carbon", "amount": 1500 }
                 ],
-                ["ceramic", { "type": "RESOURCE", "id": "ceramic", "amount": 1500 }]
+                ["Ceramic", { "type": "RESOURCE", "id": "ceramic", "amount": 1500 }]
             ]
         }
     ]

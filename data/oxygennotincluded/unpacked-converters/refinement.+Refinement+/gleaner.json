@@ -1,25 +1,33 @@
 {
-    "consumes": [
-        { "type": "RESOURCE", "id": "power", "amount": 480 },
+    "settings": [
         {
-            "type": "ENTANGLED_OR",
-            "name": "recipe",
-            "resources": [
+            "type": "ENUMERATE",
+            "name": "Recipe",
+            "options": ["Brackwax", "Caviar"],
+            "default": "Brackwax"
+        }
+    ],
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": [480, 15] },
+        {
+            "type": "BRANCH",
+            "settingName": "Recipe",
+            "branches": [
                 [
-                    "brackwax",
+                    "Brackwax",
                     { "type": "RESOURCE", "id": "brackene", "amount": 600 }
                 ],
-                ["caviar", { "type": "RESOURCE", "id": "ovolene", "amount": 600 }]
+                ["Caviar", { "type": "RESOURCE", "id": "ovolene", "amount": 600 }]
             ]
         }
     ],
     "produces": [
         {
-            "type": "ENTANGLED_OR",
-            "name": "recipe",
-            "resources": [
+            "type": "BRANCH",
+            "settingName": "Recipe",
+            "branches": [
                 [
-                    "brackwax",
+                    "Brackwax",
                     {
                         "type": "AND",
                         "resources": [
@@ -34,7 +42,7 @@
                     }
                 ],
                 [
-                    "caviar",
+                    "Caviar",
                     {
                         "type": "AND",
                         "resources": [

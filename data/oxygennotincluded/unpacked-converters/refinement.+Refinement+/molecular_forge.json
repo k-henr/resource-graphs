@@ -1,95 +1,109 @@
 {
-    "consumes": [
-        { "type": "RESOURCE", "id": "power", "amount": 1600 },
+    "settings": [
         {
-            "type": "ENTANGLED_OR",
-            "id": "recipe",
-            "resources": [
+            "type": "ENUMERATE",
+            "name": "Recipe",
+            "options": [
+                "Atomic Power Bank",
+                "Fullerene",
+                "Insulite",
+                "Plastium",
+                "Thermium"
+            ],
+            "default": "Atomic Power Bank"
+        }
+    ],
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": [1600, 15] },
+        {
+            "type": "BRANCH",
+            "settingName": "Recipe",
+            "branches": [
                 [
-                    "thermium",
+                    "Thermium",
                     {
                         "type": "AND",
                         "resources": [
-                            { "type": "RESOURCE", "id": "niobium", "amount": 75 },
-                            { "type": "RESOURCE", "id": "tungsten", "amount": 1425 }
+                            { "type": "RESOURCE", "id": "niobium", "amount": 5 },
+                            { "type": "RESOURCE", "id": "tungsten", "amount": 95 }
                         ]
                     }
                 ],
                 [
-                    "insulite",
+                    "Insulite",
                     {
                         "type": "AND",
                         "resources": [
-                            { "type": "RESOURCE", "id": "isosap", "amount": 225 },
+                            { "type": "RESOURCE", "id": "isosap", "amount": 15 },
                             {
                                 "type": "RESOURCE",
                                 "id": "abyssalite",
-                                "amount": 1200
+                                "amount": 80
                             },
                             {
                                 "type": "TAG",
                                 "tagName": "&Fiber",
-                                "amount": 75
+                                "amount": 5
                             }
                         ]
                     }
                 ],
                 [
-                    "plastium",
+                    "Plastium",
                     {
                         "type": "AND",
                         "resources": [
-                            { "type": "RESOURCE", "id": "thermium", "amount": 225 },
-                            { "type": "RESOURCE", "id": "plastic", "amount": 1050 },
-                            { "type": "RESOURCE", "id": "brackwax", "amount": 225 }
+                            { "type": "RESOURCE", "id": "thermium", "amount": 15 },
+                            { "type": "RESOURCE", "id": "plastic", "amount": 70 },
+                            { "type": "RESOURCE", "id": "brackwax", "amount": 15 }
                         ]
                     }
                 ],
                 [
-                    "fullerene",
+                    "Fullerene",
                     {
                         "type": "AND",
                         "resources": [
-                            { "type": "RESOURCE", "id": "graphite", "amount": 1350 },
-                            { "type": "RESOURCE", "id": "sulfur", "amount": 75 },
-                            { "type": "RESOURCE", "id": "aluminum", "amount": 75 }
+                            { "type": "RESOURCE", "id": "graphite", "amount": 90 },
+                            { "type": "RESOURCE", "id": "sulfur", "amount": 5 },
+                            { "type": "RESOURCE", "id": "aluminum", "amount": 5 }
                         ]
                     }
                 ],
                 [
-                    "atomic_power_bank",
-                    { "type": "RESOURCE", "id": "enriched_uranium", "amount": 150 }
+                    "Atomic Power Bank",
+                    { "type": "RESOURCE", "id": "enriched_uranium", "amount": 10 }
                 ]
             ]
         }
     ],
     "produces": [
         {
-            "type": "ENTANGLED_OR",
-            "id": "recipe",
-            "resources": [
+            "type": "BRANCH",
+            "settingName": "Recipe",
+            "branches": [
                 [
-                    "thermium",
-                    { "type": "RESOURCE", "id": "thermium", "amount": 1500 }
+                    "Thermium",
+                    { "type": "RESOURCE", "id": "thermium", "amount": 100 }
                 ],
                 [
-                    "insulite",
-                    { "type": "RESOURCE", "id": "insulite", "amount": 1500 }
+                    "Insulite",
+                    { "type": "RESOURCE", "id": "insulite", "amount": 100 }
                 ],
                 [
-                    "plastium",
-                    { "type": "RESOURCE", "id": "plastium", "amount": 1500 }
+                    "Plastium",
+                    { "type": "RESOURCE", "id": "plastium", "amount": 100 }
                 ],
                 [
-                    "fullerene",
-                    { "type": "RESOURCE", "id": "fullerene", "amount": 1500 }
+                    "Fullerene",
+                    { "type": "RESOURCE", "id": "fullerene", "amount": 100 }
                 ],
                 [
-                    "atomic_power_bank",
+                    "Atomic Power Bank",
                     {
                         "type": "RESOURCE",
                         "id": "atomic_power_bank",
-                        "amount": 82800000
+                        "amount": 5400000
                     }
                 ]
             ]

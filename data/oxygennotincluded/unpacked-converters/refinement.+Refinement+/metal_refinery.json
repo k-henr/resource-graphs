@@ -1,75 +1,143 @@
 {
-    "consumes": [
-        { "type": "RESOURCE", "id": "power", "amount": 1200 },
+    "settings": [
         {
-            "type": "ENTANGLED_OR",
-            "id": "recipe",
-            "resources": [
+            "type": "ENUMERATE",
+            "name": "Recipe",
+            "options": ["Refined Metal", "Steel"],
+            "default": "Refined Metal"
+        }
+    ],
+    "consumes": [
+        { "type": "RESOURCE", "id": "power", "amount": [1200, 15] },
+        {
+            "type": "BRANCH",
+            "settingName": "Recipe",
+            "branches": [
                 [
-                    "gold",
-                    { "type": "RESOURCE", "id": "gold_amalgam", "amount": 1500 }
-                ],
-                [
-                    "mercury",
-                    { "type": "RESOURCE", "id": "cinnabar_ore", "amount": 1500 }
-                ],
-                [
-                    "copper",
-                    { "type": "RESOURCE", "id": "copper_ore", "amount": 1500 }
-                ],
-                [
-                    "tungsten",
-                    { "type": "RESOURCE", "id": "wolframite", "amount": 1500 }
-                ],
-                [
-                    "aluminum",
-                    { "type": "RESOURCE", "id": "aluminum_ore", "amount": 1500 }
-                ],
-                [
-                    "cobalt",
-                    { "type": "RESOURCE", "id": "cobalt_ore", "amount": 1500 }
-                ],
-                [
-                    "nickel",
-                    { "type": "RESOURCE", "id": "nickel_ore", "amount": 1500 }
-                ],
-                [
-                    "niobium",
-                    { "type": "RESOURCE", "id": "thermium", "amount": 1500 }
-                ],
-                [
-                    "iron_pyrite",
-                    { "type": "RESOURCE", "id": "pyrite", "amount": 1500 }
-                ],
-                ["iron", { "type": "RESOURCE", "id": "iron_ore", "amount": 1500 }],
-                [
-                    "zinc",
+                    "Refined Metal",
                     {
-                        "type": "RESOURCE",
-                        "id": "zinc_ore",
-                        "amount": 1500
+                        "type": "ENTANGLED_OR",
+                        "id": "ore",
+                        "resources": [
+                            [
+                                "gold",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "gold_amalgam",
+                                    "amount": 100
+                                }
+                            ],
+                            [
+                                "mercury",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "cinnabar_ore",
+                                    "amount": 100
+                                }
+                            ],
+                            [
+                                "copper",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "copper_ore",
+                                    "amount": 100
+                                }
+                            ],
+                            [
+                                "tungsten",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "wolframite",
+                                    "amount": 100
+                                }
+                            ],
+                            [
+                                "aluminum",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "aluminum_ore",
+                                    "amount": 100
+                                }
+                            ],
+                            [
+                                "cobalt",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "cobalt_ore",
+                                    "amount": 100
+                                }
+                            ],
+                            [
+                                "nickel",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "nickel_ore",
+                                    "amount": 100
+                                }
+                            ],
+                            [
+                                "niobium",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "thermium",
+                                    "amount": 100
+                                }
+                            ],
+                            [
+                                "iron_pyrite",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "pyrite",
+                                    "amount": 100
+                                }
+                            ],
+                            [
+                                "iron",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "iron_ore",
+                                    "amount": 100
+                                }
+                            ],
+                            [
+                                "zinc",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "zinc_ore",
+                                    "amount": 100
+                                }
+                            ],
+                            [
+                                "lead",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "galena",
+                                    "amount": 100
+                                }
+                            ]
+                        ]
                     }
                 ],
                 [
-                    "lead",
-                    {
-                        "type": "RESOURCE",
-                        "id": "galena",
-                        "amount": 1500
-                    }
-                ],
-                [
-                    "steel",
+                    "Steel",
                     {
                         "type": "AND",
                         "resources": [
-                            { "type": "RESOURCE", "id": "iron", "amount": 1050 },
+                            {
+                                "type": "RESOURCE",
+                                "id": "iron",
+                                "amount": 70
+                            },
                             {
                                 "type": "RESOURCE",
                                 "id": "refined_carbon",
-                                "amount": 300
+                                "amount": 20
                             },
-                            { "type": "RESOURCE", "id": "lime", "amount": 150 }
+                            {
+                                "type": "RESOURCE",
+                                "id": "lime",
+                                "amount": 10
+                            }
                         ]
                     }
                 ]
@@ -78,45 +146,110 @@
     ],
     "produces": [
         {
-            "type": "ENTANGLED_OR",
-            "id": "recipe",
-            "resources": [
-                ["gold", { "type": "RESOURCE", "id": "gold", "amount": 1500 }],
-                ["mercury", { "type": "RESOURCE", "id": "mercury", "amount": 1500 }],
-                ["copper", { "type": "RESOURCE", "id": "copper", "amount": 1500 }],
+            "type": "BRANCH",
+            "settingName": "Recipe",
+            "branches": [
                 [
-                    "tungsten",
-                    { "type": "RESOURCE", "id": "tungsten", "amount": 1500 }
-                ],
-                [
-                    "aluminum",
-                    { "type": "RESOURCE", "id": "aluminum", "amount": 1500 }
-                ],
-                ["cobalt", { "type": "RESOURCE", "id": "cobalt", "amount": 1500 }],
-                ["nickel", { "type": "RESOURCE", "id": "nickel", "amount": 1500 }],
-                ["niobium", { "type": "RESOURCE", "id": "niobium", "amount": 1500 }],
-                [
-                    "iron_pyrite",
-                    { "type": "RESOURCE", "id": "iron", "amount": 1500 }
-                ],
-                ["iron", { "type": "RESOURCE", "id": "iron", "amount": 1500 }],
-                [
-                    "zinc",
+                    "Refined Metal",
                     {
-                        "type": "RESOURCE",
-                        "id": "zinc",
-                        "amount": 1500
+                        "type": "ENTANGLED_OR",
+                        "id": "ore",
+                        "resources": [
+                            [
+                                "gold",
+                                { "type": "RESOURCE", "id": "gold", "amount": 100 }
+                            ],
+                            [
+                                "mercury",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "mercury",
+                                    "amount": 100
+                                }
+                            ],
+                            [
+                                "copper",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "copper",
+                                    "amount": 100
+                                }
+                            ],
+                            [
+                                "tungsten",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "tungsten",
+                                    "amount": 100
+                                }
+                            ],
+                            [
+                                "aluminum",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "aluminum",
+                                    "amount": 100
+                                }
+                            ],
+                            [
+                                "cobalt",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "cobalt",
+                                    "amount": 100
+                                }
+                            ],
+                            [
+                                "nickel",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "nickel",
+                                    "amount": 100
+                                }
+                            ],
+                            [
+                                "niobium",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "niobium",
+                                    "amount": 100
+                                }
+                            ],
+                            [
+                                "iron_pyrite",
+                                { "type": "RESOURCE", "id": "iron", "amount": 100 }
+                            ],
+                            [
+                                "iron",
+                                { "type": "RESOURCE", "id": "iron", "amount": 100 }
+                            ],
+                            [
+                                "zinc",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "zinc",
+                                    "amount": 100
+                                }
+                            ],
+                            [
+                                "lead",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "lead",
+                                    "amount": 100
+                                }
+                            ]
+                        ]
                     }
                 ],
                 [
-                    "lead",
+                    "Steel",
                     {
                         "type": "RESOURCE",
-                        "id": "lead",
-                        "amount": 1500
+                        "id": "steel",
+                        "amount": 100
                     }
-                ],
-                ["steel", { "type": "RESOURCE", "id": "steel", "amount": 1500 }]
+                ]
             ]
         }
     ]

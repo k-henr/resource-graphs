@@ -1,6 +1,6 @@
 {
     "settings": [
-        { "type": "NUMBER", "name": "Ice temperatue", "default": -20, "unit": "°C" }
+        { "type": "NUMBER", "name": "Ice temperature", "default": -20, "unit": "°C" }
     ],
     "consumes": [
         {
@@ -8,7 +8,7 @@
             "multiplier": {
                 "type": "SUB",
                 "value1": 25,
-                "value2": { "type": "SETTING", "name": "Ice temperatue" }
+                "value2": { "type": "SETTING", "name": "Ice temperature" }
             },
             "resource": {
                 "type": "TAG",

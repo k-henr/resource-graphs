@@ -1,12 +1,23 @@
 {
+    "settings": [
+        {
+            "type": "ENUMERATE",
+            "name": "Recipe",
+            "options": ["Uranium Ore", "Enriched Uranium"],
+            "default": "Uranium Ore"
+        }
+    ],
     "consumes": [
         {
-            "type": "ENTANGLED_OR",
-            "id": "recipe",
-            "resources": [
-                ["ore", { "type": "RESOURCE", "id": "uranium_ore", "amount": 15 }],
+            "type": "BRANCH",
+            "settingName": "Recipe",
+            "branches": [
                 [
-                    "refined",
+                    "Uranium Ore",
+                    { "type": "RESOURCE", "id": "uranium_ore", "amount": 15 }
+                ],
+                [
+                    "Enriched Uranium",
                     { "type": "RESOURCE", "id": "enriched_uranium", "amount": 15 }
                 ]
             ]
@@ -14,11 +25,17 @@
     ],
     "produces": [
         {
-            "type": "ENTANGLED_OR",
-            "id": "recipe",
-            "resources": [
-                ["ore", { "type": "RESOURCE", "id": "radbolt", "amount": 75 }],
-                ["refined", { "type": "RESOURCE", "id": "radbolt", "amount": 375 }]
+            "type": "BRANCH",
+            "settingName": "Recipe",
+            "branches": [
+                [
+                    "Uranium Ore",
+                    { "type": "RESOURCE", "id": "radbolt", "amount": 75 }
+                ],
+                [
+                    "Enriched Uranium",
+                    { "type": "RESOURCE", "id": "radbolt", "amount": 375 }
+                ]
             ]
         }
     ]
