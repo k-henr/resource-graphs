@@ -1,11 +1,123 @@
 {
+    "settings": [
+        {
+            "type": "ENUMERATE",
+            "name": "Recipe",
+            "options": ["Blastshot", "Intracosmic Blastshot"],
+            "default": "Blastshot"
+        }
+    ],
     "consumes": [
-        { "type": "RESOURCE", "id": "power", "amount": 960 },
-        { "type": "RESOURCE", "id": "iron", "amount": 187.5 },
-        { "type": "RESOURCE", "id": "petroleum", "amount": 375 }
+        { "type": "RESOURCE", "id": "power", "amount": [960, 7.5] },
+        {
+            "type": "BRANCH",
+            "settingName": "Recipe",
+            "branches": [
+                [
+                    "Blastshot",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "iron", "amount": 25 },
+                            { "type": "RESOURCE", "id": "petroleum", "amount": 50 }
+                        ]
+                    }
+                ],
+                [
+                    "Intracosmic Blastshot",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            {
+                                "type": "OR",
+                                "resources": [
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "copper",
+                                        "amount": 50
+                                    },
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "aluminum",
+                                        "amount": 50
+                                    },
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "iron",
+                                        "amount": 50
+                                    },
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "cobalt",
+                                        "amount": 50
+                                    },
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "nickel",
+                                        "amount": 50
+                                    },
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "zinc",
+                                        "amount": 50
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "OR",
+                                "resources": [
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "fertilizer",
+                                        "amount": 100
+                                    },
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "peat",
+                                        "amount": 100
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "OR",
+                                "resources": [
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "petroleum",
+                                        "amount": 200
+                                    },
+                                    {
+                                        "type": "RESOURCE",
+                                        "id": "biodiesel",
+                                        "amount": 200
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            ]
+        }
     ],
     "produces": [
-        { "type": "RESOURCE", "id": "blastshot", "amount": 37.5 },
-        { "type": "RESOURCE", "id": "carbon_dioxide", "amount": 7.5 }
+        { "type": "RESOURCE", "id": "carbon_dioxide", "amount": 1 },
+        {
+            "type": "BRANCH",
+            "settingName": "Recipe",
+            "branches": [
+                [
+                    "Blastshot",
+                    { "type": "RESOURCE", "id": "blastshot", "amount": 5 }
+                ],
+                [
+                    "Intracosmic Blastshot",
+                    {
+                        "type": "RESOURCE",
+                        "id": "intracosmic_blastshot",
+                        "amount": 1
+                    }
+                ]
+            ]
+        }
     ]
 }

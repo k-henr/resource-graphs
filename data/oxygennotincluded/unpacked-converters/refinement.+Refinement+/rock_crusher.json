@@ -10,6 +10,7 @@
                 "Egg Shell",
                 "Graphite",
                 "Oakshell Molt",
+                "Pinpoki",
                 "Pokeshell Molt",
                 "Refined Metal",
                 "Salt",
@@ -190,12 +191,9 @@
                 ],
                 [
                     "Graphite",
-                    {
-                        "type": "RESOURCE",
-                        "id": "fullerene",
-                        "amount": 100
-                    }
-                ]
+                    { "type": "RESOURCE", "id": "fullerene", "amount": 100 }
+                ],
+                ["Pinpoki", { "type": "RESOURCE", "id": "pinpoki", "amount": 1 }]
             ]
         }
     ],
@@ -398,7 +396,8 @@
                             { "type": "RESOURCE", "id": "sand", "amount": 10 }
                         ]
                     }
-                ]
+                ],
+                ["Pinpoki", { "type": "RESOURCE", "id": "diamond", "amount": 100 }]
             ]
         }
     ]
