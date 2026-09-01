@@ -42,6 +42,7 @@ export class OrNode extends ResourceTreeBoolNode {
     // (the options list is a list of name/option pairs)
     constructor(options: [string | string[], ResourceTree][]) {
         super(options.map(([, r]) => r));
+        console.log(options);
         this.options = options;
     }
 
@@ -76,6 +77,7 @@ export class OrNode extends ResourceTreeBoolNode {
             const option = this.children[i];
 
             for (const name of optionList) {
+                console.log(option);
                 this.optionNameToTreeMap.set(name, option);
                 // Create a container for the option. This container is what's being
                 // accessed in the collapse function, which means that the content of

@@ -1,0 +1,82 @@
+{
+    "templateName": "critter-2%",
+    "displayName": "{Cramped|Cramped }{Wild|Wild }{Morph} (happiness {Happiness})",
+    "thumbName": "Pip",
+    "morphs": ["Pip", "Cuddle Pip"],
+    "defaultMorph": "Pip",
+    "meat": "meat",
+    "caloriesDropped": 1600,
+    "egg": "pip_egg",
+    "consumeResource": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "SETTING",
+                "name": "Morph",
+                "options": [
+                    ["Pip", 1],
+                    ["Cuddle Pip", 1.25]
+                ]
+            },
+            "resource": {
+                "type": "OR",
+                "resources": [
+                    {
+                        "type": "CONVERTER",
+                        "id": "arbor_tree",
+                        "amount": {
+                            "type": "SETTING",
+                            "name": "Wild",
+                            "true": [3556, 1000],
+                            "false": [889, 1000]
+                        },
+                        "amountPreview": 0.0889
+                    },
+                    {
+                        "type": "CONVERTER",
+                        "id": "thimble_reed",
+                        "amount": {
+                            "type": "SETTING",
+                            "name": "Wild",
+                            "true": 0.8,
+                            "false": 0.2
+                        },
+                        "amountPreview": 0.2
+                    },
+                    {
+                        "type": "CONVERTER",
+                        "id": "bonbon_tree",
+                        "amount": {
+                            "type": "SETTING",
+                            "name": "Wild",
+                            "true": [3556, 1000],
+                            "false": [889, 1000]
+                        },
+                        "amountPreview": 0.0889
+                    },
+                    {
+                        "type": "CONVERTER",
+                        "id": "gum_palm",
+                        "amount": {
+                            "type": "SETTING",
+                            "name": "Wild",
+                            "true": 0.32,
+                            "false": 0.08
+                        },
+                        "amountPreview": 0.08
+                    }
+                ]
+            }
+        }
+    ],
+    "produceResource": [
+        {
+            "type": "BRANCH",
+            "settingName": "Morph",
+            "branches": [
+                ["Pip", { "type": "RESOURCE", "id": "dirt", "amount": 20 }],
+                ["Cuddle Pip", { "type": "RESOURCE", "id": "dirt", "amount": 12.5 }]
+            ]
+        }
+    ]
+}

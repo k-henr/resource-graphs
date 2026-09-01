@@ -940,6 +940,7 @@ Please report this as a bug!`);
     // (the options list is a list of name/option pairs)
     constructor(options) {
       super(options.map(([, r]) => r));
+      console.log(options);
       this.options = options;
     }
     createElement() {
@@ -957,6 +958,7 @@ Please report this as a bug!`);
         const optionList = typeof optionName === "string" ? [optionName] : optionName;
         const option = this.children[i];
         for (const name of optionList) {
+          console.log(option);
           this.optionNameToTreeMap.set(name, option);
           const optionContainer = _OrNode.converterOptionTemplate.cloneElement();
           console.log(optionContainer);
@@ -1288,6 +1290,8 @@ Please report this as a bug!`);
           );
         const options = [];
         data.resources.map((childData) => preprocessOrInput(childData, options));
+        console.log(data);
+        console.log(data.resources);
         return new OrNode(
           options.map((cData, cIndex) => [
             String(cIndex),
@@ -1342,6 +1346,9 @@ Please report this as a bug!`);
       case "AND":
       case "OR":
       case "MULTIPLIER":
+      case "CONVERTER":
+      case "BRANCH":
+      case "ENTANGLED_OR":
         output.push(tree);
         break;
       case "TAG":

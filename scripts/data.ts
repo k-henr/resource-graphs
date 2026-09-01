@@ -156,6 +156,8 @@ export function resourceTreeDataToClass(
                 );
             const options: ResourceTreeData[] = [];
             data.resources.map((childData) => preprocessOrInput(childData, options));
+            console.log(data);
+            console.log(data.resources);
             return new OrNode(
                 options.map((cData, cIndex) => [
                     String(cIndex),
@@ -221,6 +223,9 @@ function preprocessOrInput(tree: ResourceTreeData, output: ResourceTreeData[]) {
         case "AND":
         case "OR":
         case "MULTIPLIER":
+        case "CONVERTER":
+        case "BRANCH":
+        case "ENTANGLED_OR":
             output.push(tree);
             break;
         case "TAG":
@@ -235,6 +240,8 @@ function preprocessOrInput(tree: ResourceTreeData, output: ResourceTreeData[]) {
                 });
             }
             break;
+        // default:
+        //     throw new GraphError(`Unknown resource tree type "${tree.type}"!`);
     }
 }
 

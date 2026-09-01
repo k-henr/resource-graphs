@@ -1,0 +1,12 @@
+{
+    "templateName": "critter-2%",
+    "displayName": "{Cramped|Cramped }{Wild|Wild }{Morph} (happiness {Happiness})",
+    "thumbName": "Orehull",
+    "morphs": ["Orehull"],
+    "defaultMorph": "Orehull",
+    "meat": "raw_shellfish",
+    "caloriesDropped": 6000,
+    "egg": "orehull_egg",
+    "consumeResource": [{ "type": "RESOURCE", "id": "nori", "amount": 20 }],
+    "produceResource": [{ "type": "RESOURCE", "id": "polluted_mud", "amount": 50 }]
+}
