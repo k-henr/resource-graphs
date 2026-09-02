@@ -1,0 +1,18 @@
+{
+    "templateName": "critter-2%",
+    "displayName": "{Cramped|Cramped }{Wild|Wild }{Morph} (happiness {Happiness})",
+    "thumbName": "Seaquine",
+    "morphs": ["Seaquine"],
+    "defaultMorph": "Seaquine",
+    "meat": "fish_fillet",
+    "caloriesDropped": 1000,
+    "egg": "seaquine_egg",
+    "consumeResource": [{ "type": "RESOURCE", "id": "pearl", "amount": 3.1 }],
+    "produceResource": [
+        {
+            "type": "RESOURCE",
+            "id": "slime",
+            "amount": 12
+        }
+    ]
+}

@@ -5,7 +5,6 @@ import os
 import json
 import re
 from jsonType import jsonObject
-from typing import cast
 
 # Matches id_and_name.unitGroup.#tag1.tag2.tag3#.ext
 # The unit group and tag list are optional. Dots are used to separate parts of the
@@ -41,7 +40,7 @@ def build(
         for [unit, tags] in folderMatcher.findall(path):
             if unit != "":
                 defaultUnitGroup = unit
-            if tags != None:
+            if tags != None and tags != "":
                 for t in tags.split("."):
                     defaultTags.append(t)
 
@@ -76,8 +75,12 @@ def build(
                 if (tags == None):
                     resource["tags"] = defaultTags
                 else:
-                    resource["tags"] = [cast(list[jsonObject], t)
-                                        for t in tags.split(".")]
+                    resource["tags"] = []
+                    for t in tags.split("."):
+                        if t == "":
+                            continue
+                        resource["tags"].append(t)
+
                     resource["tags"].extend(defaultTags)
 
             # Add to list of all resources

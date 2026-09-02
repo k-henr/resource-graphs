@@ -1,0 +1,57 @@
+{
+    "templateName": "critter-2%",
+    "displayName": "{Cramped|Cramped }{Wild|Wild }{Morph} (happiness {Happiness})",
+    "thumbName": "Shove Vole",
+    "morphs": ["Shove Vole", "Delecta Vole"],
+    "defaultMorph": "Shove Vole",
+    "meat": "meat",
+    "caloriesDropped": 16000,
+    "egg": "shove_vole_egg",
+    "consumeResource": [
+        {
+            "type": "ENTANGLED_OR",
+            "id": "diet",
+            "resources": [
+                [
+                    "regolith",
+                    { "type": "RESOURCE", "id": "regolith", "amount": 4800 }
+                ],
+                ["dirt", { "type": "RESOURCE", "id": "dirt", "amount": 4800 }],
+                [
+                    "iron_ore",
+                    { "type": "RESOURCE", "id": "iron_ore", "amount": 4800 }
+                ]
+            ]
+        }
+    ],
+    "produceResource": [
+        {
+            "type": "ENTANGLED_OR",
+            "id": "diet",
+            "resources": [
+                [
+                    "regolith",
+                    { "type": "RESOURCE", "id": "regolith", "amount": 2400 }
+                ],
+                ["dirt", { "type": "RESOURCE", "id": "dirt", "amount": 2400 }],
+                [
+                    "iron_ore",
+                    { "type": "RESOURCE", "id": "iron_ore", "amount": 2400 }
+                ]
+            ]
+        }
+    ],
+    "additionalProduce": [
+        {
+            "type": "BRANCH",
+            "settingName": "Morph",
+            "branches": [
+                ["Shove Vole", { "type": "AND", "resources": [] }],
+                [
+                    "Delecta Vole",
+                    { "type": "RESOURCE", "id": "tonic_root", "amount": 1 }
+                ]
+            ]
+        }
+    ]
+}

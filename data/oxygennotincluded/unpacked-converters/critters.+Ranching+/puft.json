@@ -1,0 +1,110 @@
+{
+    "templateName": "critter-2%",
+    "displayName": "{Cramped|Cramped }{Wild|Wild }{Morph} (happiness {Happiness})",
+    "thumbName": "Puft",
+    "morphs": ["Puft", "Puft Prince", "Dense Puft", "Squeaky Puft"],
+    "defaultMorph": "Puft",
+    "meat": "meat",
+    "caloriesDropped": 1600,
+    "egg": "puft_egg",
+    "consumeResource": [
+        {
+            "type": "BRANCH",
+            "settingName": "Morph",
+            "branches": [
+                [
+                    "Puft",
+                    { "type": "RESOURCE", "id": "polluted_oxygen", "amount": 50 }
+                ],
+                [
+                    "Squeaky Puft",
+                    { "type": "RESOURCE", "id": "chlorine", "amount": 30 }
+                ],
+                ["Dense Puft", { "type": "RESOURCE", "id": "oxygen", "amount": 50 }],
+                [
+                    "Puft Prince",
+                    {
+                        "type": "ENTANGLED_OR",
+                        "id": "prince_diet",
+                        "resources": [
+                            [
+                                "poxy",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "polluted_oxygen",
+                                    "amount": 30
+                                }
+                            ],
+                            [
+                                "bleach",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "chlorine",
+                                    "amount": 30
+                                }
+                            ],
+                            [
+                                "oxy",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "oxygen",
+                                    "amount": 30
+                                }
+                            ]
+                        ]
+                    }
+                ]
+            ]
+        }
+    ],
+    "produceResource": [
+        {
+            "type": "BRANCH",
+            "settingName": "Morph",
+            "branches": [
+                ["Puft", { "type": "RESOURCE", "id": "slime", "amount": 47.5 }],
+                [
+                    "Squeaky Puft",
+                    { "type": "RESOURCE", "id": "bleach_stone", "amount": 28.5 }
+                ],
+                [
+                    "Dense Puft",
+                    { "type": "RESOURCE", "id": "oxygen", "amount": 47.5 }
+                ],
+                [
+                    "Puft Prince",
+                    {
+                        "type": "ENTANGLED_OR",
+                        "id": "prince_diet",
+                        "resources": [
+                            [
+                                "poxy",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "slime",
+                                    "amount": 3
+                                }
+                            ],
+                            [
+                                "bleach",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "bleach_stone",
+                                    "amount": 3
+                                }
+                            ],
+                            [
+                                "oxy",
+                                {
+                                    "type": "RESOURCE",
+                                    "id": "oxylite",
+                                    "amount": 3
+                                }
+                            ]
+                        ]
+                    }
+                ]
+            ]
+        }
+    ]
+}
