@@ -70,5 +70,22 @@
             },
             "resource": { "type": "RESOURCE", "id": "sand", "amount": 1 }
         }
+    ],
+    "additionalProduce": [
+        {
+            "type": "BRANCH",
+            "settingName": "Morph",
+            "branches": [
+                [
+                    "Oakshell",
+                    {
+                        "type": "RESOURCE",
+                        "id": "oakshell_molt",
+                        "amount": [550, 95]
+                    }
+                ],
+                [["Pokeshell", "Sanishell"], { "type": "AND", "resources": [] }]
+            ]
+        }
     ]
 }
