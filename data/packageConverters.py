@@ -4,15 +4,13 @@
 import os
 import json
 import re
+from jsonType import jsonObject
 
 
 class ParseException(BaseException):
-    def __init__(self, message):
+    def __init__(self, message: str):
         self.message = message
 
-
-type jsonObject = \
-    dict[str, jsonObject] | str | list[jsonObject] | float | int | bool
 
 # Matches "TEMPLATE:" strings in template files, as well as their "settings"
 templateStringMatcher = re.compile(
@@ -31,17 +29,17 @@ folderDetailRemover = re.compile(r"\.\+[^\/\+]+\+")
 
 
 def build(
-    projName,
-    unpackedDir="unpacked-converters",
-    output="converters.json",
-    templateDir="templates",
-    defaultImgDir="images/converters",
-    defaultImgExt="png",
-    capitalizeDisplayNames=True
+    projName: str,
+    unpackedDir: str = "unpacked-converters",
+    output: str = "converters.json",
+    templateDir: str = "templates",
+    defaultImgDir: str = "images/converters",
+    defaultImgExt: str = "png",
+    capitalizeDisplayNames: bool = True
 ):
     # Go through a list of all files in the input directory
-    allConverters = []
-    warnings = []
+    allConverters: list[jsonObject] = []
+    warnings: list[str] = []
     projectPath = os.path.join(os.getcwd(), "data", projName)
     unpackedPath = os.path.join(projectPath, unpackedDir)
     templatePath = os.path.join(projectPath, templateDir)
@@ -57,7 +55,7 @@ def build(
             )
 
             # Check for extra tags added by the path
-            defaultTags = []
+            defaultTags: list[jsonObject] = []
             tags: str
             for tags in folderMatcher.findall(path):
                 if tags != "":
@@ -108,7 +106,7 @@ def parseConverter(
     templatePath: str,
     defaultImgPath: str,
     defaultImgExt: str,
-    defaultTags: list[str]
+    defaultTags: list[jsonObject]
 ) -> jsonObject:
     if type(converter) is dict:
 
@@ -136,7 +134,7 @@ def parseConverter(
                         return (outputDict, False)
 
                     case list():
-                        outputList: list = []
+                        outputList: list[jsonObject] = []
                         for v in templateObject:
                             tuple = resolveTemplate(v)
                             if tuple == None:
@@ -168,7 +166,7 @@ def parseConverter(
                         else:
                             # If not a template string, check for substrings to
                             # splice in the string
-                            def matchHandler(match):
+                            def matchHandler(match: re.Match[str]):
                                 repl = str(converter.get(
                                     match.group("TEMPLATENAME")))
                                 if (not (repl or match.group("OPTIONAL"))):
