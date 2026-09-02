@@ -13,7 +13,8 @@ export class Converter {
     private ingredients: ConverterIngredient[];
     private products: ConverterIngredient[];
 
-    // Stores dependencies for display purposes
+    // Stores dependencies for display purposes. The rational is a multiplier (how
+    // many dependencies per base converter)
     public readonly dependencies: [Converter, Rational][];
 
     private name: string;

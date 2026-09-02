@@ -133,7 +133,7 @@ export class ResourceGraph {
         converter: Converter,
         amount: Rational,
         listElement: HTMLElement,
-        removable: boolean = true,
+        isDependency: boolean = false,
     ) {
         const el = this.converterTemplate.clone();
 
@@ -154,22 +154,29 @@ export class ResourceGraph {
             if (amount) this.setConverterAmount(converter, amount);
         };
 
-        if (removable) {
+        if (!isDependency) {
             // Button to remove
             el.querySelector<HTMLElement>(".remove-converter-button")!.onclick =
                 () => this.removeConverter(converter);
         } else {
             // Kill the remove button to make it impossible to remove if it should be
             el.querySelector<HTMLElement>(".remove-converter-button")!.remove();
+
+            // Disable the number input
+            console.log(
+                el.querySelector<HTMLInputElement>("input.converter-amount"),
+            );
+            el.querySelector<HTMLInputElement>("input.converter-amount")!.disabled =
+                true;
         }
 
         // Add the dependencies to the converter
         for (const [dependency, dependencyAmount] of converter.dependencies) {
             this.addConverterElement(
                 dependency,
-                dependencyAmount,
+                dependencyAmount.mul(amount),
                 el.querySelector(".converter-dependencies")!,
-                false,
+                true,
             );
         }
 

@@ -185,7 +185,8 @@ Please report this as a bug!`);
     // All the inputs and outputs of this conversion
     ingredients;
     products;
-    // Stores dependencies for display purposes
+    // Stores dependencies for display purposes. The rational is a multiplier (how
+    // many dependencies per base converter)
     dependencies;
     name;
     image;
@@ -1464,7 +1465,7 @@ Please report this as a bug!`);
         this.addConverterElement(converter, amount, this.converterList);
       }
     }
-    addConverterElement(converter, amount, listElement, removable = true) {
+    addConverterElement(converter, amount, listElement, isDependency = false) {
       const el = this.converterTemplate.clone();
       el.querySelector(".converter-name").innerText = converter.getDisplayName();
       el.querySelector(".converter-image").src = converter.getDisplayImage();
@@ -1476,17 +1477,21 @@ Please report this as a bug!`);
         const amount2 = Rational.fromInput(el2.value, el2);
         if (amount2) this.setConverterAmount(converter, amount2);
       };
-      if (removable) {
+      if (!isDependency) {
         el.querySelector(".remove-converter-button").onclick = () => this.removeConverter(converter);
       } else {
         el.querySelector(".remove-converter-button").remove();
+        console.log(
+          el.querySelector("input.converter-amount")
+        );
+        el.querySelector("input.converter-amount").disabled = true;
       }
       for (const [dependency, dependencyAmount] of converter.dependencies) {
         this.addConverterElement(
           dependency,
-          dependencyAmount,
+          dependencyAmount.mul(amount),
           el.querySelector(".converter-dependencies"),
-          false
+          true
         );
       }
       listElement.appendChild(el);
