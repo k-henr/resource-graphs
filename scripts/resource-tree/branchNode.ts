@@ -28,6 +28,7 @@ export class BranchNode implements ResourceTree {
     public createElement(): HTMLElement {
         const el = document.createElement("div");
         this.childNodes.map(([name, child]) => {
+            console.log("Creating child element for branch", this.settingName);
             const childEl = child.createElement();
             el.appendChild(childEl);
             childEl.classList.add("hidden");
@@ -63,9 +64,14 @@ export class BranchNode implements ResourceTree {
         // (todo: only hide child branches that were created by this node. Add
         // wrapper elements like in OR?)
         this.currentBranch?.elements.map((el) => el.classList.add("hidden"));
+        console.log("Hiding all elements");
         // Switch branch to the new one
         const branch = this.getBranch(settings);
-        branch.elements.map((el) => el.classList.remove("hidden"));
+        branch.elements.map((el) => {
+            el.classList.add("" + Math.random());
+            el.classList.remove("hidden");
+            console.log("Unhiding", el);
+        });
         this.currentBranch = branch;
     }
 

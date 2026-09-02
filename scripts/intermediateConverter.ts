@@ -135,7 +135,6 @@ export class IntermediateConverter {
 
     // Add a dependency, once that dependency has been resolved
     public addDependency(dependency: Converter, amount: Rational) {
-        console.log("Adding dependency:", dependency);
         this.dependencies.push([dependency, amount]);
     }
 

@@ -1,0 +1,74 @@
+{
+    "templateName": "critter-2%",
+    "displayName": "{Cramped|Cramped }{Wild|Wild }{Morph} (happiness {Happiness})",
+    "thumbName": "Pokeshell",
+    "morphs": ["Pokeshell", "Oakshell", "Sanishell"],
+    "defaultMorph": "Pokeshell",
+    "meat": "raw_shellfish",
+    "caloriesDropped": 1200,
+    "egg": "pokeshell_roe",
+    "consumeResource": [
+        {
+            "type": "BRANCH",
+            "settingName": "Morph",
+            "branches": [
+                [
+                    "Pokeshell",
+                    {
+                        "type": "OR",
+                        "resources": [
+                            {
+                                "type": "RESOURCE",
+                                "id": "polluted_dirt",
+                                "amount": 70
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "rot_pile",
+                                "amount": 70
+                            }
+                        ]
+                    }
+                ],
+                [
+                    ["Oakshell", "Sanishell"],
+                    {
+                        "type": "OR",
+                        "resources": [
+                            {
+                                "type": "RESOURCE",
+                                "id": "polluted_dirt",
+                                "amount": 70
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "rot_pile",
+                                "amount": 70
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "slime",
+                                "amount": 70
+                            }
+                        ]
+                    }
+                ]
+            ]
+        }
+    ],
+    "produceResource": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "SETTING",
+                "name": "Morph",
+                "options": [
+                    ["Pokeshell", 35],
+                    ["Oakshell", 17.5],
+                    ["Sanishell", 10]
+                ]
+            },
+            "resource": { "type": "RESOURCE", "id": "sand", "amount": 1 }
+        }
+    ]
+}

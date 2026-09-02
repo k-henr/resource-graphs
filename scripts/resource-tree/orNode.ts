@@ -42,7 +42,6 @@ export class OrNode extends ResourceTreeBoolNode {
     // (the options list is a list of name/option pairs)
     constructor(options: [string | string[], ResourceTree][]) {
         super(options.map(([, r]) => r));
-        console.log(options);
         this.options = options;
     }
 
@@ -77,7 +76,6 @@ export class OrNode extends ResourceTreeBoolNode {
             const option = this.children[i];
 
             for (const name of optionList) {
-                console.log(option);
                 this.optionNameToTreeMap.set(name, option);
                 // Create a container for the option. This container is what's being
                 // accessed in the collapse function, which means that the content of
@@ -85,24 +83,13 @@ export class OrNode extends ResourceTreeBoolNode {
                 // function and re-set the onclick for that element
                 const optionContainer =
                     OrNode.converterOptionTemplate.cloneElement();
-                console.log(optionContainer);
 
                 // Create an element for the option and add it to the container
                 const optionEl = option.createElement();
                 optionContainer.appendChild(optionEl);
 
                 // Add the option element to the map
-                console.log(
-                    "Storing",
-                    optionEl,
-                    "as option",
-                    name,
-                    "for element",
-                    el,
-                );
-                console.log([el, name]);
                 optionElementMap.set(name, optionEl);
-                console.log(this.elementAndOptionNameToOptionElementMap);
 
                 // Set a listener for the option container to collapse into it
                 optionContainer.onclick = () => {
@@ -172,9 +159,6 @@ export class OrNode extends ResourceTreeBoolNode {
 
         // Replace all tracked elements with the element representing the chosen option
         for (const el of this.elements) {
-            console.log("Trying to replace", el, "with option", optionName);
-            console.log([el, optionName]);
-
             const optionEl = this.elementAndOptionNameToOptionElementMap
                 .get(el)
                 ?.get(optionName);

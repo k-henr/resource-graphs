@@ -156,8 +156,6 @@ export function resourceTreeDataToClass(
                 );
             const options: ResourceTreeData[] = [];
             data.resources.map((childData) => preprocessOrInput(childData, options));
-            console.log(data);
-            console.log(data.resources);
             return new OrNode(
                 options.map((cData, cIndex) => [
                     String(cIndex),

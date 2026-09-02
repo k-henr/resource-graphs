@@ -31,7 +31,6 @@ export class Converter {
         this.ingredients = ingredients;
         this.products = products;
         this.dependencies = dependencies;
-        console.log(dependencies);
     }
 
     /**

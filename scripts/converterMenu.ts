@@ -143,9 +143,7 @@ export class ConverterMenu extends SubmitMenu {
             dependency.converter.settings,
             () => {
                 // When the settings are changed, this should update the amount required
-                console.log("Settings changed");
                 const amount = dependencySettings.evaluateTree(dependency.amount);
-                console.log(amount.getDecimalString());
                 ingredientTree.updateElements(amount, dependencySettings);
                 dependencyAmountEl.innerText = amount.getDecimalString();
             },

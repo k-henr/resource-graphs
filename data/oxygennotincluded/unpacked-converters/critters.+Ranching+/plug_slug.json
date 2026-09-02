@@ -1,0 +1,57 @@
+{
+    "templateName": "critter-2%",
+    "displayName": "{Cramped|Cramped }{Wild|Wild }{Morph} (happiness {Happiness})",
+    "thumbName": "Plug Slug",
+    "morphs": ["Plug Slug", "Smog Slug", "Sponge Slug"],
+    "defaultMorph": "Plug Slug",
+    "meat": "meat",
+    "caloriesDropped": 3200,
+    "egg": "plug_slug_egg",
+    "consumeResource": [
+        {
+            "type": "OR",
+            "resources": [
+                { "type": "TAG", "tagName": "&Refined Solid Metal", "amount": 60 },
+                { "type": "TAG", "tagName": "&Unrefined Ore", "amount": 60 }
+            ]
+        }
+    ],
+    "produceResource": [
+        {
+            "type": "BRANCH",
+            "settingName": "Morph",
+            "branches": [
+                [
+                    "Plug Slug",
+                    {
+                        "type": "AND",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "hydrogen", "amount": 3 }
+                        ]
+                    }
+                ],
+                [["Smog Slug", "Sponge Slug"], { "type": "AND", "resources": [] }]
+            ]
+        }
+    ],
+    "additionalProduce": [
+        {
+            "type": "MULTIPLIER",
+            "multiplier": {
+                "type": "MUL",
+                "values": [
+                    { "type": "SETTING", "name": "Wild", "true": 0.25, "false": 1 },
+                    {
+                        "type": "SETTING",
+                        "name": "Morph",
+                        "options": [
+                            ["Plug Slug", 1],
+                            ["Smog Slug", "Sponge Slug", 0]
+                        ]
+                    }
+                ]
+            },
+            "resource": { "type": "RESOURCE", "id": "power", "amount": 1600 }
+        }
+    ]
+}

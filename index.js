@@ -195,7 +195,6 @@ Please report this as a bug!`);
       this.ingredients = ingredients;
       this.products = products;
       this.dependencies = dependencies;
-      console.log(dependencies);
     }
     /**
      * Apply this conversion to a given graph, consuming and adding items. This can
@@ -625,7 +624,6 @@ Please report this as a bug!`);
     }
     // Add a dependency, once that dependency has been resolved
     addDependency(dependency, amount) {
-      console.log("Adding dependency:", dependency);
       this.dependencies.push([dependency, amount]);
     }
     tryUpdateInfoPanel() {
@@ -825,6 +823,7 @@ Please report this as a bug!`);
     createElement() {
       const el = document.createElement("div");
       this.childNodes.map(([name, child]) => {
+        console.log("Creating child element for branch", this.settingName);
         const childEl = child.createElement();
         el.appendChild(childEl);
         childEl.classList.add("hidden");
@@ -848,8 +847,13 @@ Please report this as a bug!`);
         value.updateElements(multiplier, settings);
       }
       this.currentBranch?.elements.map((el) => el.classList.add("hidden"));
+      console.log("Hiding all elements");
       const branch = this.getBranch(settings);
-      branch.elements.map((el) => el.classList.remove("hidden"));
+      branch.elements.map((el) => {
+        el.classList.add("" + Math.random());
+        el.classList.remove("hidden");
+        console.log("Unhiding", el);
+      });
       this.currentBranch = branch;
     }
     getBranch(settings) {
@@ -940,7 +944,6 @@ Please report this as a bug!`);
     // (the options list is a list of name/option pairs)
     constructor(options) {
       super(options.map(([, r]) => r));
-      console.log(options);
       this.options = options;
     }
     createElement() {
@@ -958,23 +961,11 @@ Please report this as a bug!`);
         const optionList = typeof optionName === "string" ? [optionName] : optionName;
         const option = this.children[i];
         for (const name of optionList) {
-          console.log(option);
           this.optionNameToTreeMap.set(name, option);
           const optionContainer = _OrNode.converterOptionTemplate.cloneElement();
-          console.log(optionContainer);
           const optionEl = option.createElement();
           optionContainer.appendChild(optionEl);
-          console.log(
-            "Storing",
-            optionEl,
-            "as option",
-            name,
-            "for element",
-            el
-          );
-          console.log([el, name]);
           optionElementMap.set(name, optionEl);
-          console.log(this.elementAndOptionNameToOptionElementMap);
           optionContainer.onclick = () => {
             try {
               console.log("Choosing option", name);
@@ -1007,8 +998,6 @@ Please report this as a bug!`);
         );
       this.chosenOption = chosenOption;
       for (const el of this.elements) {
-        console.log("Trying to replace", el, "with option", optionName);
-        console.log([el, optionName]);
         const optionEl = this.elementAndOptionNameToOptionElementMap.get(el)?.get(optionName);
         if (!optionEl)
           throw new ProgramError(
@@ -1290,8 +1279,6 @@ Please report this as a bug!`);
           );
         const options = [];
         data.resources.map((childData) => preprocessOrInput(childData, options));
-        console.log(data);
-        console.log(data.resources);
         return new OrNode(
           options.map((cData, cIndex) => [
             String(cIndex),
@@ -1740,9 +1727,7 @@ Please report this as a bug!`);
       const dependencySettings = new ConverterSettings(
         dependency.converter.settings,
         () => {
-          console.log("Settings changed");
           const amount2 = dependencySettings.evaluateTree(dependency.amount);
-          console.log(amount2.getDecimalString());
           ingredientTree.updateElements(amount2, dependencySettings);
           dependencyAmountEl.innerText = amount2.getDecimalString();
         }
