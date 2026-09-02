@@ -1,0 +1,43 @@
+{
+    "templateName": "critter-2%",
+    "displayName": "{Cramped|Cramped }{Wild|Wild }{Morph} (happiness {Happiness})",
+    "thumbName": "Slickster",
+    "morphs": ["Slickster", "Molten Slickster", "Longhair Slickster"],
+    "defaultMorph": "Slickster",
+    "meat": "meat",
+    "caloriesDropped": 3200,
+    "egg": "slickster_egg",
+    "consumeResource": [
+        {
+            "type": "BRANCH",
+            "settingName": "Morph",
+            "branches": [
+                [
+                    ["Slickster", "Molten Slickster"],
+                    { "type": "RESOURCE", "id": "carbon_dioxide", "amount": 20 }
+                ],
+                [
+                    "Longhair Slickster",
+                    { "type": "RESOURCE", "id": "oxygen", "amount": 30 }
+                ]
+            ]
+        }
+    ],
+    "produceResource": [
+        {
+            "type": "BRANCH",
+            "settingName": "Morph",
+            "branches": [
+                [
+                    "Slickster",
+                    { "type": "RESOURCE", "id": "crude_oil", "amount": 10 }
+                ],
+                [
+                    "Molten Slickster",
+                    { "type": "RESOURCE", "id": "petroleum", "amount": 10 }
+                ],
+                ["Longhair Slickster", { "type": "AND", "resources": [] }]
+            ]
+        }
+    ]
+}

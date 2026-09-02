@@ -1,0 +1,45 @@
+{
+    "templateName": "critter-2%",
+    "displayName": "{Cramped|Cramped }{Wild|Wild }{Morph} (happiness {Happiness})",
+    "thumbName": "Spligot Seal",
+    "morphs": ["Spigot Seal"],
+    "defaultMorph": "Spigot Seal",
+    "meat": "tallow",
+    "caloriesDropped": 50,
+    "egg": "spigot_seal_egg",
+    "consumeResource": [
+        {
+            "type": "OR",
+            "resources": [
+                { "type": "RESOURCE", "id": "sucrose", "amount": 30.8 },
+                {
+                    "type": "CONVERTER",
+                    "id": "bonbon_tree",
+                    "amount": {
+                        "type": "MUL",
+                        "values": [
+                            {
+                                "type": "THRESHOLD",
+                                "value": {
+                                    "type": "SETTING",
+                                    "name": "Lux"
+                                },
+                                "threshold": 300,
+                                "higherOrEqual": {
+                                    "type": "CLAMP",
+                                    "value": { "type": "SETTING", "name": "Lux" },
+                                    "low": 0,
+                                    "high": 10000
+                                },
+                                "lower": 0
+                            },
+                            [0.5, 10000]
+                        ]
+                    },
+                    "amountPreview": 0.5
+                }
+            ]
+        }
+    ],
+    "produceResource": [{ "type": "RESOURCE", "id": "ethanol", "amount": 40 }]
+}
