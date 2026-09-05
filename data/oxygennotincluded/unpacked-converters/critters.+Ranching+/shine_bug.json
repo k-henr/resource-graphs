@@ -1,0 +1,249 @@
+{
+    "templateName": "critter-7%",
+    "displayName": "{Cramped|Cramped }{Wild|Wild }{Morph} (happiness {Happiness})",
+    "thumbName": "Shine Bug",
+    "morphs": [
+        "Shine Bug",
+        "Sun Bug",
+        "Royal Bug",
+        "Coral Bug",
+        "Azure Bug",
+        "Abyss Bug",
+        "Radiant Bug"
+    ],
+    "defaultMorph": "Shine Bug",
+    "meat": "meat",
+    "caloriesDropped": 0,
+    "egg": "shine_bug_egg",
+    "consumeResource": [
+        {
+            "type": "BRANCH",
+            "settingName": "Morph",
+            "branches": [
+                [
+                    "Shine Bug",
+                    {
+                        "type": "OR",
+                        "resources": [
+                            {
+                                "type": "RESOURCE",
+                                "id": "bristle_berry",
+                                "amount": 265.6
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "gristle_berry",
+                                "amount": 332
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "pikeapple",
+                                "amount": 132.8
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "pikeapple_skewer",
+                                "amount": 199.2
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "phosphorite",
+                                "amount": 0.2
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "Sun Bug",
+                    {
+                        "type": "OR",
+                        "resources": [
+                            { "type": "RESOURCE", "id": "mushroom", "amount": 600 },
+                            {
+                                "type": "RESOURCE",
+                                "id": "fried_mushroom",
+                                "amount": 700
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "gristle_berry",
+                                "amount": 500
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "pikeapple_skewer",
+                                "amount": 300
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "phosphorite",
+                                "amount": 0.2
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "Royal Bug",
+                    {
+                        "type": "OR",
+                        "resources": [
+                            {
+                                "type": "RESOURCE",
+                                "id": "fried_mushroom",
+                                "amount": 2800
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "gristle_berry",
+                                "amount": 2000
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "pikeapple_skewer",
+                                "amount": 1200
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "pincha_peppernut",
+                                "amount": 1
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "pepper_bread",
+                                "amount": 4000
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "phosphorite",
+                                "amount": 1
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "Coral Bug",
+                    {
+                        "type": "OR",
+                        "resources": [
+                            {
+                                "type": "RESOURCE",
+                                "id": "fried_mushroom",
+                                "amount": 2800
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "pepper_bread",
+                                "amount": 4000
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "bristle_berry",
+                                "amount": 1600
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "gristle_berry",
+                                "amount": 2000
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "pikeapple_skewer",
+                                "amount": 1200
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "stuffed_berry",
+                                "amount": 4400
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "phosphorite",
+                                "amount": 1
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "Azure Bug",
+                    {
+                        "type": "OR",
+                        "resources": [
+                            {
+                                "type": "RESOURCE",
+                                "id": "pepper_bread",
+                                "amount": 4000
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "stuffed_berry",
+                                "amount": 4400
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "phosphorite",
+                                "amount": 1
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "refined_phosphorus",
+                                "amount": 1
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "Abyss Bug",
+                    {
+                        "type": "OR",
+                        "resources": [
+                            {
+                                "type": "RESOURCE",
+                                "id": "stuffed_berry",
+                                "amount": 4400
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "meat",
+                                "amount": 1600
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "barbeque",
+                                "amount": 4000
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "abyssalite",
+                                "amount": 1
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "refined_phosphorus",
+                                "amount": 1
+                            }
+                        ]
+                    }
+                ],
+                [
+                    "Radiant Bug",
+                    {
+                        "type": "OR",
+                        "resources": [
+                            {
+                                "type": "RESOURCE",
+                                "id": "barbeque",
+                                "amount": 4000
+                            },
+                            {
+                                "type": "RESOURCE",
+                                "id": "diamond",
+                                "amount": 1
+                            }
+                        ]
+                    }
+                ]
+            ]
+        }
+    ],
+    "produceResource": []
+}

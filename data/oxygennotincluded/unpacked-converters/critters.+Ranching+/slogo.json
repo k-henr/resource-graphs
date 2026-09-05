@@ -1,0 +1,31 @@
+{
+    "templateName": "critter-7%",
+    "displayName": "{Cramped|Cramped }{Wild|Wild }{Morph} (happiness {Happiness})",
+    "thumbName": "Slogo",
+    "morphs": ["Slogo", "Glidgo"],
+    "defaultMorph": "Slogo",
+    "meat": "meat",
+    "caloriesDropped": 800,
+    "egg": "slogo_egg",
+    "consumeResource": [
+        {
+            "type": "BRANCH",
+            "settingName": "Morph",
+            "branches": [
+                ["Slogo", { "type": "RESOURCE", "id": "salt", "amount": 100 }],
+                ["Glidgo", { "type": "RESOURCE", "id": "sulfur", "amount": 100 }]
+            ]
+        }
+    ],
+    "produceResource": [
+        {
+            "type": "BRANCH",
+            "settingName": "Morph",
+            "branches": [
+                ["Slogo", { "type": "RESOURCE", "id": "dirt", "amount": 50 }],
+                ["Glidgo", { "type": "RESOURCE", "id": "obsidian", "amount": 50 }]
+            ]
+        }
+    ],
+    "additionalProduce": [{ "type": "RESOURCE", "id": "mucin", "amount": 50 }]
+}

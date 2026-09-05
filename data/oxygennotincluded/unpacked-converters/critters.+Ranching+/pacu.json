@@ -1,0 +1,49 @@
+{
+    "templateName": "critter-7%",
+    "displayName": "{Cramped|Cramped }{Wild|Wild }{Morph} (happiness {Happiness})",
+    "thumbName": "Pacu",
+    "morphs": ["Pacu"],
+    "defaultMorph": "Pacu",
+    "meat": "fish_fillet",
+    "caloriesDropped": 1000,
+    "egg": "pacu_egg",
+    "consumeResource": [
+        {
+            "type": "ENTANGLED_OR",
+            "id": "diet",
+            "resources": [
+                ["algae", { "type": "RESOURCE", "id": "algae", "amount": 7.5 }],
+                [
+                    "pacu_treat",
+                    { "type": "RESOURCE", "id": "pacu_treat", "amount": 1 }
+                ],
+                ["seed", { "type": "TAG", "tagName": "Seeds", "amount": 1 }],
+                [
+                    "seakomb_leaf",
+                    { "type": "RESOURCE", "id": "seakomb_leaf", "amount": 20 }
+                ]
+            ]
+        }
+    ],
+    "produceResource": [
+        {
+            "type": "ENTANGLED_OR",
+            "id": "diet",
+            "resources": [
+                [
+                    "algae",
+                    { "type": "RESOURCE", "id": "polluted_dirt", "amount": 5 }
+                ],
+                [
+                    "pacu_treat",
+                    { "type": "RESOURCE", "id": "polluted_dirt", "amount": 6 }
+                ],
+                ["seed", { "type": "RESOURCE", "id": "polluted_dirt", "amount": 3 }],
+                [
+                    "seakomb_leaf",
+                    { "type": "RESOURCE", "id": "polluted_dirt", "amount": 10 }
+                ]
+            ]
+        }
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    "templateName": "critter",
+    "baseReproduction": 0.07,
+    "adultLifespan": 20,
+
+    "displayName": "TEMPLATE:displayName",
+    "thumbName": "TEMPLATE:thumbName",
+    "morphs": "TEMPLATE:morphs",
+    "defaultMorph": "TEMPLATE:defaultMorph",
+    "additionalSettings": "TEMPLATE?:additionalSettings",
+    "consumeResource": "TEMPLATE:consumeResource",
+    "additionalConsume": "TEMPLATE?:additionalConsume",
+    "produceResource": "TEMPLATE:produceResource",
+    "additionalProduce": "TEMPLATE?:additionalProduce",
+    "egg": "TEMPLATE:egg",
+    "meat": "TEMPLATE:meat",
+    "caloriesDropped": "TEMPLATE:caloriesDropped"
+}

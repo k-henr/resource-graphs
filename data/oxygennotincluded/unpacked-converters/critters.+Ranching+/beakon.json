@@ -1,0 +1,18 @@
+{
+    "templateName": "critter-7%",
+    "displayName": "{Cramped|Cramped }{Wild|Wild }{Morph} (happiness {Happiness})",
+    "thumbName": "Beakon",
+    "morphs": ["Beakon"],
+    "defaultMorph": "Beakon",
+    "meat": "fish_fillet",
+    "caloriesDropped": 1000,
+    "egg": "beakon_egg",
+    "consumeResource": [{ "type": "RESOURCE", "id": "phosphorite", "amount": 10 }],
+    "produceResource": [
+        {
+            "type": "RESOURCE",
+            "id": "lime",
+            "amount": 5
+        }
+    ]
+}

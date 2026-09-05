@@ -1,0 +1,18 @@
+{
+    "templateName": "critter-7%",
+    "displayName": "{Cramped|Cramped }{Wild|Wild }{Morph} (happiness {Happiness})",
+    "thumbName": "Blowter",
+    "morphs": ["Blowter"],
+    "defaultMorph": "Blowter",
+    "meat": "fish_fillet",
+    "caloriesDropped": 1000,
+    "egg": "blowter_egg",
+    "consumeResource": [{ "type": "RESOURCE", "id": "lettuce", "amount": 400 }],
+    "produceResource": [
+        {
+            "type": "RESOURCE",
+            "id": "oxygen",
+            "amount": 15
+        }
+    ]
+}
